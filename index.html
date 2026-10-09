@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqHub</title>
+<meta name="description" content="Rozcestník mých mini aplikací">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqHub">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="ambient" aria-hidden="true"><i></i></div>
+
+<header class="topbar" id="topbar">
+  <span class="date-line" id="date"></span>
+  <span class="mini-title">ResqHub</span>
+  <a class="round-btn glass" href="admin.html" aria-label="Správa aplikací">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/>
+    </svg>
+  </a>
+</header>
+
+<section class="hero" id="hero">
+  <h1 class="wordmark">ResqHub</h1>
+  <div class="hero-meta" id="meta"></div>
+</section>
+
+<div id="recentWrap" hidden>
+  <div class="section-head">Naposledy otevřené</div>
+  <a class="recent glass" id="recent" href="#"></a>
+</div>
+
+<div class="section-head" id="allHead" hidden>Všechny aplikace</div>
+<main class="grid enter" id="grid"></main>
+
+<div class="empty glass" id="empty" hidden>
+  <strong>Zatím tu nic není</strong>
+  Přidej první aplikaci ve správě, dostane tu svou dlaždici s ikonou.
+  <br><a class="cta" href="admin.html">Přidat aplikaci</a>
+</div>
+<div class="empty glass" id="noResults" hidden>
+  <strong>Nic nenalezeno</strong>
+  Zkus jiné slovo z názvu nebo popisu.
+</div>
+
+<div class="dock" id="dock" hidden>
+  <label class="search glass">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input type="search" id="q" placeholder="Hledat aplikaci" autocomplete="off" enterkeyhint="search" aria-label="Hledat aplikaci">
+    <button type="button" class="clear" id="clear" aria-label="Vymazat hledání" hidden>
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+    </button>
+  </label>
+</div>
+
+<section class="viewer" id="viewer" aria-hidden="true">
+  <div class="viewer-bar">
+    <button class="pill-btn" id="back" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      Hub
+    </button>
+    <div class="viewer-title" id="vtitle"></div>
+  </div>
+  <iframe id="frame" title="Aplikace" allow="clipboard-write; fullscreen; geolocation; camera; microphone"></iframe>
+</section>
+
+<script src="apps.js"></script>
+<script src="common.js"></script>
+<script>
+(function () {
+  'use strict';
+  var state = RH.current();
+  var apps = state.apps;
+  var $ = function (id) { return document.getElementById(id); };
+  var grid = $('grid'), q = $('q'), viewer = $('viewer'), frame = $('frame');
+  var openedFromHub = false, closeTimer;
+  var RECENT_KEY = 'resqhub:recent';
+  var arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+
+  /* ---- Datum ---- */
+  try {
+    $('date').textContent = new Intl.DateTimeFormat('cs-CZ', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
+  } catch (e) {}
+
+  /* ---- Stavové štítky ---- */
+  function appsLabel(n) {
+    if (n === 1) return '1 aplikace';
+    if (n >= 2 && n <= 4) return n + ' aplikace';
+    return n + ' aplikací';
+  }
+  function renderMeta(offlineReady) {
+    var chips = [];
+    if (apps.length) chips.push('<span class="chip glass">' + appsLabel(apps.length) + '</span>');
+    if (state.source === 'draft') {
+      chips.push('<span class="chip glass"><span class="dot warn"></span>Nepublikovaný koncept <a href="admin.html">Publikovat</a></span>');
+    } else if (state.source === 'pending') {
+      chips.push('<span class="chip glass"><span class="dot warn"></span>Nasazuji změny</span>');
+    }
+    if (offlineReady) chips.push('<span class="chip glass"><span class="dot ok"></span>Připraveno offline</span>');
+    else if (!navigator.onLine) chips.push('<span class="chip glass"><span class="dot warn"></span>Bez připojení</span>');
+    $('meta').innerHTML = chips.join('');
+  }
+
+  /* ---- Vykreslení ---- */
+  function hrefFor(app) {
+    if (app.inFrame === false) return app.path || '#';
+    return '#/app/' + encodeURIComponent(app.id);
+  }
+  function findApp(id) { return apps.find(function (a) { return a.id === id; }); }
+
+  function renderRecent() {
+    var id = RH.sGet(RECENT_KEY), app = id && findApp(id);
+    var show = !!(app && apps.length > 3 && !q.value.trim());
+    $('recentWrap').hidden = !show;
+    $('allHead').hidden = !show;
+    if (!show) return;
+    var el = $('recent');
+    el.href = hrefFor(app); el.dataset.id = app.id;
+    el.innerHTML = RH.iconHtml(app, 'lg') +
+      '<div class="grow"><h2>' + RH.esc(app.name) + '</h2>' + (app.description ? '<p>' + RH.esc(app.description) + '</p>' : '') + '</div>' +
+      '<span class="go" aria-hidden="true">' + arrow + '</span>';
+  }
+
+  function render() {
+    var term = RH.normalize(q.value.trim());
+    var list = apps.filter(function (a) {
+      return !term || RH.normalize(a.name + ' ' + (a.description || '')).indexOf(term) !== -1;
+    });
+    grid.innerHTML = list.map(function (a, i) {
+      return '<a class="tile glass" href="' + RH.esc(hrefFor(a)) + '" data-id="' + RH.esc(a.id) + '" style="animation-delay:' + Math.min(i * 40, 360) + 'ms">' +
+        RH.iconHtml(a) +
+        '<div><h3>' + RH.esc(a.name) + '</h3>' +
+        (a.description ? '<p>' + RH.esc(a.description) + '</p>' : '') + '</div></a>';
+    }).join('');
+    $('empty').hidden = apps.length > 0;
+    $('noResults').hidden = !(apps.length && !list.length);
+    $('dock').hidden = apps.length < 5;
+    $('clear').hidden = !q.value;
+    renderRecent();
+  }
+
+  function onOpen(e) {
+    var el = e.target.closest('[data-id]');
+    if (!el) return;
+    var app = findApp(el.dataset.id);
+    if (app && !app.path) { e.preventDefault(); RH.toast('Aplikace zatím nemá nastavený soubor.'); return; }
+    if (app) RH.sSet(RECENT_KEY, app.id);
+    openedFromHub = true;
+  }
+  grid.addEventListener('click', onOpen);
+  $('recent').addEventListener('click', onOpen);
+
+  q.addEventListener('input', function () { grid.classList.remove('enter'); render(); });
+  $('clear').addEventListener('click', function () { q.value = ''; render(); q.focus(); });
+
+  /* ---- Prohlížeč aplikace ---- */
+  function openViewer(app) {
+    clearTimeout(closeTimer);
+    if (frame.dataset.path !== app.path) { frame.src = app.path; frame.dataset.path = app.path; }
+    $('vtitle').innerHTML = RH.iconHtml(app, 'sm') + '<span>' + RH.esc(app.name) + '</span>';
+    frame.title = app.name;
+    viewer.classList.add('open');
+    viewer.setAttribute('aria-hidden', 'false');
+    document.title = app.name + ' – ResqHub';
+  }
+  function closeViewer() {
+    if (!viewer.classList.contains('open')) return;
+    viewer.classList.remove('open');
+    viewer.setAttribute('aria-hidden', 'true');
+    document.title = 'ResqHub';
+    renderRecent();
+    closeTimer = setTimeout(function () { frame.src = 'about:blank'; frame.dataset.path = ''; }, 450);
+  }
+  function route() {
+    var m = location.hash.match(/^#\/app\/(.+)$/);
+    if (m) {
+      var app = findApp(decodeURIComponent(m[1]));
+      if (app && app.path) return openViewer(app);
+    }
+    closeViewer();
+  }
+  $('back').addEventListener('click', function () {
+    if (openedFromHub) { openedFromHub = false; history.back(); }
+    else { history.replaceState(null, '', location.pathname + location.search); route(); }
+  });
+  window.addEventListener('hashchange', route);
+
+  /* ---- Lišta při scrollu ---- */
+  var topbar = $('topbar'), hero = $('hero');
+  function onScroll() { topbar.classList.toggle('scrolled', window.scrollY > hero.offsetTop + 40); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  render();
+  renderMeta(false);
+  route();
+  onScroll();
+
+  RH.registerSW().then(function () {
+    RH.precache(apps.map(function (a) { return a.path; }).filter(Boolean));
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) renderMeta(true);
+  });
+})();
+</script>
+</body>
+</html>
