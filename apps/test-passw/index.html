@@ -1,185 +1,62 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ResqSpine®</title>
-    
-<link rel="apple-touch-icon" href="icon.png">
-
-    <style>
-        :root {
-            --bg: #ffffff;
-            --surface: #f2f2f7;
-            --card: #ffffff;
-            --text-main: #000000;
-            --text-muted: #6e6e73;
-            --primary: #007AFF;
-            --accent: #ff3b30;
-            --success: #4cd964;
-            --border: #d1d1d6;
-            --safe-top: env(safe-area-inset-top);
-        }
-
-        .dark-mode {
-            --bg: #000000;
-            --surface: #1c1c1e;
-            --card: #2c2c2e;
-            --text-main: #ffffff;
-            --text-muted: #a1a1a6;
-            --border: #38383a;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            padding-top: var(--safe-top);
-        }
-
-        header {
-            display: flex;
-            justify-content: center;
-            padding: 15px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .app-title { font-weight: 900; font-size: 1.4rem; letter-spacing: -0.8px; }
-        .trademark { font-size: 0.6rem; vertical-align: top; margin-left: 2px; color: var(--text-muted); }
-
-        .container {
-            flex: 1;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between; /* Tlačítko dolů, karta doprostřed */
-            align-items: center;
-        }
-
-        .question-card {
-            width: 100%;
-            max-width: 400px;
-            background: var(--card);
-            border-radius: 25px;
-            padding: 25px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            text-align: center;
-            border: 1px solid var(--border);
-            margin-top: auto; /* Vycentrování vertikálně */
-            margin-bottom: auto;
-        }
-
-        .q-text { font-size: 1.4rem; font-weight: 900; margin-bottom: 15px; }
-        .q-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 25px; display: block; line-height: 1.3; }
-
-        .btn-group { display: flex; gap: 10px; width: 100%; }
-        .btn {
-            flex: 1;
-            padding: 20px;
-            border-radius: 15px;
-            border: none;
-            font-size: 1.1rem;
-            font-weight: 800;
-            cursor: pointer;
-        }
-        .btn-yes { background: var(--accent); color: white; }
-        .btn-no { background: var(--primary); color: white; }
-
-        /* Decentní tlačítko restartu */
-        .btn-restart {
-            background: none;
-            border: none;
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 0.9rem;
-            padding: 20px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .fixate { color: var(--accent); font-size: 2.2rem; font-weight: 900; }
-        .clear { color: var(--success); font-size: 2.2rem; font-weight: 900; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Test PASSW</title>
+<style>
+:root{--bg:#E4EEEF;--ink:#0A1F23;--ink2:rgba(10,31,35,.58);--petrol:#0B6E79;--on:#fff;--glass:rgba(255,255,255,.6);--edge:rgba(255,255,255,.8);--field:rgba(10,31,35,.06);--glow:rgba(11,110,121,.45);--err:#E5383B;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#03141A;--ink:#EAF6F7;--ink2:rgba(234,246,247,.62);--petrol:#3CC0CB;--on:#03141A;--glass:rgba(255,255,255,.07);--edge:rgba(255,255,255,.13);--field:rgba(255,255,255,.08);--glow:rgba(11,110,121,.6);--err:#FF6B6E;color-scheme:dark}}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:grid;place-items:center;min-height:100vh;padding:24px 16px;
+background:radial-gradient(90% 60% at 20% 0%,var(--glow),transparent 70%),var(--bg)}
+.card{width:100%;max-width:360px;padding:30px 22px 24px;border-radius:30px;text-align:center;background:var(--glass);border:1px solid var(--edge);
+-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);box-shadow:0 20px 50px -20px rgba(0,0,0,.3)}
+.lock{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;display:grid;place-items:center;color:#fff;background:linear-gradient(150deg,#22C1C9,#0B6E79)}
+.lock svg{width:30px;height:30px}h1{margin:0;font-size:24px;letter-spacing:-.02em}p{margin:6px 0 22px;color:var(--ink2);font-size:15px}
+form{display:flex;flex-direction:column;gap:12px}
+input[type=password]{width:100%;height:50px;border:0;border-radius:16px;background:var(--field);padding:0 16px;font-size:17px;color:var(--ink);outline:none}
+input[type=password]:focus{box-shadow:0 0 0 2px var(--petrol)}
+label{display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;color:var(--ink2)}
+label input{width:18px;height:18px;accent-color:var(--petrol)}
+button{height:50px;border:0;border-radius:25px;background:var(--petrol);color:var(--on);font-size:17px;font-weight:650}
+button:disabled{opacity:.6}.err{margin:2px 0 0;color:var(--err);font-size:14px;font-weight:550}
+.shake{animation:shake .4s}@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}
+</style>
 </head>
 <body>
-
-    <header>
-        <div class="app-title">ResqSpine<span class="trademark">®</span></div>
-    </header>
-
-    <div class="container">
-        <div id="card" class="question-card">
-            </div>
-        
-        <button class="btn-restart" onclick="start()">↺ Restartovat</button>
-    </div>
-
+<main class="card" id="card">
+<div class="lock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg></div>
+<h1>Test PASSW</h1>
+<p>Aplikace je zamčená heslem.</p>
+<form id="form">
+<input type="password" id="pw" placeholder="Heslo" autocomplete="current-password" aria-label="Heslo" required>
+<label><input type="checkbox" id="remember" checked> Zapamatovat v tomto telefonu</label>
+<button type="submit" id="go">Odemknout</button>
+<div class="err" id="err" role="alert" hidden>Špatné heslo. Zkus to znovu.</div>
+</form>
+</main>
 <script>
-    const steps = {
-        start: {
-            q: "Vysoké riziko?",
-            sub: "Věk ≥ 65, pád z výšky, autonehoda (> 100 km/h), parestézie končetin.",
-            yes: "fixate",
-            no: "lowRisk"
-        },
-        lowRisk: {
-            q: "Nízké riziko?",
-            sub: "Náraz zezadu, sedící/chodící pac., opožděná bolest, BEZ citlivosti v ose páteře.",
-            yes: "rotation",
-            no: "fixate"
-        },
-        rotation: {
-            q: "Rotace hlavy 45°?",
-            sub: "Dokáže otočit hlavu vlevo i vpravo bez ohledu na bolest?",
-            yes: "clear",
-            no: "fixate"
-        },
-        fixate: {
-            isResult: true,
-            type: "fixate",
-            text: "⚠️ FIXOVAT",
-            sub: "Pacient nesplňuje kritéria pro vyřazení. Použijte imobilizaci."
-        },
-        clear: {
-            isResult: true,
-            type: "clear",
-            text: "✅ BEZ LÍMCE",
-            sub: "Nízké riziko a plná hybnost. Fixace není nutná."
-        }
-    };
-
-    function render(stepId) {
-        const step = steps[stepId];
-        const card = document.getElementById('card');
-
-        if (step.isResult) {
-            card.innerHTML = `
-                <div class="${step.type}">${step.text}</div>
-                <p class="q-sub" style="margin-top:15px;">${step.sub}</p>
-            `;
-        } else {
-            card.innerHTML = `
-                <div class="q-text">${step.q}</div>
-                <span class="q-sub">${step.sub}</span>
-                <div class="btn-group">
-                    <button class="btn btn-yes" onclick="render('${step.yes}')">ANO</button>
-                    <button class="btn btn-no" onclick="render('${step.no}')">NE</button>
-                </div>
-            `;
-        }
-    }
-
-    function start() { render('start'); }
-    start();
+(function(){
+var P={"v":1,"iter":600000,"salt":"9Xofs6NNDjukxKNo+9P13A==","iv":"928zvHzmBE0i/uRd","data":"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"},ID="test-passw",KEY="resqhub:key:"+ID;
+function u8(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+function b64(u){var s="";for(var i=0;i<u.length;i+=32768)s+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(s)}
+function render(buf){var html=new TextDecoder().decode(buf);function go(){document.open();document.write(html);document.close()}
+if(document.readyState==="complete")go();else window.addEventListener("load",go)}
+function show(k){return crypto.subtle.decrypt({name:"AES-GCM",iv:u8(P.iv)},k,u8(P.data)).then(render)}
+function fromPw(pw){return crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]).then(function(b){
+return crypto.subtle.deriveKey({name:"PBKDF2",salt:u8(P.salt),iterations:P.iter,hash:"SHA-256"},b,{name:"AES-GCM",length:256},true,["decrypt"])})}
+var saved=null;try{saved=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(saved&&saved.salt===P.salt){crypto.subtle.importKey("raw",u8(saved.k),"AES-GCM",false,["decrypt"]).then(show).catch(function(){try{localStorage.removeItem(KEY)}catch(e){}});}
+var f=document.getElementById("form"),pw=document.getElementById("pw"),go=document.getElementById("go"),err=document.getElementById("err");
+f.addEventListener("submit",function(e){e.preventDefault();err.hidden=true;go.disabled=true;go.textContent="Odemykám…";var key;
+fromPw(pw.value).then(function(k){key=k;return crypto.subtle.decrypt({name:"AES-GCM",iv:u8(P.iv)},k,u8(P.data))}).then(function(buf){
+if(document.getElementById("remember").checked){return crypto.subtle.exportKey("raw",key).then(function(raw){try{localStorage.setItem(KEY,JSON.stringify({salt:P.salt,k:b64(new Uint8Array(raw))}))}catch(e){}return buf})}return buf;
+}).then(render
+).catch(function(){go.disabled=false;go.textContent="Odemknout";err.hidden=false;pw.select();var c=document.getElementById("card");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake");});});
+})();
 </script>
 </body>
 </html>
