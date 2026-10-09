@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ResqBurns">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <title>ResqBurns®</title>
+    <style>
+        :root {
+            --bg: #f2f2f7;
+            --surface: #ffffff;
+            --primary: #003d4d;
+            --logo-color: #003d4d;
+            --accent: #007aff;
+            --text: #1c1c1e;
+            --text-sec: #8e8e93;
+            --border: #d1d1d6;
+            --shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .dark-mode {
+            --bg: #000000;
+            --surface: #1c1c1e;
+            --text: #ffffff;
+            --logo-color: #ffffff;
+            --border: #38383a;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            /* Fix pro 100% výšku na iOS */
+            height: 100dvh; 
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: fixed; 
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        header {
+            padding-top: env(safe-area-inset-top, 20px); 
+            height: auto;
+            min-height: 55px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-shrink: 0;
+            padding-bottom: 5px;
+        }
+
+        .logo { 
+            font-weight: 800; 
+            font-size: 1.1rem; 
+            letter-spacing: -0.5px; 
+            color: var(--logo-color); 
+            transition: color 0.3s ease;
+        }
+        .logo span { color: var(--text-sec); font-size: 0.6rem; vertical-align: top; margin-left: 2px; }
+
+        .theme-toggle { 
+            position: absolute; 
+            right: 15px; 
+            bottom: 8px;
+            cursor: pointer; 
+            font-size: 1.1rem; 
+            background: none;
+            border: none;
+        }
+
+        /* DASHBOARD */
+        .dashboard {
+            background: var(--surface);
+            margin: 8px;
+            padding: 12px;
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .stat { text-align: center; }
+        .stat-label { font-size: 0.6rem; font-weight: 700; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: block; }
+        .stat-val { font-size: 1.4rem; font-weight: 900; color: var(--accent); line-height: 1; }
+        .stat-unit { font-size: 0.75rem; font-weight: 600; }
+
+        .weight-input {
+            width: 55px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 3px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: center;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .view-switch {
+            margin: 2px auto;
+            background: rgba(118, 118, 128, 0.12);
+            padding: 2px;
+            border-radius: 8px;
+            display: flex;
+            width: 85%;
+            max-width: 280px;
+            flex-shrink: 0;
+        }
+
+        .switch-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 6px;
+            color: var(--text);
+        }
+
+        .switch-btn.active {
+            background: var(--surface);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .body-canvas {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            overflow: hidden;
+            min-height: 0; /* Klíčové pro správné smrštění SVG */
+        }
+
+        svg { height: 100%; width: auto; max-width: 100%; display: none; }
+        svg.active { display: block; }
+
+        .part {
+            fill: #e5e5ea;
+            stroke: #c7c7cc;
+            stroke-width: 1px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .part.selected {
+            fill: var(--accent) !important;
+            stroke: #005bbd;
+        }
+
+        .actions {
+            padding: 10px 15px calc(10px + env(safe-area-inset-bottom, 15px));
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-call { background: var(--primary); color: white; }
+        .btn-reset { background: rgba(255, 59, 48, 0.1); color: #ff3b30; padding: 10px; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--surface);
+            width: 85%;
+            max-width: 320px;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+        .btn-confirm { background: var(--accent); color: white; padding: 12px; border-radius: 10px; border: none; font-weight: 700; }
+        .btn-danger { background: #ff3b30; color: white; padding: 12px; border-radius: 10px; border: none; font-weight: 700; }
+        .btn-cancel { background: none; border: none; color: var(--text-sec); padding: 10px; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">ResqBurns<span>®</span></div>
+    <button class="theme-toggle" onclick="document.body.classList.toggle('dark-mode')">🌓</button>
+</header>
+
+<div class="dashboard">
+    <div class="stat">
+        <span class="stat-label">Plocha (BSA)</span>
+        <div class="stat-val" id="res-pct">0<span class="stat-unit">%</span></div>
+    </div>
+    <div class="stat">
+        <span class="stat-label">Váha</span>
+        <input type="number" id="weight" class="weight-input" value="80" oninput="calculate()">
+        <span class="stat-unit">kg</span>
+    </div>
+    <div class="stat">
+        <span class="stat-label">Tekutiny (1h PNP)</span>
+        <div class="stat-val" id="res-fluids">0<span class="stat-unit">ml</span></div>
+    </div>
+</div>
+
+<div class="view-switch">
+    <button id="btn-front" class="switch-btn active" onclick="switchView('front')">PŘEDNÍ</button>
+    <button id="btn-back" class="switch-btn" onclick="switchView('back')">ZADNÍ</button>
+</div>
+
+<div class="body-canvas">
+    <svg id="svg-front" class="active" viewBox="0 0 220 450">
+        <path class="part" data-pct="4.5" d="M110,20 c-15,0-25,12-25,28 s10,25,25,25 s25-10,25-25 s-10-28-25-28" />
+        <rect class="part" data-pct="9" x="75" y="80" width="70" height="60" rx="4" />
+        <rect class="part" data-pct="9" x="75" y="145" width="70" height="60" rx="4" />
+        <rect class="part" data-pct="1.5" x="48" y="85" width="22" height="40" rx="3" />
+        <rect class="part" data-pct="1.5" x="48" y="128" width="22" height="40" rx="3" />
+        <rect class="part" data-pct="1.5" x="48" y="171" width="22" height="20" rx="3" />
+        <rect class="part" data-pct="1.5" x="150" y="85" width="22" height="40" rx="3" />
+        <rect class="part" data-pct="1.5" x="150" y="128" width="22" height="40" rx="3" />
+        <rect class="part" data-pct="1.5" x="150" y="171" width="22" height="20" rx="3" />
+        <circle class="part" data-pct="1" cx="110" cy="215" r="10" />
+        <rect class="part" data-pct="3" x="75" y="235" width="32" height="70" rx="4" />
+        <rect class="part" data-pct="3" x="75" y="310" width="32" height="70" rx="4" />
+        <rect class="part" data-pct="3" x="75" y="385" width="32" height="20" rx="4" />
+        <rect class="part" data-pct="3" x="113" y="235" width="32" height="70" rx="4" />
+        <rect class="part" data-pct="3" x="113" y="310" width="32" height="70" rx="4" />
+        <rect class="part" data-pct="3" x="113" y="385" width="32" height="20" rx="4" />
+    </svg>
+    <svg id="svg-back" viewBox="0 0 220 450">
+        <path class="part" data-pct="4.5" d="M110,20 c-15,0-25,12-25,28 s10,25,25,25 s25-10,25-25 s-10-28-25-28" />
+        <rect class="part" data-pct="9" x="75" y="80" width="70" height="60" rx="4" />
+        <rect class="part" data-pct="9" x="75" y="145" width="70" height="75" rx="4" />
+        <rect class="part" data-pct="1.5" x="48" y="85" width="22" height="40" rx="3" />
+        <rect class="part" data-pct="1.5" x="48" y="128" width="22" height="40" rx="3" />
+        <rect class="part" data-pct="1.5" x="48" y="171" width="22" height="20" rx="3" />
+        <rect class="part" data-pct="1.5" x="150" y="85" width="22" height="40" rx="3" />
+        <rect class="part" data-pct="1.5" x="150" y="128" width="22" height="40" rx="3" />
+        <rect class="part" data-pct="1.5" x="150" y="171" width="22" height="20" rx="3" />
+        <rect class="part" data-pct="3" x="75" y="235" width="32" height="70" rx="4" />
+        <rect class="part" data-pct="3" x="75" y="310" width="32" height="70" rx="4" />
+        <rect class="part" data-pct="3" x="75" y="385" width="32" height="20" rx="4" />
+        <rect class="part" data-pct="3" x="113" y="235" width="32" height="70" rx="4" />
+        <rect class="part" data-pct="3" x="113" y="310" width="32" height="70" rx="4" />
+        <rect class="part" data-pct="3" x="113" y="385" width="32" height="20" rx="4" />
+    </svg>
+</div>
+
+<div class="actions">
+    <button class="btn btn-call" onclick="showModal('modal-call')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        Konzultovat s centrem
+    </button>
+    <button class="btn btn-reset" onclick="showModal('modal-reset')">RESET MAPY</button>
+</div>
+
+<div id="modal-call" class="modal-overlay">
+    <div class="modal">
+        <h3>Telefonická konzultace PC FNKV?</h3>
+        <p>BSA: <strong id="m-pct">0</strong>% | PNP 1h: <strong id="m-ml">0</strong> ml</p>
+        <div class="modal-btns">
+            <button class="btn-confirm" onclick="window.location.href='tel:+420602322184'">VYTOČIT</button>
+            <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-reset" class="modal-overlay">
+    <div class="modal">
+        <h3>Smazat vše?</h3>
+        <p>Opravdu chcete vyčistit mapu?</p>
+        <div class="modal-btns">
+            <button class="btn-danger" onclick="resetAll()">SMAZAT</button>
+            <button class="btn-cancel" onclick="closeModal()">Zpět</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPct = 0;
+    let currentMl = 0;
+
+    function init() {
+        document.querySelectorAll('.part').forEach(p => {
+            p.onclick = function() {
+                this.classList.toggle('selected');
+                calculate();
+            };
+        });
+    }
+
+    function switchView(view) {
+        document.getElementById('svg-front').classList.remove('active');
+        document.getElementById('svg-back').classList.remove('active');
+        document.getElementById('btn-front').classList.remove('active');
+        document.getElementById('btn-back').classList.remove('active');
+        document.getElementById('svg-' + view).classList.add('active');
+        document.getElementById('btn-' + view).classList.add('active');
+    }
+
+    function calculate() {
+        let total = 0;
+        document.querySelectorAll('.part.selected').forEach(p => {
+            total += parseFloat(p.getAttribute('data-pct'));
+        });
+        currentPct = total;
+        const w = document.getElementById('weight').value;
+        currentMl = Math.round(((4 * w * total) / 2) / 8);
+        document.getElementById('res-pct').innerHTML = total + '<span class="stat-unit">%</span>';
+        document.getElementById('res-fluids').innerHTML = currentMl + '<span class="stat-unit">ml</span>';
+    }
+
+    function showModal(id) {
+        document.getElementById('m-pct').innerText = currentPct;
+        document.getElementById('m-ml').innerText = currentMl;
+        document.getElementById(id).style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+    }
+
+    function resetAll() {
+        document.querySelectorAll('.part').forEach(p => p.classList.remove('selected'));
+        calculate();
+        closeModal();
+    }
+    init();
+</script>
+</body>
+</html>
