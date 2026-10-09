@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqBelly®</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqBelly">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+/* ResqBelly – diferenciální rozvaha bolesti břicha. Vzhled sladěný s ResqHubem. */
+:root {
+  --bg: #E4EEEF;
+  --ink: #0A1F23;
+  --ink-2: rgba(10, 31, 35, .6);
+  --ink-3: rgba(10, 31, 35, .34);
+  --petrol: #0B6E79;
+  --petrol-soft: rgba(11, 110, 121, .12);
+  --on-petrol: #FFFFFF;
+  --red: #D92D30;
+  --red-soft: rgba(229, 56, 59, .12);
+  --orange: #C96A0A;
+  --orange-soft: rgba(245, 154, 31, .16);
+  --region: rgba(255, 255, 255, .72);
+  --region-edge: rgba(10, 31, 35, .14);
+  --body: rgba(255, 255, 255, .38);
+  --body-edge: rgba(10, 31, 35, .12);
+  --glow-a: rgba(11, 110, 121, .5);
+  --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .58);
+  --glass-strong: rgba(250, 253, 253, .92);
+  --glass-edge: rgba(255, 255, 255, .78);
+  --glass-hi: rgba(255, 255, 255, .95);
+  --glass-shadow: rgba(6, 55, 62, .13);
+  --hairline: rgba(10, 31, 35, .1);
+  --fill: rgba(10, 31, 35, .06);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+    --red: #FF6B6E; --red-soft: rgba(255, 107, 110, .14); --orange: #FFA94D; --orange-soft: rgba(255, 169, 77, .15);
+    --region: rgba(255, 255, 255, .09); --region-edge: rgba(255, 255, 255, .16); --body: rgba(255, 255, 255, .04); --body-edge: rgba(255, 255, 255, .12);
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .94);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+  --red: #FF6B6E; --red-soft: rgba(255, 107, 110, .14); --orange: #FFA94D; --orange-soft: rgba(255, 169, 77, .15);
+  --region: rgba(255, 255, 255, .09); --region-edge: rgba(255, 255, 255, .16); --body: rgba(255, 255, 255, .04); --body-edge: rgba(255, 255, 255, .12);
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .94);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden; font-family: var(--font); font-size: 17px; line-height: 1.35; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+svg { display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
+
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%); border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -10px var(--glass-shadow); }
+
+.wrap { max-width: 640px; margin: 0 auto; padding: max(14px, env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom)); }
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 8px 4px 16px; }
+.head h1 { margin: 0; font-family: var(--font-display); font-size: 40px; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.head h1 sup { font-size: .38em; font-weight: 600; color: var(--ink-3); letter-spacing: 0; margin-left: 2px; }
+.head p { margin: 6px 0 0; color: var(--ink-2); font-size: 15px; }
+.round-btn { width: 42px; height: 42px; border-radius: 50%; flex: none; display: grid; place-items: center; color: var(--ink); }
+.round-btn svg { width: 20px; height: 20px; }
+.round-btn:active { transform: scale(.92); }
+
+/* stav peritoneálního dráždění */
+.status { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; padding: 14px 16px; border-radius: 22px; transition: background .3s, border-color .3s; }
+.status .ic { width: 40px; height: 40px; border-radius: 12px; flex: none; display: grid; place-items: center; background: var(--petrol-soft); color: var(--petrol); }
+.status .ic svg { width: 21px; height: 21px; }
+.status .lbl { font-size: 13px; font-weight: 650; color: var(--ink-2); }
+.status .msg { font-size: 17px; font-weight: 750; letter-spacing: -.01em; margin-top: 1px; }
+.status.warn { background: var(--orange-soft); border-color: color-mix(in srgb, var(--orange) 35%, transparent); }
+.status.warn .ic { background: var(--orange); color: #fff; }
+.status.warn .lbl { color: var(--orange); }
+.status.crit { background: linear-gradient(150deg, #F25C5F 0%, #C91F23 100%); border-color: transparent; color: #fff; box-shadow: 0 14px 30px -14px rgba(229, 56, 59, .8); }
+.status.crit .ic { background: rgba(255, 255, 255, .22); color: #fff; }
+.status.crit .lbl { color: rgba(255, 255, 255, .85); }
+
+/* přepínač */
+.segmented { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; margin-bottom: 14px; border-radius: 16px; background: var(--fill); }
+.segmented .thumb { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 12px; background: var(--glass-strong); box-shadow: 0 3px 10px -2px var(--glass-shadow), 0 0 0 1px var(--glass-edge); transition: transform .32s cubic-bezier(.3, .7, .3, 1); }
+.segmented[data-active="diag"] .thumb { transform: translateX(100%); }
+.segmented button { position: relative; z-index: 1; height: 40px; border: 0; background: none; border-radius: 12px; font-size: 15px; font-weight: 600; color: var(--ink-2); }
+.segmented button[aria-selected="true"] { color: var(--ink); }
+
+/* mapa břicha */
+.map-card { border-radius: 26px; padding: 12px 10px 10px; }
+.map-card svg { width: 100%; height: auto; max-height: 56vh; margin: 0 auto; }
+.torso { fill: var(--body); stroke: var(--body-edge); stroke-width: 1.5; }
+.rib { fill: none; stroke: var(--body-edge); stroke-width: 1.5; stroke-linecap: round; }
+.region { cursor: pointer; }
+.region rect { fill: var(--region); stroke: var(--region-edge); stroke-width: 1.2; transition: fill .15s, stroke .15s; }
+.region text { font-family: var(--font); font-size: 10.5px; font-weight: 650; fill: var(--ink-2); text-anchor: middle; pointer-events: none; }
+.region .cnt { font-family: var(--font-round); font-size: 10px; font-weight: 800; fill: var(--ink-3); }
+.region.on rect { fill: var(--petrol); stroke: var(--petrol); }
+.region.on text, .region.on .cnt { fill: var(--on-petrol); }
+.region:focus, .region:focus-visible { outline: none; }
+.region:focus-visible rect { stroke: var(--petrol); stroke-width: 3; }
+.region text.long { font-size: 9.5px; }
+.region.on .navel { fill: var(--on-petrol); opacity: .6; }
+.navel { fill: var(--ink-3); }
+.side { font-family: var(--font); font-size: 11px; font-weight: 700; fill: var(--ink-3); letter-spacing: .04em; }
+.map-hint { text-align: center; font-size: 13px; color: var(--ink-2); margin-top: 6px; }
+.map-actions { display: flex; justify-content: center; margin-top: 4px; }
+.text-btn { border: 0; background: none; color: var(--petrol); font-weight: 600; font-size: 15px; padding: 8px 12px; }
+
+/* seznamy */
+.section-label { margin: 18px 6px 8px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.list { border-radius: 22px; overflow: hidden; }
+.item { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 16px; border: 0; background: none; text-align: left; color: var(--ink); }
+.item + .item::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; border-top: 1px solid var(--hairline); }
+.item:active { background: var(--fill); }
+.item .grow { flex: 1; min-width: 0; }
+.item .name { font-size: 17px; font-weight: 650; letter-spacing: -.01em; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.item .pearl { font-size: 13.5px; color: var(--ink-2); margin-top: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tag { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 10px; font-size: 11.5px; font-weight: 750; letter-spacing: .01em; }
+.tag.critical { background: var(--red); color: #fff; }
+.tag.urgent { background: var(--orange-soft); color: var(--orange); }
+.chev { width: 8px; height: 14px; color: var(--ink-3); flex: none; }
+.empty { padding: 22px 20px; text-align: center; color: var(--ink-2); font-size: 15px; border-radius: 22px; }
+.empty strong { display: block; color: var(--ink); font-size: 17px; margin-bottom: 4px; }
+
+/* rozvaha */
+.checker { border-radius: 22px; padding: 6px 0; }
+.param { padding: 12px 16px 14px; }
+.param + .param { border-top: 1px solid var(--hairline); }
+.param-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; font-size: 15px; font-weight: 650; }
+.param-head small { font-size: 13px; font-weight: 500; color: var(--ink-3); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { min-height: 38px; padding: 0 13px; border-radius: 19px; border: 1px solid var(--hairline); background: var(--fill); font-size: 14.5px; font-weight: 550; color: var(--ink); transition: background .15s, color .15s, transform .1s; }
+.chip:active { transform: scale(.96); }
+.chip[aria-pressed="true"] { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
+.reset-row { display: flex; justify-content: center; padding: 8px 0 0; }
+.text-btn:disabled { color: var(--ink-3); }
+.match { display: flex; align-items: center; gap: 14px; }
+.ring { position: relative; width: 50px; height: 50px; flex: none; }
+.ring svg { width: 50px; height: 50px; transform: rotate(-90deg); }
+.ring .track { stroke: var(--fill); }
+.ring .val { stroke: var(--petrol); }
+.ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 12px; font-weight: 750; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+
+/* peritoneální dráždění */
+.flags { border-radius: 22px; overflow: hidden; }
+.flag-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 16px; border: 0; background: none; text-align: left; color: var(--ink); }
+.flag-row + .flag-row { border-top: 1px solid var(--hairline); }
+.flag-row .grow { flex: 1; font-size: 15.5px; font-weight: 600; }
+.flag-row .grow small { display: block; font-size: 13px; font-weight: 500; color: var(--ink-2); margin-top: 1px; }
+.switch { position: relative; width: 52px; height: 32px; flex: none; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
+.switch span { position: absolute; inset: 0; border-radius: 32px; background: var(--fill); box-shadow: inset 0 0 0 1px var(--hairline); transition: background .2s; }
+.switch span::after { content: ""; position: absolute; top: 2px; left: 2px; width: 28px; height: 28px; border-radius: 50%; background: #fff; box-shadow: 0 3px 8px rgba(0, 0, 0, .18); transition: transform .25s cubic-bezier(.3, .7, .4, 1); }
+.switch input:checked + span { background: var(--red); box-shadow: none; }
+.switch input:checked + span::after { transform: translateX(20px); }
+.switch input:focus-visible + span { outline: 2px solid var(--petrol); outline-offset: 2px; }
+
+/* detail */
+.detail-top { position: sticky; top: max(10px, env(safe-area-inset-top)); z-index: 10; margin-bottom: 14px; }
+.pill-btn { display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 16px 0 10px; border-radius: 20px; font-weight: 600; font-size: 16px; color: var(--ink); }
+.pill-btn svg { width: 20px; height: 20px; color: var(--petrol); }
+.hero { padding: 6px 4px 18px; }
+.hero .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.hero .loc { display: inline-flex; align-items: center; height: 26px; padding: 0 11px; border-radius: 13px; background: var(--petrol-soft); color: var(--petrol); font-size: 13.5px; font-weight: 650; }
+.hero .tag { height: 26px; padding: 0 11px; border-radius: 13px; font-size: 13px; }
+.hero h2 { margin: 12px 0 0; font-family: var(--font-display); font-size: 32px; font-weight: 800; letter-spacing: -.035em; line-height: 1.08; text-wrap: balance; }
+.key { border-radius: 22px; padding: 16px 18px; margin-bottom: 12px; color: #fff; background: linear-gradient(150deg, #16A3AE 0%, #0B6E79 55%, #074B53 100%); box-shadow: 0 14px 30px -14px rgba(11, 110, 121, .8); }
+.key h3 { margin: 0 0 6px; font-size: 14px; font-weight: 650; opacity: .82; }
+.key p { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.38; }
+.block { border-radius: 22px; padding: 16px; margin-bottom: 12px; }
+.block h3 { margin: 0 0 10px; font-size: 15px; font-weight: 650; color: var(--ink-2); }
+.dots { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.dots li { position: relative; padding-left: 20px; font-size: 16px; line-height: 1.4; }
+.dots li::before { content: ""; position: absolute; left: 3px; top: .55em; width: 7px; height: 7px; border-radius: 50%; background: var(--petrol); }
+.block p { margin: 0; font-size: 16px; line-height: 1.45; }
+.warning { border-radius: 22px; padding: 16px; margin-bottom: 12px; background: var(--red-soft); border: 1px solid color-mix(in srgb, var(--red) 30%, transparent); }
+.warning h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 15px; font-weight: 700; color: var(--red); }
+.warning h3 svg { width: 18px; height: 18px; }
+.warning p { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.45; }
+.note { margin: 16px 8px 0; font-size: 13px; color: var(--ink-3); text-align: center; line-height: 1.45; }
+
+.view-enter { animation: enter .3s cubic-bezier(.2, .8, .2, 1); }
+@keyframes enter { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+
+<div class="wrap">
+  <div id="main-view">
+    <header class="head">
+      <div>
+        <h1>ResqBelly<sup>®</sup></h1>
+        <p>Diferenciální rozvaha bolesti břicha</p>
+      </div>
+      <button class="round-btn glass" id="theme-toggle" type="button" aria-label="Přepnout světlý nebo tmavý režim">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4v16"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+      </button>
+    </header>
+
+    <div class="status glass" id="status-card" role="status">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg></span>
+      <div><div class="lbl" id="status-label">Klinický status</div><div class="msg" id="status-msg">Vyber oblast bolesti</div></div>
+    </div>
+
+    <div class="segmented" id="segmented" data-active="map" role="tablist">
+      <span class="thumb" aria-hidden="true"></span>
+      <button type="button" role="tab" id="btn-map" aria-selected="true">Mapa břicha</button>
+      <button type="button" role="tab" id="btn-diag" aria-selected="false">Rozvaha</button>
+    </div>
+
+    <!-- mapa -->
+    <section id="tab-map">
+      <div class="map-card glass">
+        <svg viewBox="0 0 300 330" id="belly-map" role="group" aria-label="Mapa břicha, pohled zepředu na pacienta">
+          <path class="torso" d="M78 8 C 70 40, 52 70, 48 110 C 44 150, 46 190, 44 230 C 42 262, 56 296, 92 318 L 208 318 C 244 296, 258 262, 256 230 C 254 190, 256 150, 252 110 C 248 70, 230 40, 222 8 Z"/>
+          <path class="rib" d="M64 66 C 100 96, 128 100, 150 70 C 172 100, 200 96, 236 66"/>
+          <path class="rib" d="M70 292 C 100 280, 120 296, 150 312 C 180 296, 200 280, 230 292"/>
+          <g id="regions"></g>
+          <text class="side" x="20" y="186" text-anchor="middle" transform="rotate(-90 20 186)">PRAVÁ</text>
+          <text class="side" x="280" y="186" text-anchor="middle" transform="rotate(90 280 186)">LEVÁ</text>
+        </svg>
+        <div class="map-hint" id="map-hint">Pohled zepředu, pravá strana pacienta je vlevo. Vybrat jde i víc oblastí.</div>
+        <div class="map-actions"><button type="button" class="text-btn" id="clear-regions" hidden>Zrušit výběr</button></div>
+      </div>
+      <div id="region-results"></div>
+    </section>
+
+    <!-- rozvaha -->
+    <section id="tab-diag" hidden>
+      <div class="checker glass" id="checker"></div>
+      <div class="reset-row"><button type="button" class="text-btn" id="reset-diag" disabled>Zrušit všechny nálezy</button></div>
+      <div id="diag-results"></div>
+    </section>
+
+    <div class="section-label">Peritoneální dráždění</div>
+    <div class="flags glass" id="flags"></div>
+    <p class="note">Orientační pomůcka. Rozhodnutí vždy podle celkového stavu pacienta a protokolu.</p>
+  </div>
+
+  <!-- detail -->
+  <div id="detail-view" hidden>
+    <div class="detail-top">
+      <button type="button" class="pill-btn glass" id="back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        <span id="back-label">Mapa</span>
+      </button>
+    </div>
+    <div class="hero">
+      <div class="tags" id="det-tags"></div>
+      <h2 id="det-title">--</h2>
+    </div>
+    <div class="key"><h3>Klíčový nález</h3><p id="det-pearl">--</p></div>
+    <div class="warning" id="det-warn-card"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3zM12 10v4M12 17.2v.1"/></svg>Pozor</h3><p id="det-warn">--</p></div>
+    <div class="block glass"><h3>Typické příznaky</h3><ul class="dots" id="det-signs"></ul></div>
+    <div class="block glass"><h3>Přednemocniční postup</h3><p id="det-prehosp">--</p></div>
+  </div>
+</div>
+
+<script>
+/* ===================== OBLASTI (pohled zepředu, pravá strana pacienta vlevo) ===================== */
+const REGIONS = ["Pravé podžebří", "Epigastrium", "Levé podžebří", "Pravý bok", "Okolí pupku", "Levý bok", "Pravé tříslo", "Podpřišek", "Levé tříslo"];
+
+/* ===================== DIAGNÓZY =====================
+   p    = klíčový nález (původní text aplikace)
+   r    = oblasti (indexy REGIONS)
+   lvl  = critical | urgent | standard
+   f    = doprovodné nálezy pro rozvahu a jejich váha (1–3)
+*/
+const DB = [
+  { id: 'chole', n: 'Akutní cholecystitida', r: [0, 1], lvl: 'urgent',
+    p: 'Murphyho příznak: Zástava dechu při palpaci pod žeberním obloukem.',
+    s: ['Bolest pod pravým žeberním obloukem, může vystřelovat pod pravou lopatku', 'Nauzea, zvracení, horečka', 'Často po tučném jídle', 'Ikterus při obstrukci žlučových cest'],
+    h: 'Analgezie, antiemetikum, i.v. vstup. Transport na chirurgii.',
+    w: 'Horečka + ikterus + zmatenost = cholangoitida, hrozí sepse.',
+    f: { fever: 2, vomit: 1, icterus: 2, shoulder: 1, alcohol: 1 } },
+  { id: 'hep', n: 'Hepatitida / Jaterní městnání', r: [0], lvl: 'standard',
+    p: 'Hmatný okraj jater, bolestivý tlak, možný ikterus.',
+    s: ['Tupá tlaková bolest pod pravým obloukem', 'Ikterus, tmavá moč, únava, nechutenství', 'Při městnání otoky dolních končetin a zvýšená náplň krčních žil'],
+    h: 'Symptomatická péče, zhodnotit oběh a známky srdečního selhání.',
+    w: 'Jaterní městnání bývá projevem pravostranného srdečního selhání.',
+    f: { icterus: 3, alcohol: 1, fever: 1 } },
+  { id: 'pneu', n: 'Basální pneumonie', r: [0, 2], lvl: 'standard',
+    p: 'Poslechově krepitus, horečka, kašel. Pozor na záměnu s NPB!',
+    s: ['Kašel, horečka, dušnost, tachypnoe', 'Bolest zhoršená dýcháním', 'Poslechově chrůpky nebo oslabené dýchání vpravo či vlevo dole'],
+    h: 'O2 podle SpO2, antipyretika, monitorace. Transport na internu.',
+    w: 'Hlavně u dětí a starších imituje náhlou příhodu břišní.',
+    f: { fever: 3, cough: 3 } },
+  { id: 'aim', n: 'Akutní infarkt myokardu (AIM)', r: [1], lvl: 'critical',
+    p: 'VŽDY EKG! Bolest může imitovat vřed. Nauzea, pocení.',
+    s: ['Tlaková nebo pálivá bolest v epigastriu', 'Pocení, nauzea, dušnost', 'Vyzařování do čelisti, levé paže nebo zad', 'U diabetiků, žen a starších často atypicky'],
+    h: '12svodové EKG co nejdříve, monitorace. Další postup podle protokolu AKS.',
+    w: 'Epigastrická bolest bez EKG je chyba. Spodní STEMI se často projeví „žaludkem“.',
+    f: { cardio: 3, vomit: 1, elderly: 1, shoulder: 1 } },
+  { id: 'ulcus', n: 'Gastroduodenální vřed', r: [1], lvl: 'urgent',
+    p: 'Anamnéza chronické bolesti, NSAID. Riziko perforace!',
+    s: ['Pálivá bolest nalačno nebo po jídle', 'NSAID, kouření, vředová anamnéza', 'Perforace: náhlá krutá bolest, prknovité břicho', 'Krvácení: hematemeza, meléna'],
+    h: 'Nic per os, i.v. vstup, analgezie. Při šoku tekutiny. Transport na chirurgii.',
+    w: 'Náhlá krutá bolest a prknovité břicho znamenají perforaci.',
+    f: { nsaid: 3, sudden: 2, shock: 1, vomit: 1 } },
+  { id: 'pank', n: 'Akutní pankreatitida', r: [1, 2], lvl: 'urgent',
+    p: 'Bolest se šíří pásovitě do zad. Často po alkoholu/tučném jídle.',
+    s: ['Krutá bolest v epigastriu, pásovitě do zad', 'Opakované zvracení bez úlevy', 'Alkohol, žlučové kameny', 'U těžké formy tachykardie a hypotenze'],
+    h: 'Analgezie (opioidy), i.v. tekutiny, nic per os, antiemetikum.',
+    w: 'Těžká forma vede k šoku a multiorgánovému selhání.',
+    f: { back: 3, alcohol: 3, vomit: 2, shock: 1 } },
+  { id: 'lien', n: 'Léze sleziny (ruptura?)', r: [2], lvl: 'critical',
+    p: 'Trauma v anamnéze. Kehrův příznak: Bolest vystřelující do l. ramene.',
+    s: ['Trauma levé poloviny hrudníku nebo břicha, i banální', 'Bolest v levém podžebří', 'Známky hemoragického šoku', 'Riziko i u zvětšené sleziny (mononukleóza)'],
+    h: 'Postup podle protokolu traumatu: zástava krvácení, permisivní hypotenze, rychlý transport do traumacentra.',
+    w: 'Dvoudobá ruptura: krvácení se může projevit až hodiny po úrazu.',
+    f: { trauma: 3, shoulder: 3, shock: 3 } },
+  { id: 'gastr', n: 'Akutní gastritida', r: [2, 1], lvl: 'standard',
+    p: 'Tlaková bolest, zvracení, dietní chyba.',
+    s: ['Tlaková nebo pálivá bolest v nadbřišku', 'Nauzea, zvracení', 'Dietní chyba, alkohol, NSAID'],
+    h: 'Symptomatická léčba, antiemetikum, tekutiny.',
+    w: 'Diagnóza vyloučením: nejdřív vylučit AIM a perforaci.',
+    f: { vomit: 2, alcohol: 2, nsaid: 2 } },
+  { id: 'colic', n: 'Renální kolika', r: [3, 5], lvl: 'standard',
+    p: 'Tapottement pozitivní na postižené straně. Bolest vystřeluje do třísla/genitálu. Kolikovitá bolest.',
+    s: ['Krutá kolikovitá bolest v boku, pacient neposedí', 'Vystřelování do třísla a genitálu', 'Hematurie, nauzea, zvracení'],
+    h: 'Analgezie podle protokolu, i.v. vstup. Při horečce myslet na infikovanou obstrukci.',
+    w: 'Starší pacient s první „renální kolikou“: vyloučit aneurysma břišní aorty!',
+    f: { colic: 3, groin: 3, urine: 2, vomit: 1, back: 1 } },
+  { id: 'pyelo', n: 'Pyelonefritida', r: [3, 5], lvl: 'urgent',
+    p: 'Horečka, schvácenost, bolest při poklepu na ledvinu.',
+    s: ['Horečka, třesavka, schvácenost', 'Bolest v boku, tapottement pozitivní', 'Dysurie, časté močení'],
+    h: 'Antipyretika, tekutiny, sledovat známky sepse (TK, vědomí, dechová frekvence).',
+    w: 'Riziko urosepse, hlavně u starších a diabetiků.',
+    f: { fever: 3, urine: 3, back: 1 } },
+  { id: 'aaa', n: 'Aneurysma břišní aorty', r: [4, 3, 5], lvl: 'critical',
+    p: 'Hmatná pulzující rezistence! Riziko náhlého vykrvácení.',
+    s: ['Bolest břicha nebo zad, může imitovat renální koliku', 'Starší muž, kuřák, hypertonik', 'Ruptura: náhlá bolest, synkopa, šok'],
+    h: 'Šetrná manipulace, 2 i.v. vstupy, permisivní hypotenze podle protokolu. Avizovat cévní chirurgii, rychlý transport.',
+    w: 'Hypotenze + bolest břicha nebo zad u staršího pacienta = AAA, dokud se neprokáže opak.',
+    f: { pulsmass: 3, back: 2, elderly: 2, shock: 3, sudden: 2 } },
+  { id: 'mesent', n: 'Mezenteriální ischémie', r: [4], lvl: 'critical',
+    p: "Příšerná bolest neodpovídající nálezu. Pacient 'vypadá hůř, než břicho'.",
+    s: ['Krutá bolest, břicho přitom měkké', 'Fibrilace síní, ateroskleróza, vyšší věk', 'Zvracení, později krvavá stolice'],
+    h: 'Analgezie, i.v. tekutiny, EKG (fibrilace síní). Rychlý transport s avizem.',
+    w: 'Měkké břicho nevylučuje katastrofu. Čas rozhoduje o přežití střeva.',
+    f: { elderly: 3, sudden: 2, vomit: 1, shock: 1 } },
+  { id: 'ileus', n: 'Ileus (střevní neprůchodnost)', r: [4], lvl: 'urgent',
+    p: 'Vzedmuté břicho, zvracení, chybí odchod větrů/stolice.',
+    s: ['Vzedmuté břicho, kolikovitá bolest', 'Zvracení, později fekulentní', 'Zástava odchodu plynů a stolice', 'Jizvy po operacích, kýly'],
+    h: 'Nic per os, i.v. tekutiny, antiemetikum, poloha proti aspiraci. Transport na chirurgii.',
+    w: 'Vysoké riziko aspirace zvratků.',
+    f: { distension: 3, nostool: 3, vomit: 2, colic: 2 } },
+  { id: 'divert', n: 'Divertikulitida', r: [5, 8], lvl: 'urgent',
+    p: 'Bolest v levé jámě kyčelní, může se šířit do boku. Hmatný infiltrát, subfebrilie.',
+    s: ['Bolest vlevo dole, někdy v levém boku', 'Horečka nebo subfebrilie', 'Změna stolice', 'Častěji u starších („levostranná apendicitida“)'],
+    h: 'Analgezie, antipyretika, tekutiny. Transport na chirurgii.',
+    w: 'Perforace se projeví difuzní peritonitidou.',
+    f: { fever: 2, elderly: 2 } },
+  { id: 'app', n: 'Akutní appendicitida', r: [6, 4], lvl: 'urgent',
+    p: 'Psoatický manévr (bolest při extenzi v kyčli), Pleniésův příznak (bolest při poklepu).',
+    s: ['Bolest začíná kolem pupku a stěhuje se doprava dolů', 'Nechutenství, nauzea, subfebrilie', 'Blumberg, Rovsing, bolestivost v McBurneyově bodě'],
+    h: 'Nic per os, analgezie (diagnózu nezastře), i.v. vstup. Transport na chirurgii.',
+    w: 'U dětí, starších a těhotných bývá průběh atypický.',
+    f: { fever: 1, vomit: 1 } },
+  { id: 'eug', n: 'Mimoděložní těhotenství', r: [6, 8, 7], lvl: 'critical',
+    p: 'Anamnéza cyklu. Náhlý pokles TK. Kritické!',
+    s: ['Žena ve fertilním věku, vynechaná menstruace', 'Náhlá jednostranná bolest v podbřišku', 'Vaginální krvácení', 'Bolest do ramene a šok při hemoperitoneu'],
+    h: 'Při šoku tekutiny a permisivní hypotenze, rychlý transport na gynekologii s avizem.',
+    w: 'U každé ženy ve fertilním věku s bolestí břicha myslet na těhotenství.',
+    f: { female: 3, sudden: 2, shock: 3, shoulder: 1 } },
+  { id: 'ovar', n: 'Ovariální torze / Cysta', r: [6, 8], lvl: 'urgent',
+    p: 'Krutá, náhlá bolest u žen. Nauzea.',
+    s: ['Náhlá krutá jednostranná bolest', 'Nauzea, zvracení', 'Žena, často mladá'],
+    h: 'Analgezie, antiemetikum, rychlý transport na gynekologii.',
+    w: 'Záchrana vaječníku je časově závislá.',
+    f: { female: 3, sudden: 3, vomit: 2 } },
+  { id: 'cyst', n: 'Cystitida / Retence moči', r: [7], lvl: 'standard',
+    p: 'Hmatný močový měchýř (globus), bolest při palpaci nad sponou.',
+    s: ['Pálení a řezání při močení, časté močení', 'Retence: nemožnost močit, hmatný globus', 'Retence hlavně u starších mužů (prostata)'],
+    h: 'Analgezie, při retenci cévkování podle kompetencí.',
+    w: 'Akutní retence u staršího pacienta může způsobit zmatenost.',
+    f: { urine: 3, elderly: 1 } },
+  { id: 'pid', n: 'Pánevní zánět (PID)', r: [7, 6, 8], lvl: 'standard',
+    p: 'Výtok, horečky, celková bolestivost podbřišku.',
+    s: ['Oboustranná bolest v podbřišku', 'Horečka, výtok', 'Žena, sexuálně aktivní'],
+    h: 'Analgezie, antipyretika. Transport na gynekologii.',
+    w: 'Vždy myslet i na mimoděložní těhotenství.',
+    f: { female: 3, fever: 2 } },
+  { id: 'hern', n: 'Inguinální kýla (uskřinutá)', r: [8, 6], lvl: 'urgent',
+    p: 'Hmatná, bolestivá, ne-reponibilní rezistence v třísle.',
+    s: ['Bolestivá nereponibilní rezistence v třísle', 'Zvracení, příznaky ileu', 'Zarudnutí kůže nad kýlou'],
+    h: 'Nereponovat násilím. Analgezie, nic per os, transport na chirurgii.',
+    w: 'Uskřinutí hrozí nekrózou střeva.',
+    f: { vomit: 1, nostool: 2, distension: 1 } }
+];
+
+/* doprovodné nálezy pro rozvahu */
+const FEATURES = [
+  { g: 'Charakter bolesti', items: [['sudden', 'Náhlý začátek'], ['colic', 'Kolikovitá'], ['back', 'Šíří se do zad'], ['shoulder', 'Šíří se do ramene'], ['groin', 'Šíří se do třísla']] },
+  { g: 'Doprovodné příznaky', items: [['vomit', 'Zvracení'], ['fever', 'Horečka'], ['icterus', 'Ikterus'], ['urine', 'Dysurie / hematurie'], ['cough', 'Kašel, dušnost'], ['nostool', 'Zástava plynů a stolice'], ['distension', 'Vzedmuté břicho']] },
+  { g: 'Oběh a nález', items: [['shock', 'Hypotenze / šok'], ['pulsmass', 'Pulzující rezistence'], ['cardio', 'Pocení, kardiální anamnéza']] },
+  { g: 'Anamnéza', items: [['trauma', 'Trauma'], ['female', 'Žena ve fertilním věku'], ['elderly', 'Věk nad 60 / FiS'], ['alcohol', 'Alkohol, tučné jídlo'], ['nsaid', 'NSAID, vředy']] }
+];
+
+const FLAGS = [
+  ['Défense musculaire', 'prknovité stažení'],
+  ['Ticho v břiše', 'auskultační ticho'],
+  ['Šokový stav', 'TK < 90, puls > 110'],
+  ['Blumberg / Rovsing pozitivní', '']
+];
+
+/* ===================== pomocné ===================== */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const CHEV = '<svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>';
+const LVL = { critical: 'Život ohrožující', urgent: 'Urgentní' };
+const LVL_ORDER = { critical: 0, urgent: 1, standard: 2 };
+const tagHtml = (lvl) => LVL[lvl] ? `<span class="tag ${lvl}">${LVL[lvl]}</span>` : '';
+const ring = (pct) => { const C = 2 * Math.PI * 21; return `<span class="ring" aria-label="Shoda ${pct} %"><svg viewBox="0 0 50 50"><circle class="track" cx="25" cy="25" r="21" fill="none" stroke-width="5"/><circle class="val" cx="25" cy="25" r="21" fill="none" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - pct / 100)).toFixed(1)}"/></svg><b>${pct}%</b></span>`; };
+
+const state = { regions: new Set(), feats: new Set(), tab: 'map', pushed: false };
+
+/* ===================== mapa ===================== */
+function buildMap() {
+  const x0 = 66, y0 = 58, w = 54, h = 66, gx = 6, gy = 6;
+  const lines = [['Pravé', 'podžebří'], ['Epigastrium', ''], ['Levé', 'podžebří'], ['Pravý', 'bok'], ['Okolí', 'pupku'], ['Levý', 'bok'], ['Pravé', 'tříslo'], ['Podpřišek', ''], ['Levé', 'tříslo']];
+  let html = '';
+  REGIONS.forEach((name, i) => {
+    const c = i % 3, r = Math.floor(i / 3);
+    const ww = c === 1 ? w + 6 : w, x = x0 + c * (w + gx) + (c === 2 ? 6 : 0), y = y0 + r * (h + gy);
+    const cx = x + ww / 2, cy = y + h / 2;
+    const count = DB.filter(d => d.r.includes(i)).length;
+    const [a, b] = lines[i];
+    html += `<g class="region" data-i="${i}" role="button" tabindex="0" aria-pressed="false" aria-label="${esc(name)}">
+      <rect x="${x}" y="${y}" width="${ww}" height="${h}" rx="14"/>
+      <text${a.length > 9 ? ' class="long"' : ''} x="${cx}" y="${b ? cy - 3 : cy + 3}">${esc(a)}</text>${b ? `<text x="${cx}" y="${cy + 10}">${esc(b)}</text>` : ''}
+      <text class="cnt" x="${cx}" y="${y + h - 8}">${count}</text>
+      ${i === 4 ? `<circle class="navel" cx="${cx}" cy="${y + 12}" r="2.5"/>` : ''}
+    </g>`;
+  });
+  $('regions').innerHTML = html;
+  const toggle = (g) => { const i = +g.dataset.i; state.regions.has(i) ? state.regions.delete(i) : state.regions.add(i); renderMapState(); renderRegionResults(); runDiag(); };
+  $('regions').addEventListener('click', (e) => { const g = e.target.closest('.region'); if (g) toggle(g); });
+  $('regions').addEventListener('keydown', (e) => { const g = e.target.closest('.region'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(g); } });
+}
+function renderMapState() {
+  document.querySelectorAll('.region').forEach(g => { const on = state.regions.has(+g.dataset.i); g.classList.toggle('on', on); g.setAttribute('aria-pressed', on); });
+  $('clear-regions').hidden = state.regions.size === 0;
+}
+function regionNames(set) { return [...set].sort((a, b) => a - b).map(i => REGIONS[i]).join(', '); }
+
+function renderRegionResults() {
+  const box = $('region-results');
+  if (!state.regions.size) { box.innerHTML = ''; return; }
+  const list = DB.filter(d => d.r.some(r => state.regions.has(r)))
+    .sort((a, b) => LVL_ORDER[a.lvl] - LVL_ORDER[b.lvl] || a.n.localeCompare(b.n, 'cs'));
+  box.innerHTML = `<div class="section-label">${esc(regionNames(state.regions))} · ${list.length} ${list.length >= 2 && list.length <= 4 ? 'diagnózy' : 'diagnóz'}</div>
+    <div class="list glass view-enter">` + list.map(d => `
+      <button type="button" class="item" data-id="${d.id}">
+        <div class="grow"><div class="name">${esc(d.n)} ${tagHtml(d.lvl)}</div><div class="pearl">${esc(d.p)}</div></div>${CHEV}
+      </button>`).join('') + '</div>';
+}
+
+/* ===================== rozvaha ===================== */
+function buildChecker() {
+  $('checker').innerHTML =
+    `<div class="param"><div class="param-head">Lokalizace<small id="loc-state">vyber na mapě nebo tady</small></div><div class="chips" id="loc-chips">` +
+    REGIONS.map((n, i) => `<button type="button" class="chip" data-region="${i}" aria-pressed="false">${esc(n)}</button>`).join('') + `</div></div>` +
+    FEATURES.map(g => `<div class="param"><div class="param-head">${esc(g.g)}</div><div class="chips">` +
+      g.items.map(([k, l]) => `<button type="button" class="chip" data-feat="${k}" aria-pressed="false">${esc(l)}</button>`).join('') + `</div></div>`).join('');
+  $('checker').addEventListener('click', (e) => {
+    const c = e.target.closest('.chip'); if (!c) return;
+    if (c.dataset.region !== undefined) { const i = +c.dataset.region; state.regions.has(i) ? state.regions.delete(i) : state.regions.add(i); renderMapState(); renderRegionResults(); }
+    else { const k = c.dataset.feat; state.feats.has(k) ? state.feats.delete(k) : state.feats.add(k); }
+    runDiag();
+  });
+}
+function syncChips() {
+  document.querySelectorAll('#checker .chip').forEach(c => {
+    const on = c.dataset.region !== undefined ? state.regions.has(+c.dataset.region) : state.feats.has(c.dataset.feat);
+    c.setAttribute('aria-pressed', on);
+  });
+  $('reset-diag').disabled = !state.regions.size && !state.feats.size;
+}
+function runDiag() {
+  syncChips();
+  const box = $('diag-results');
+  if (!state.regions.size && !state.feats.size) { box.innerHTML = ''; return; }
+  if (!state.feats.size) { box.innerHTML = '<div class="empty glass" style="margin-top:12px"><strong>Doplň nálezy</strong>Lokalizace je vybraná. Přidej charakter bolesti, příznaky nebo anamnézu a diagnózy se seřadí podle shody.</div>'; return; }
+  // lokalizace váží 3 body, každý vybraný nález 2 body (shoda 1 nebo 2 podle váhy u diagnózy)
+  const ranked = DB.map(d => {
+    let score = 0, possible = 0;
+    if (state.regions.size) { possible += 3; if (d.r.some(r => state.regions.has(r))) score += 3; }
+    state.feats.forEach(k => { possible += 2; const wgt = d.f[k] || 0; score += wgt >= 2 ? 2 : wgt; });
+    return { d, pct: possible ? Math.round(score / possible * 100) : 0 };
+  }).filter(x => x.pct > 30).sort((a, b) => b.pct - a.pct || LVL_ORDER[a.d.lvl] - LVL_ORDER[b.d.lvl]).slice(0, 5);
+  if (!ranked.length) { box.innerHTML = '<div class="empty glass" style="margin-top:12px"><strong>Nízká shoda</strong>Vybraným nálezům žádná diagnóza výrazně neodpovídá.</div>'; return; }
+  box.innerHTML = '<div class="section-label">Pravděpodobná shoda</div><div class="list glass">' + ranked.map(({ d, pct }) => `
+    <button type="button" class="item match" data-id="${d.id}">${ring(pct)}
+      <div class="grow"><div class="name">${esc(d.n)} ${tagHtml(d.lvl)}</div><div class="pearl">${esc(d.p)}</div></div>${CHEV}
+    </button>`).join('') + '</div>';
+}
+
+/* ===================== peritoneální dráždění (původní logika) ===================== */
+function buildFlags() {
+  $('flags').innerHTML = FLAGS.map(([t, s], i) => `
+    <label class="flag-row"><span class="grow">${esc(t)}${s ? `<small>${esc(s)}</small>` : ''}</span>
+      <span class="switch"><input type="checkbox" class="flag" id="flag-${i}" aria-label="${esc(t)}"><span></span></span></label>`).join('');
+  $('flags').addEventListener('change', checkFlags);
+}
+function checkFlags() {
+  const count = Array.from(document.querySelectorAll('.flag')).filter(c => c.checked).length;
+  const card = $('status-card');
+  card.classList.remove('warn', 'crit');
+  if (count >= 2) {
+    card.classList.add('crit');
+    $('status-label').innerText = 'Kritický nález / NPB';
+    $('status-msg').innerText = 'Okamžitý transport na chirurgii!';
+  } else if (count === 1) {
+    card.classList.add('warn');
+    $('status-label').innerText = 'Varování';
+    $('status-msg').innerText = 'Vysoké riziko náhlé příhody břišní.';
+  } else {
+    $('status-label').innerText = 'Klinický status';
+    $('status-msg').innerText = state.regions.size ? 'Sledujte dynamiku nálezu.' : 'Vyber oblast bolesti';
+  }
+}
+
+/* ===================== detail ===================== */
+function showDetail(id, push) {
+  const d = DB.find(x => x.id === id); if (!d) return;
+  if (push) { history.pushState({ belly: id }, ''); state.pushed = true; }
+  $('det-title').textContent = d.n;
+  $('det-tags').innerHTML = tagHtml(d.lvl) + d.r.map(r => `<span class="loc">${esc(REGIONS[r])}</span>`).join('');
+  $('det-pearl').textContent = d.p;
+  $('det-signs').innerHTML = d.s.map(x => `<li>${esc(x)}</li>`).join('');
+  $('det-prehosp').textContent = d.h;
+  $('det-warn-card').hidden = !d.w;
+  $('det-warn').textContent = d.w || '';
+  $('back-label').textContent = state.tab === 'diag' ? 'Rozvaha' : 'Mapa';
+  state.scroll = window.scrollY;
+  $('main-view').hidden = true; $('detail-view').hidden = false;
+  $('detail-view').classList.remove('view-enter'); void $('detail-view').offsetWidth; $('detail-view').classList.add('view-enter');
+  window.scrollTo(0, 0);
+}
+function hideDetail() {
+  state.pushed = false;
+  if ($('detail-view').hidden) return;
+  $('detail-view').hidden = true; $('main-view').hidden = false;
+  window.scrollTo(0, state.scroll || 0);
+}
+
+/* ===================== přepínání ===================== */
+function switchTab(tab) {
+  state.tab = tab;
+  const isMap = tab === 'map';
+  $('tab-map').hidden = !isMap; $('tab-diag').hidden = isMap;
+  $('btn-map').setAttribute('aria-selected', isMap); $('btn-diag').setAttribute('aria-selected', !isMap);
+  $('segmented').dataset.active = tab;
+}
+
+/* ===================== start ===================== */
+buildMap(); buildChecker(); buildFlags();
+$('btn-map').addEventListener('click', () => switchTab('map'));
+$('btn-diag').addEventListener('click', () => switchTab('diag'));
+$('clear-regions').addEventListener('click', () => { state.regions.clear(); renderMapState(); renderRegionResults(); runDiag(); checkFlags(); });
+$('reset-diag').addEventListener('click', () => { state.regions.clear(); state.feats.clear(); renderMapState(); renderRegionResults(); runDiag(); checkFlags(); });
+['region-results', 'diag-results'].forEach(id => $(id).addEventListener('click', (e) => { const b = e.target.closest('[data-id]'); if (b) showDetail(b.dataset.id, true); }));
+$('back').addEventListener('click', () => { if (state.pushed) history.back(); else hideDetail(); });
+window.addEventListener('popstate', (e) => { if (e.state && e.state.belly) showDetail(e.state.belly, false); else hideDetail(); });
+// po výběru oblasti aktualizovat i stavovou zprávu
+$('regions').addEventListener('click', checkFlags);
+
+const THEME_KEY = 'resqbelly:theme';
+try { const t = localStorage.getItem(THEME_KEY); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+$('theme-toggle').onclick = () => {
+  const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+};
+</script>
+</body>
+</html>
