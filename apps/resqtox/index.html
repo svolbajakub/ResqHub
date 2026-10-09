@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ResqTox®</title>
+        
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ResqPedi">
+    
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <style>
+        :root {
+            --bg: #f2f2f7;
+            --surface: #ffffff;
+            --primary: #007AFF;
+            --text-main: #1c1c1e;
+            --text-muted: #6e6e73;
+            --border: #d1d1d6;
+            --accent-red: #ff3b30;
+            --shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .dark-mode {
+            --bg: #000000;
+            --surface: #1c1c1e;
+            --text-main: #ffffff;
+            --border: #38383a;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding-bottom: 40px;
+            transition: 0.2s;
+        }
+
+        header {
+            background: var(--surface);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .app-title { font-weight: 800; font-size: 1.2rem; }
+        .mode-toggle { cursor: pointer; font-size: 1.2rem; }
+
+        .container { padding: 15px; max-width: 650px; margin: 0 auto; }
+
+        .search-wrapper { position: relative; margin-bottom: 15px; }
+        .search-input {
+            width: 100%;
+            padding: 14px 45px 14px 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+        .search-clear {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--border);
+            color: var(--surface);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+            display: none;
+        }
+
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: var(--border);
+            color: var(--text-main);
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .card {
+            background: var(--surface);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+        }
+
+        .card-header {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .tox-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; display: block; }
+
+        .symptom-list { margin: 0; padding: 0; list-style: none; }
+        .symptom-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+        .symptom-list li::before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .diag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .diag-item { margin-bottom: 12px; }
+        .diag-label { font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; display: block; }
+        .diag-select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            background: var(--bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        .match-badge {
+            float: right;
+            background: gold;
+            color: black;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 900;
+        }
+
+        .warning-card {
+            border-left: 5px solid var(--accent-red) !important;
+            background: rgba(255, 59, 48, 0.05);
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-brand">
+            <img src="icon.png" alt="ResqTox Icon" class="app-icon">
+            <div class="app-title">ResqTox® <span style="font-size: 0.7rem; opacity: 0.6;"></span></div>
+        </div>
+        <div class="mode-toggle" id="theme-toggle">🌓</div>
+    </header>
+
+    <div class="container">
+        
+        <div class="tabs">
+            <button class="tab-btn active" id="btn-search">Hledat</button>
+            <button class="tab-btn" id="btn-diag">Tox-Checker</button>
+        </div>
+
+        <div id="tab-search">
+            <div class="search-wrapper">
+                <input type="text" id="main-search" class="search-input" placeholder="Hledat (např. Lexaurin, Piko, Fridex...)">
+                <button id="clear-search" class="search-clear">✕</button>
+            </div>
+            <div id="search-results"></div>
+        </div>
+
+        <div id="tab-diag" class="hidden">
+            <div class="card">
+                <span class="card-header">Klinický nález</span>
+                <div class="diag-grid">
+                    <div class="diag-item">
+                        <label class="diag-label">Zornice</label>
+                        <select id="diag-eyes" class="diag-select diag-input">
+                            <option value="">Nezjištěno</option>
+                            <option value="miosa">Mióza (úzké)</option>
+                            <option value="mydriasa">Mydriáza (široké)</option>
+                            <option value="stredni">Střední postavení</option>
+                        </select>
+                    </div>
+                    <div class="diag-item">
+                        <label class="diag-label">Puls (TF)</label>
+                        <select id="diag-tf" class="diag-select diag-input">
+                            <option value="">Nezjištěno</option>
+                            <option value="high">Tachykardie</option>
+                            <option value="low">Bradykardie</option>
+                            <option value="norm">Normokardie</option>
+                        </select>
+                    </div>
+                    <div class="diag-item">
+                        <label class="diag-label">Dýchání (DF)</label>
+                        <select id="diag-df" class="diag-select diag-input">
+                            <option value="">Nezjištěno</option>
+                            <option value="low">Bradypnoe / Útlum</option>
+                            <option value="high">Tachypnoe</option>
+                        </select>
+                    </div>
+                    <div class="diag-item">
+                        <label class="diag-label">Kůže</label>
+                        <select id="diag-skin" class="diag-select diag-input">
+                            <option value="">Nezjištěno</option>
+                            <option value="sucha">Suchá / Horká</option>
+                            <option value="opocena">Vlhká / Orosená</option>
+                            <option value="cyan">Cyanotická (modrá)</option>
+                        </select>
+                    </div>
+                    <div class="diag-item">
+                        <label class="diag-label">Stav vědomí</label>
+                        <select id="diag-mental" class="diag-select diag-input">
+                            <option value="">Nezjištěno</option>
+                            <option value="tlum">Útlum / Kóma</option>
+                            <option value="agit">Agitace / Psychóza</option>
+                            <option value="krece">Křeče</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="tab-btn" id="reset-diag" style="width: 100%; background: var(--bg); font-size: 0.8rem;">Resetovat filtry</button>
+            </div>
+            <div id="diag-results"></div>
+        </div>
+
+        <div id="detail-view" class="hidden">
+            <div class="card" style="border-left-color: var(--text-main);">
+                <span class="card-header" id="det-toxidrom">Toxidrom</span>
+                <span class="tox-title" id="det-title">--</span>
+            </div>
+
+            <div class="card">
+                <span class="card-header">Klinické příznaky</span>
+                <ul class="symptom-list" id="det-symptoms"></ul>
+            </div>
+
+            <div class="card">
+                <span class="card-header">Terapie (Dle SPC / TIS)</span>
+                <div id="det-proc" style="margin-bottom: 15px; font-size: 0.95rem;">--</div>
+                <div style="padding: 12px; background: var(--bg); border-radius: 10px;">
+                    <span class="card-header" style="font-size: 0.6rem;">Antidotum / Specifická léčba</span>
+                    <div id="det-antidote" style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">--</div>
+                </div>
+            </div>
+
+            <div class="card warning-card" id="det-warning-card">
+                <span class="card-header" style="color: var(--accent-red);">Pozor</span>
+                <div id="det-warning" style="font-size: 0.9rem; font-weight: 600;">--</div>
+            </div>
+            
+            <button class="tab-btn" id="back-to-list" style="width: 100%; margin-top: 10px;">Zpět na vyhledávání</button>
+        </div>
+
+    </div>
+
+<script>
+/**
+ * TOXIKOLOGICKÁ DATABÁZE
+ */
+const DB = [
+    {
+        id: 'opioid',
+        title: 'Opioidy',
+        aliases: ['Heroin', 'Fentanyl', 'Morfin', 'Tramadol', 'Brau', 'Háčko'],
+        toxidrom: 'Opioidní toxidrom',
+        symptoms: ['Mióza (špendlíkovité zornice)', 'Bradypnoe (< 10/min) až apnoe', 'Porucha vědomí (somnolence - kóma)', 'Bradykardie', 'Hypotenze'],
+        proc: 'Zajištění dýchacích cest, ventilace O2. Monitoring vitálních funkcí.',
+        antidote: 'Naloxon: 0,4 mg i.v. / i.m. / i.n. Titrovat do obnovy dostatečné ventilace.',
+        warning: 'Tramadol může navíc vyvolat křeče a serotoninový syndrom. Pozor na rebound efekt u dlouhodobých látek!',
+        diag: { eyes: 'miosa', tf: 'low', df: 'low', mental: 'tlum' }
+    },
+    {
+        id: 'pervitin',
+        title: 'Stimulancia',
+        aliases: ['Metamfetamin', 'Pervitin', 'Piko', 'Peří', 'Kokain', 'MDMA', 'Koule', 'Extáze'],
+        toxidrom: 'Sympatomimetický toxidrom',
+        symptoms: ['Výrazná mydriáza', 'Tachykardie a hypertenze', 'Profúzní pocení (vlhká kůže)', 'Agitovanost, paranoidní bludy', 'Bolest na hrudi, tremor'],
+        proc: 'Fyzikální chlazení, tiché prostředí. Tekutiny i.v.',
+        antidote: 'Diazepam: 5-10 mg i.v. pomalu k tlumení sympatické aktivity a agitace.',
+        warning: 'NEPODÁVAT betablokátory! Hrozí neoponovaná alfa-stimulace a hypertenzní krize.',
+        diag: { eyes: 'mydriasa', tf: 'high', df: 'high', skin: 'opocena', mental: 'agit' }
+    },
+    {
+        id: 'benzo',
+        title: 'Benzodiazepiny',
+        aliases: ['Neurol', 'Diazepam', 'Lexaurin', 'Xanax', 'Rivotril', 'BZD'],
+        toxidrom: 'Hypnoticko-sedativní',
+        symptoms: ['Útlum CNS, ospalost', 'Ataxie, setřelá řeč', 'Střední postavení zornic / Mióza', 'Relativně stabilní oběh (pokud není s alkoholem)'],
+        proc: 'Polohování, prevence aspirace, monitoring dechu.',
+        antidote: 'Flumazenil (Anexate): 0,2 mg i.v. během 15s. Pouze při izolované intoxikaci!',
+        warning: 'NEPODÁVAT u polypragmázie (riziko křečí u TCA) a u epileptiků!',
+        diag: { eyes: 'stredni', tf: 'norm', df: 'low', mental: 'tlum' }
+    },
+    {
+        id: 'tca',
+        title: 'Tricyklická antidepresiva',
+        aliases: ['TCA', 'Dosulepin', 'Amitriptylin', 'Prothiaden'],
+        toxidrom: 'Anticholinergní / Kardiotoxický',
+        symptoms: ['Mydriáza', 'Široké QRS na EKG (>120ms)', 'Křeče', 'Hypotenze', 'Arytmie', 'Suchá a horká kůže'],
+        proc: 'Zajištění dýchacích cest, alkalizace krve (při QRS >100ms).',
+        antidote: '8,4% NaHCO3 (Hydrogenuhličitan sodný): 1-2 mmol/kg i.v. bolus.',
+        warning: 'Klíčové je sledovat EKG! Rozšíření QRS je známkou těžké toxicity a rizika zástavy.',
+        diag: { eyes: 'mydriasa', tf: 'high', skin: 'sucha', mental: 'krece' }
+    },
+    {
+        id: 'paralen',
+        title: 'Paracetamol',
+        aliases: ['Paralen', 'Panadol', 'Acetaminofen'],
+        toxidrom: 'Hepatotoxický potenciál',
+        symptoms: ['Prvních 24h: často bez příznaků / zvracení', 'Později: Bolest pod pravým žebrem, žloutenka', 'Selhání jater'],
+        proc: 'Výplach žaludku (do 1h), aktivní uhlí.',
+        antidote: 'N-acetylcystein (NAC): p.o. nebo i.v. (např. ACC Injekt). Nejlíp do 8h.',
+        warning: 'Záludné! Pacient po požití vypadá 2 dny v pořádku, zatímco probíhá nekróza jater.',
+        diag: { mental: 'tlum' }
+    },
+    {
+        id: 'nitrit',
+        title: 'Dusičnany / Dusitany',
+        aliases: ['Sodium Nitrite', 'Rychlosůl', 'Dusitan sodný'],
+        toxidrom: 'Methemoglobinémie',
+        symptoms: ['Cyanóza nereagující na O2', 'Čokoládově hnědá krev', 'Dušnost, tachykardie', 'Bolest hlavy'],
+        proc: '100% O2, monitoring. Pozor: pulsní oxymetrie ukazuje falešně ~85%!',
+        antidote: 'Methylenová modř: 1-2 mg/kg i.v. (velmi pomalu během 5 min).',
+        warning: 'Cyanóza při normálním pO2 v ABR je typický znak methemoglobinémie.',
+        diag: { skin: 'cyan', tf: 'high', df: 'high' }
+    },
+    {
+        id: 'kratom',
+        title: 'Kratom',
+        aliases: ['Mitragynin'],
+        toxidrom: 'Smíšený (Stimulační / Opioidní)',
+        symptoms: ['Nízké dávky: stimulace, tachykardie', 'Vysoké dávky: útlum dechu, mióza', 'Nauzea, zvracení', 'Při předávkování křeče'],
+        proc: 'Monitoring dechu a vědomí. Při křečích BZD.',
+        antidote: 'Naloxon (při respirační depresi), Diazepam (při křečích).',
+        warning: 'Pozor na kombinaci s alkoholem nebo BZD - násobí se respirační útlum!',
+        diag: { eyes: 'miosa', tf: 'high', mental: 'krece' }
+    },
+    {
+        id: 'hhc',
+        title: 'HHC / Kanabinoidy',
+        aliases: ['Tráva', 'Marihuana', 'Skérko', 'Fénixovy kapky'],
+        toxidrom: 'Kanabinoidní intoxikace',
+        symptoms: ['Tachykardie', 'Extrémní úzkost / panika', 'Sucho v ústech', 'Injekce spojivek (červené oči)', 'Ortostatická hypotenze'],
+        proc: 'Klidné prostředí, talk-down. Monitoring SF.',
+        antidote: 'Diazepam 5mg p.o. / i.v. pouze při nezvladatelné panice.',
+        warning: 'Účinek HHC z edibles může nastoupit velmi pozdě a trvat velmi dlouho!',
+        diag: { tf: 'high', skin: 'sucha', mental: 'agit' }
+    },
+    {
+        id: 'fridex',
+        title: 'Ethylenglykol',
+        aliases: ['Fridex', 'Nemrznoucí směs'],
+        toxidrom: 'Metabolická acidóza s anion gap',
+        symptoms: ['Působí jako opilost (bez zápachu)', 'Kussmaulovo dýchání (hluboké, zrychlené)', 'Později anurie (selhání ledvin)'],
+        proc: 'Korekce acidózy (NaHCO3), hemodialýza.',
+        antidote: 'Ethanol (udržovat 1 promile) nebo Fomepizol.',
+        warning: 'Při podezření volat TIS a zahájit léčbu ethanolem ihned.',
+        diag: { df: 'high', mental: 'tlum' }
+    }
+];
+
+/**
+ * KONFIGURACE VAH DIAGNOSTIKY
+ */
+const DIAG_WEIGHTS = {
+    eyes: 4,
+    tf: 2,
+    df: 2,
+    skin: 3,
+    mental: 2
+};
+
+/**
+ * APLIKAČNÍ LOGIKA
+ */
+const App = {
+    ui: {
+        themeToggle: document.getElementById('theme-toggle'),
+        btnSearch: document.getElementById('btn-search'),
+        btnDiag: document.getElementById('btn-diag'),
+        tabSearch: document.getElementById('tab-search'),
+        tabDiag: document.getElementById('tab-diag'),
+        mainSearch: document.getElementById('main-search'),
+        clearSearch: document.getElementById('clear-search'),
+        searchResults: document.getElementById('search-results'),
+        diagResults: document.getElementById('diag-results'),
+        detailView: document.getElementById('detail-view'),
+        resetDiag: document.getElementById('reset-diag'),
+        backToList: document.getElementById('back-to-list'),
+        detTitle: document.getElementById('det-title'),
+        detToxidrom: document.getElementById('det-toxidrom'),
+        detProc: document.getElementById('det-proc'),
+        detAntidote: document.getElementById('det-antidote'),
+        detSymptoms: document.getElementById('det-symptoms'),
+        detWarningCard: document.getElementById('det-warning-card'),
+        detWarning: document.getElementById('det-warning'),
+        diagInputs: document.querySelectorAll('.diag-input')
+    },
+
+    init() {
+        this.bindEvents();
+    },
+
+    bindEvents() {
+        this.ui.themeToggle.addEventListener('click', () => document.body.classList.toggle('dark-mode'));
+        this.ui.btnSearch.addEventListener('click', () => this.switchTab('search'));
+        this.ui.btnDiag.addEventListener('click', () => this.switchTab('diag'));
+        this.ui.mainSearch.addEventListener('input', this.debounce(() => this.handleSearch(), 250));
+        this.ui.clearSearch.addEventListener('click', () => this.resetSearch());
+        this.ui.diagInputs.forEach(input => {
+            input.addEventListener('change', () => this.runDiagnostic());
+        });
+        this.ui.resetDiag.addEventListener('click', () => this.resetDiag());
+        this.ui.backToList.addEventListener('click', () => this.switchTab('search'));
+    },
+
+    debounce(func, timeout = 300) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
+    },
+
+    switchTab(tab) {
+        const isSearch = tab === 'search';
+        this.ui.tabSearch.classList.toggle('hidden', !isSearch);
+        this.ui.tabDiag.classList.toggle('hidden', isSearch);
+        this.ui.btnSearch.classList.toggle('active', isSearch);
+        this.ui.btnDiag.classList.toggle('active', !isSearch);
+        this.ui.detailView.classList.add('hidden');
+    },
+
+    handleSearch() {
+        const query = this.ui.mainSearch.value.toLowerCase().trim();
+        this.ui.clearSearch.style.display = query.length > 0 ? 'flex' : 'none';
+
+        if (query.length < 2) {
+            this.ui.searchResults.innerHTML = '';
+            return;
+        }
+
+        const filtered = DB.filter(item => 
+            item.title.toLowerCase().includes(query) || 
+            item.aliases.some(a => a.toLowerCase().includes(query)) ||
+            item.toxidrom.toLowerCase().includes(query)
+        );
+
+        this.renderSearchResults(filtered);
+    },
+
+    renderSearchResults(items) {
+        this.ui.searchResults.innerHTML = items.map(item => `
+            <div class="card result-card" data-id="${item.id}" style="cursor:pointer">
+                <span class="card-header">${item.toxidrom}</span>
+                <span style="font-weight:700">${item.title}</span>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+                    ${item.aliases.join(', ')}
+                </div>
+            </div>
+        `).join('');
+
+        this.ui.searchResults.querySelectorAll('.result-card').forEach(card => {
+            card.addEventListener('click', () => this.showDetail(card.dataset.id));
+        });
+    },
+
+    resetSearch() {
+        this.ui.mainSearch.value = '';
+        this.handleSearch();
+    },
+
+    showDetail(id) {
+        const item = DB.find(x => x.id === id);
+        if (!item) return;
+
+        this.ui.tabSearch.classList.add('hidden');
+        this.ui.tabDiag.classList.add('hidden');
+        this.ui.detailView.classList.remove('hidden');
+
+        this.ui.detTitle.textContent = item.title;
+        this.ui.detToxidrom.textContent = item.toxidrom;
+        this.ui.detProc.textContent = item.proc;
+        this.ui.detAntidote.textContent = item.antidote;
+        this.ui.detSymptoms.innerHTML = item.symptoms.map(s => `<li>${s}</li>`).join('');
+
+        if (item.warning) {
+            this.ui.detWarningCard.style.display = 'block';
+            this.ui.detWarning.textContent = item.warning;
+        } else {
+            this.ui.detWarningCard.style.display = 'none';
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+    runDiagnostic() {
+        const inputs = {
+            eyes: document.getElementById('diag-eyes').value,
+            tf: document.getElementById('diag-tf').value,
+            df: document.getElementById('diag-df').value,
+            skin: document.getElementById('diag-skin').value,
+            mental: document.getElementById('diag-mental').value
+        };
+
+        const matches = DB.map(item => {
+            let score = 0;
+            let totalPossible = 0;
+
+            Object.keys(DIAG_WEIGHTS).forEach(key => {
+                const weight = DIAG_WEIGHTS[key];
+                if (inputs[key]) {
+                    totalPossible += weight;
+                    if (item.diag?.[key] === inputs[key]) {
+                        score += weight;
+                    }
+                }
+            });
+
+            const percentage = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
+            return { ...item, percentage };
+        })
+        .filter(item => item.percentage > 30)
+        .sort((a, b) => b.percentage - a.percentage);
+
+        this.renderDiagResults(matches);
+    },
+
+    renderDiagResults(matches) {
+        if (matches.length === 0) {
+            this.ui.diagResults.innerHTML = '<div class="card">Nízká shoda příznaků.</div>';
+            return;
+        }
+
+        const html = `
+            <span class="card-header" style="margin-left:5px">Pravděpodobná shoda</span>
+            ${matches.slice(0, 3).map(item => `
+                <div class="card diag-result-card" data-id="${item.id}" style="cursor:pointer; border-left-color: gold;">
+                    <span class="match-badge">${item.percentage}%</span>
+                    <strong>${item.title}</strong><br>
+                    <small>${item.toxidrom}</small>
+                </div>
+            `).join('')}
+        `;
+
+        this.ui.diagResults.innerHTML = html;
+
+        this.ui.diagResults.querySelectorAll('.diag-result-card').forEach(card => {
+            card.addEventListener('click', () => this.showDetail(card.dataset.id));
+        });
+    },
+
+    resetDiag() {
+        this.ui.diagInputs.forEach(input => input.value = "");
+        this.ui.diagResults.innerHTML = "";
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => App.init());
+
+</script>
+</body>
+</html>
