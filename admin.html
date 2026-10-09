@@ -109,13 +109,23 @@
     <div class="group-head"><span>Soubor aplikace</span></div>
     <div class="group glass">
       <div class="row"><label class="lbl" for="fPath">Cesta</label><input class="field" id="fPath" placeholder="apps/nazev/index.html" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+      <div class="row">
+        <div class="grow">Zamknout heslem</div>
+        <label class="switch"><input type="checkbox" id="fLocked" aria-label="Zamknout heslem"><span></span></label>
+      </div>
+      <div class="row pw-row" hidden><label class="lbl" for="fPw">Heslo</label><input class="field" id="fPw" type="password" autocomplete="new-password" placeholder="Aspoň 8 znaků"></div>
+      <div class="row pw-row" hidden><label class="lbl" for="fPw2">Znovu</label><input class="field" id="fPw2" type="password" autocomplete="new-password" placeholder="Pro kontrolu"></div>
       <button class="row action" type="button" id="uploadHtmlBtn">
         <span class="lead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M12 18v-6M9.5 14.5 12 12l2.5 2.5"/></svg></span>
-        <span class="grow">Nahrát HTML soubor na GitHub</span>
+        <span class="grow" id="uploadLabel">Nahrát HTML soubor na GitHub</span>
+      </button>
+      <button class="row action" type="button" id="forgetBtn" hidden>
+        <span class="lead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 7.5-2"/></svg></span>
+        <span class="grow">Zapomenout heslo v tomto telefonu</span>
       </button>
       <input type="file" id="htmlInput" accept=".html,.htm,text/html" hidden>
     </div>
-    <div class="group-foot">Cesta je relativní k hubu, třeba apps/kalkulacka/index.html. Aplikaci z jednoho souboru můžeš nahrát rovnou odsud.</div>
+    <div class="group-foot" id="fileFoot"></div>
 
     <div class="group-head"><span>Zobrazení</span></div>
     <div class="group glass">
@@ -135,6 +145,7 @@
 
 <script src="apps.js"></script>
 <script src="common.js"></script>
+<script src="lock.js"></script>
 <script>
 (function () {
   'use strict';
@@ -312,6 +323,10 @@
     $('fDesc').value = form.description || '';
     $('fPath').value = form.path || '';
     $('fInFrame').checked = form.inFrame !== false;
+    $('fLocked').checked = !!form.locked;
+    $('fPw').value = ''; $('fPw2').value = '';
+    $('forgetBtn').hidden = !form.locked;
+    updateLockUi();
     $('deleteGroup').hidden = idx < 0;
     $('deleteGroup').previousElementSibling.hidden = idx < 0;
     $('descCount').textContent = $('fDesc').value.length + '/90';
@@ -343,6 +358,15 @@
     form.description = $('fDesc').value.trim();
     form.path = $('fPath').value.trim().replace(/^\.?\//, '');
     form.inFrame = $('fInFrame').checked;
+    var wantLock = $('fLocked').checked;
+    var wasLock = editing >= 0 && !!apps[editing].locked;
+    var uploaded = form._uploaded;
+    if (!uploaded && wantLock !== wasLock) {
+      RH.toast(wantLock ? 'Pro zamčení zadej heslo a nahraj HTML soubor.' : 'Pro odemčení nahraj HTML soubor znovu, bez hesla.', 4000);
+      return;
+    }
+    delete form._uploaded;
+    if (uploaded ? uploaded === 'locked' : wasLock) form.locked = true; else delete form.locked;
     if (!form.id) form.id = uniqueId(RH.slugify(name));
     if (editing >= 0) apps[editing] = form; else apps.push(form);
     save();
@@ -398,23 +422,66 @@
   });
 
   /* ---- Nahrání HTML souboru přímo do repozitáře ---- */
+  function updateLockUi() {
+    var locked = $('fLocked').checked;
+    document.querySelectorAll('.pw-row').forEach(function (r) { r.hidden = !locked; });
+    $('uploadLabel').textContent = locked
+      ? (ghReady() ? 'Zašifrovat a nahrát HTML soubor' : 'Zašifrovat HTML soubor ke stažení')
+      : 'Nahrát HTML soubor na GitHub';
+    $('fileFoot').textContent = locked
+      ? 'Soubor se zašifruje přímo v telefonu ještě před nahráním. Heslo se nikam neukládá, ani do správy, ani na GitHub. Když ho zapomeneš, obsah už nepůjde otevřít.'
+      : 'Cesta je relativní k hubu, třeba apps/kalkulacka/index.html. Aplikaci z jednoho souboru můžeš nahrát rovnou odsud.';
+  }
+  $('fLocked').addEventListener('change', updateLockUi);
+
+  $('forgetBtn').addEventListener('click', function () {
+    RH_LOCK.forget(form.id);
+    RH.toast('Heslo zapomenuto, aplikace se příště zeptá znovu.');
+  });
+
   $('uploadHtmlBtn').addEventListener('click', function () {
-    if (!ghReady()) { RH.toast('Nejdřív vyplň připojení ke GitHubu dole ve správě.', 3500); return; }
+    var locked = $('fLocked').checked;
+    if (!ghReady() && !locked) { RH.toast('Nejdřív vyplň připojení ke GitHubu dole ve správě.', 3500); return; }
     if (!form.id && !$('fName').value.trim()) { RH.toast('Nejdřív vyplň název aplikace.'); $('fName').focus(); return; }
+    if (locked) {
+      if ($('fPw').value.length < 8) { RH.toast('Heslo musí mít aspoň 8 znaků.'); $('fPw').focus(); return; }
+      if ($('fPw').value !== $('fPw2').value) { RH.toast('Hesla se neshodují.'); $('fPw2').focus(); return; }
+    }
     $('htmlInput').click();
   });
+
   $('htmlInput').addEventListener('change', async function () {
     var f = this.files[0]; this.value = '';
     if (!f) return;
-    if (!form.id) form.id = uniqueId(RH.slugify($('fName').value.trim()));
+    var locked = $('fLocked').checked;
+    var name = $('fName').value.trim() || form.name || 'Aplikace';
+    if (!form.id) form.id = uniqueId(RH.slugify(name));
     var path = 'apps/' + form.id + '/index.html';
-    RH.toast('Nahrávám ' + f.name + '…', 10000);
     try {
-      var buf = new Uint8Array(await f.arrayBuffer());
-      await ghPut(path, bytesToB64(buf), 'ResqHub: aplikace ' + ($('fName').value.trim() || form.id));
+      var bytes;
+      if (locked) {
+        RH.toast('Šifruji…', 10000);
+        var payload = await RH_LOCK.encrypt(await f.text(), $('fPw').value);
+        bytes = new TextEncoder().encode(RH_LOCK.page(payload, form.id, name));
+      } else {
+        bytes = new Uint8Array(await f.arrayBuffer());
+      }
+      if (ghReady()) {
+        RH.toast('Nahrávám ' + f.name + '…', 10000);
+        await ghPut(path, bytesToB64(bytes), 'ResqHub: aplikace ' + name + (locked ? ' (zamčená)' : ''));
+        RH.toast((locked ? 'Zašifrováno a nahráno.' : 'Nahráno.') + ' Dej Uložit a pak Publikovat.', 3800);
+      } else {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([bytes], { type: 'text/html' }));
+        a.download = 'index.html';
+        document.body.appendChild(a); a.click(); a.remove();
+        RH.toast('Nahraj stažený soubor na GitHub jako ' + path, 5000);
+      }
+      form._uploaded = locked ? 'locked' : 'plain';
+      $('fPw').value = ''; $('fPw2').value = '';
       $('fPath').value = path;
+      RH_LOCK.forget(form.id);
       updatePathPlaceholder();
-      RH.toast('Nahráno. Dej Uložit a pak Publikovat.', 3500);
     } catch (e) { RH.toast(e.message || 'Nahrání se nezdařilo.', 4000); }
   });
 

@@ -83,6 +83,7 @@
   var grid = $('grid'), q = $('q'), viewer = $('viewer'), frame = null;
   var openedFromHub = false, closeTimer, historyAtOpen = 0;
   var RECENT_KEY = 'resqhub:recent';
+  var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>';
   var arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
 
   /* ---- Datum ---- */
@@ -136,7 +137,7 @@
     });
     grid.innerHTML = list.map(function (a, i) {
       return '<a class="tile glass" href="' + RH.esc(hrefFor(a)) + '" data-id="' + RH.esc(a.id) + '" style="animation-delay:' + Math.min(i * 40, 360) + 'ms">' +
-        RH.iconHtml(a) +
+        RH.iconHtml(a) + (a.locked ? '<span class="lock-badge" aria-label="Zamčeno heslem">' + LOCK + '</span>' : '') +
         '<div><h3>' + RH.esc(a.name) + '</h3>' +
         (a.description ? '<p>' + RH.esc(a.description) + '</p>' : '') + '</div></a>';
     }).join('');

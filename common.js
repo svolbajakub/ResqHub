@@ -65,7 +65,7 @@
   function iconHtml(app, size) {
     var cls = 'icon' + (size ? ' ' + size : '');
     if (app.icon) return '<span class="' + cls + '"><img src="' + esc(app.icon) + '" alt="" loading="lazy"></span>';
-    var t = tint(app.id || app.name);
+    var t = tint(app.id || slugify(app.name));
     var ch = (app.name || '?').trim().charAt(0).toUpperCase() || '?';
     return '<span class="' + cls + '" aria-hidden="true" style="background:linear-gradient(150deg,' + t[0] + ',' + t[1] + ')">' + esc(ch) + '</span>';
   }
