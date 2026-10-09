@@ -1,294 +1,346 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ResqTox®</title>
-        
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ResqPedi">
-    
-    <link rel="apple-touch-icon" href="icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqTox®</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqTox">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+/* ResqTox – vzhled sladěný s ResqHubem: sklo nad petrolejovým světlem */
+:root {
+  --bg: #E4EEEF;
+  --ink: #0A1F23;
+  --ink-2: rgba(10, 31, 35, .6);
+  --ink-3: rgba(10, 31, 35, .34);
+  --petrol: #0B6E79;
+  --petrol-soft: rgba(11, 110, 121, .12);
+  --on-petrol: #FFFFFF;
+  --glow-a: rgba(11, 110, 121, .5);
+  --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .58);
+  --glass-strong: rgba(250, 253, 253, .85);
+  --glass-edge: rgba(255, 255, 255, .78);
+  --glass-hi: rgba(255, 255, 255, .95);
+  --glass-shadow: rgba(6, 55, 62, .13);
+  --hairline: rgba(10, 31, 35, .1);
+  --fill: rgba(10, 31, 35, .06);
+  --danger: #D92D30;
+  --danger-soft: rgba(229, 56, 59, .1);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .9);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    --danger: #FF6B6E; --danger-soft: rgba(255, 107, 110, .12);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .9);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  --danger: #FF6B6E; --danger-soft: rgba(255, 107, 110, .12);
+  color-scheme: dark;
+}
 
-    <style>
-        :root {
-            --bg: #f2f2f7;
-            --surface: #ffffff;
-            --primary: #007AFF;
-            --text-main: #1c1c1e;
-            --text-muted: #6e6e73;
-            --border: #d1d1d6;
-            --accent-red: #ff3b30;
-            --shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body {
+  position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden;
+  font-family: var(--font); font-size: 17px; line-height: 1.35;
+  -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+svg { display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
 
-        .dark-mode {
-            --bg: #000000;
-            --surface: #1c1c1e;
-            --text-main: #ffffff;
-            --border: #38383a;
-        }
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%);
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -10px var(--glass-shadow);
+}
 
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            padding-bottom: 40px;
-            transition: 0.2s;
-        }
+.wrap {
+  max-width: 640px; margin: 0 auto;
+  padding: max(14px, env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+}
 
-        header {
-            background: var(--surface);
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+/* ---------- Hlavička ---------- */
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 8px 4px 18px; }
+.head h1 {
+  margin: 0; font-family: var(--font-display); font-size: 40px; font-weight: 800; letter-spacing: -.04em; line-height: 1;
+}
+.head h1 sup { font-size: .38em; font-weight: 600; color: var(--ink-3); letter-spacing: 0; margin-left: 2px; }
+.head p { margin: 6px 0 0; color: var(--ink-2); font-size: 15px; }
+.round-btn {
+  width: 42px; height: 42px; border-radius: 50%; flex: none; display: grid; place-items: center; color: var(--ink);
+}
+.round-btn svg { width: 20px; height: 20px; }
+.round-btn:active { transform: scale(.92); }
 
-        .header-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+/* ---------- Přepínač sekcí (segmented control) ---------- */
+.segmented {
+  position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; margin-bottom: 16px;
+  border-radius: 16px; background: var(--fill);
+}
+.segmented .thumb {
+  position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 12px;
+  background: var(--glass-strong); box-shadow: 0 3px 10px -2px var(--glass-shadow), 0 0 0 1px var(--glass-edge);
+  transition: transform .32s cubic-bezier(.3, .7, .3, 1);
+}
+.segmented[data-active="diag"] .thumb { transform: translateX(100%); }
+.segmented button {
+  position: relative; z-index: 1; height: 40px; border: 0; background: none; border-radius: 12px;
+  font-size: 15px; font-weight: 600; color: var(--ink-2); transition: color .2s;
+}
+.segmented button[aria-selected="true"] { color: var(--ink); }
 
-        .app-icon {
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
-            border-radius: 6px;
-        }
+/* ---------- Hledání ---------- */
+.search {
+  position: relative; display: flex; align-items: center; gap: 8px; height: 50px; padding: 0 14px; margin-bottom: 14px;
+  border-radius: 18px;
+}
+.search > svg { width: 20px; height: 20px; color: var(--ink-2); flex: none; }
+.search input {
+  flex: 1; min-width: 0; height: 100%; border: 0; background: none; outline: none; font-size: 17px;
+  -webkit-appearance: none; appearance: none;
+}
+.search input::placeholder { color: var(--ink-2); }
+.search input::-webkit-search-cancel-button { display: none; }
+.clear-btn { width: 26px; height: 26px; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--fill); color: var(--ink-2); flex: none; }
+.clear-btn svg { width: 11px; height: 11px; }
 
-        .app-title { font-weight: 800; font-size: 1.2rem; }
-        .mode-toggle { cursor: pointer; font-size: 1.2rem; }
+.section-label { margin: 18px 6px 8px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
 
-        .container { padding: 15px; max-width: 650px; margin: 0 auto; }
+/* ---------- Seznam ---------- */
+.list { border-radius: 22px; overflow: hidden; }
+.item {
+  position: relative; display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 13px 16px; border: 0; background: none; text-align: left; color: var(--ink);
+}
+.item + .item::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; border-top: 1px solid var(--hairline); }
+.item:active { background: var(--fill); }
+.item .grow { flex: 1; min-width: 0; }
+.item .kind { font-size: 13px; font-weight: 600; color: var(--petrol); }
+.item .name { font-size: 17px; font-weight: 650; letter-spacing: -.01em; margin-top: 1px; }
+.item .aliases { font-size: 13.5px; color: var(--ink-2); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item .aliases mark { background: var(--petrol-soft); color: var(--ink); border-radius: 4px; padding: 0 2px; }
+.chev { width: 8px; height: 14px; color: var(--ink-3); flex: none; }
 
-        .search-wrapper { position: relative; margin-bottom: 15px; }
-        .search-input {
-            width: 100%;
-            padding: 14px 45px 14px 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text-main);
-            font-size: 1rem;
-        }
-        .search-clear {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--border);
-            color: var(--surface);
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            cursor: pointer;
-            border: none;
-            font-weight: bold;
-            display: none;
-        }
+.empty { padding: 26px 20px; text-align: center; color: var(--ink-2); font-size: 15px; border-radius: 22px; }
+.empty strong { display: block; color: var(--ink); font-size: 17px; margin-bottom: 4px; }
 
-        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 12px;
-            border: none;
-            background: var(--border);
-            color: var(--text-main);
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .tab-btn.active { background: var(--primary); color: white; }
+/* ---------- Tox-Checker ---------- */
+.checker { border-radius: 22px; padding: 6px 0; }
+.param { padding: 12px 16px 14px; }
+.param + .param { border-top: 1px solid var(--hairline); }
+.param-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; }
+.param-head span { font-size: 15px; font-weight: 650; }
+.param-head small { font-size: 13px; color: var(--ink-3); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  min-height: 38px; padding: 0 14px; border-radius: 19px; border: 1px solid var(--hairline);
+  background: var(--fill); font-size: 15px; font-weight: 550; color: var(--ink);
+  transition: background .15s, color .15s, border-color .15s, transform .1s;
+}
+.chip:active { transform: scale(.96); }
+.chip[aria-pressed="true"] { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
+.reset-row { display: flex; justify-content: center; padding: 8px 0 4px; }
+.text-btn { border: 0; background: none; color: var(--petrol); font-weight: 600; font-size: 15px; padding: 8px 12px; }
+.text-btn:disabled { color: var(--ink-3); }
 
-        .card {
-            background: var(--surface);
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            border-left: 5px solid var(--primary);
-        }
+.match { display: flex; align-items: center; gap: 14px; }
+.ring { position: relative; width: 50px; height: 50px; flex: none; }
+.ring svg { width: 50px; height: 50px; transform: rotate(-90deg); }
+.ring .track { stroke: var(--fill); }
+.ring .val { stroke: var(--petrol); transition: stroke-dashoffset .5s cubic-bezier(.3, .7, .3, 1); }
+.ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 12px; letter-spacing: -.02em; font-weight: 750; font-variant-numeric: tabular-nums; }
 
-        .card-header {
-            font-size: 0.7rem;
-            font-weight: 800;
-            color: var(--primary);
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
+/* plovoucí lišta s nejlepší shodou */
+.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 0 16px calc(14px + env(safe-area-inset-bottom)); pointer-events: none; display: flex; justify-content: center; }
+.dock-btn {
+  pointer-events: auto; width: 100%; max-width: 520px; display: flex; align-items: center; gap: 12px;
+  padding: 8px 16px 8px 8px; border-radius: 28px; background: var(--glass-strong); text-align: left; color: var(--ink);
+  animation: enter .3s cubic-bezier(.2, .8, .2, 1);
+}
+.dock-btn .ring, .dock-btn .ring svg { width: 44px; height: 44px; }
+.dock-btn .ring b { font-size: 10.5px; letter-spacing: -.03em; }
+.dock-btn .grow { flex: 1; min-width: 0; }
+.dock-btn .name { font-weight: 700; font-size: 16px; }
+.dock-btn .more { font-size: 13px; color: var(--ink-2); }
+.dock-btn > svg { width: 18px; height: 18px; color: var(--petrol); flex: none; }
+#tab-diag { padding-bottom: 76px; }
 
-        .tox-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; display: block; }
+/* ---------- Detail ---------- */
+.detail-top { position: sticky; top: max(10px, env(safe-area-inset-top)); z-index: 10; margin-bottom: 14px; }
+.pill-btn {
+  display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 16px 0 10px; border-radius: 20px;
+  font-weight: 600; font-size: 16px; color: var(--ink);
+}
+.pill-btn svg { width: 20px; height: 20px; color: var(--petrol); }
+.pill-btn:active { transform: scale(.95); }
 
-        .symptom-list { margin: 0; padding: 0; list-style: none; }
-        .symptom-list li {
-            position: relative;
-            padding-left: 20px;
-            margin-bottom: 6px;
-            font-size: 0.95rem;
-        }
-        .symptom-list li::before {
-            content: "•";
-            color: var(--primary);
-            font-weight: bold;
-            position: absolute;
-            left: 0;
-        }
+.hero { padding: 6px 4px 18px; }
+.hero .kind { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 14px; background: var(--petrol-soft); color: var(--petrol); font-size: 14px; font-weight: 650; }
+.hero h2 { margin: 12px 0 0; font-family: var(--font-display); font-size: 34px; font-weight: 800; letter-spacing: -.035em; line-height: 1.05; text-wrap: balance; }
+.hero .aliases { margin: 8px 0 0; color: var(--ink-2); font-size: 15px; }
 
-        .diag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .diag-item { margin-bottom: 12px; }
-        .diag-label { font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; display: block; }
-        .diag-select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 10px;
-            background: var(--bg);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            font-size: 0.9rem;
-        }
+.block { border-radius: 22px; padding: 16px; margin-bottom: 12px; }
+.block h3 { margin: 0 0 10px; font-size: 15px; font-weight: 650; color: var(--ink-2); }
+.symptoms { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.symptoms li { position: relative; padding-left: 20px; font-size: 16px; line-height: 1.4; }
+.symptoms li::before { content: ""; position: absolute; left: 3px; top: .55em; width: 7px; height: 7px; border-radius: 50%; background: var(--petrol); }
+.proc { margin: 0; font-size: 16px; line-height: 1.45; }
 
-        .match-badge {
-            float: right;
-            background: gold;
-            color: black;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 900;
-        }
+.antidote {
+  border-radius: 22px; padding: 16px 18px; margin-bottom: 12px; color: #fff;
+  background: linear-gradient(150deg, #16A3AE 0%, #0B6E79 55%, #074B53 100%);
+  box-shadow: 0 14px 30px -14px rgba(11, 110, 121, .8);
+}
+.antidote h3 { margin: 0 0 6px; font-size: 14px; font-weight: 650; opacity: .82; }
+.antidote p { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.35; letter-spacing: -.01em; }
 
-        .warning-card {
-            border-left: 5px solid var(--accent-red) !important;
-            background: rgba(255, 59, 48, 0.05);
-        }
+.warning { border-radius: 22px; padding: 16px; margin-bottom: 12px; background: var(--danger-soft); border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent); }
+.warning h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 15px; font-weight: 700; color: var(--danger); }
+.warning h3 svg { width: 18px; height: 18px; }
+.warning p { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.45; }
 
-        .hidden { display: none; }
-    </style>
+/* ---------- TIS ---------- */
+.tis { display: flex; align-items: center; gap: 14px; margin-top: 22px; padding: 14px 16px; border-radius: 22px; }
+.tis .ic { width: 40px; height: 40px; border-radius: 12px; flex: none; display: grid; place-items: center; background: var(--petrol-soft); color: var(--petrol); }
+.tis .ic svg { width: 20px; height: 20px; }
+.tis .grow { flex: 1; min-width: 0; }
+.tis .t { font-size: 15px; font-weight: 650; }
+.tis .nums { font-size: 15px; color: var(--ink-2); margin-top: 2px; font-variant-numeric: tabular-nums; -webkit-user-select: text; user-select: text; }
+.tis a { color: var(--petrol); text-decoration: none; font-weight: 650; }
+.note { margin: 12px 8px 0; font-size: 13px; color: var(--ink-3); text-align: center; line-height: 1.45; }
+
+.view-enter { animation: enter .3s cubic-bezier(.2, .8, .2, 1); }
+@keyframes enter { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } }
+</style>
 </head>
 <body>
+<div class="ambient" aria-hidden="true"></div>
 
-    <header>
-        <div class="header-brand">
-            <img src="icon.png" alt="ResqTox Icon" class="app-icon">
-            <div class="app-title">ResqTox® <span style="font-size: 0.7rem; opacity: 0.6;"></span></div>
-        </div>
-        <div class="mode-toggle" id="theme-toggle">🌓</div>
+<div class="wrap">
+
+  <!-- ===== Seznam / Tox-Checker ===== -->
+  <div id="main-view">
+    <header class="head">
+      <div>
+        <h1>ResqTox<sup>®</sup></h1>
+        <p>Toxikologie pro přednemocniční péči</p>
+      </div>
+      <button class="round-btn glass" id="theme-toggle" type="button" aria-label="Přepnout světlý nebo tmavý režim">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+      </button>
     </header>
 
-    <div class="container">
-        
-        <div class="tabs">
-            <button class="tab-btn active" id="btn-search">Hledat</button>
-            <button class="tab-btn" id="btn-diag">Tox-Checker</button>
-        </div>
-
-        <div id="tab-search">
-            <div class="search-wrapper">
-                <input type="text" id="main-search" class="search-input" placeholder="Hledat (např. Lexaurin, Piko, Fridex...)">
-                <button id="clear-search" class="search-clear">✕</button>
-            </div>
-            <div id="search-results"></div>
-        </div>
-
-        <div id="tab-diag" class="hidden">
-            <div class="card">
-                <span class="card-header">Klinický nález</span>
-                <div class="diag-grid">
-                    <div class="diag-item">
-                        <label class="diag-label">Zornice</label>
-                        <select id="diag-eyes" class="diag-select diag-input">
-                            <option value="">Nezjištěno</option>
-                            <option value="miosa">Mióza (úzké)</option>
-                            <option value="mydriasa">Mydriáza (široké)</option>
-                            <option value="stredni">Střední postavení</option>
-                        </select>
-                    </div>
-                    <div class="diag-item">
-                        <label class="diag-label">Puls (TF)</label>
-                        <select id="diag-tf" class="diag-select diag-input">
-                            <option value="">Nezjištěno</option>
-                            <option value="high">Tachykardie</option>
-                            <option value="low">Bradykardie</option>
-                            <option value="norm">Normokardie</option>
-                        </select>
-                    </div>
-                    <div class="diag-item">
-                        <label class="diag-label">Dýchání (DF)</label>
-                        <select id="diag-df" class="diag-select diag-input">
-                            <option value="">Nezjištěno</option>
-                            <option value="low">Bradypnoe / Útlum</option>
-                            <option value="high">Tachypnoe</option>
-                        </select>
-                    </div>
-                    <div class="diag-item">
-                        <label class="diag-label">Kůže</label>
-                        <select id="diag-skin" class="diag-select diag-input">
-                            <option value="">Nezjištěno</option>
-                            <option value="sucha">Suchá / Horká</option>
-                            <option value="opocena">Vlhká / Orosená</option>
-                            <option value="cyan">Cyanotická (modrá)</option>
-                        </select>
-                    </div>
-                    <div class="diag-item">
-                        <label class="diag-label">Stav vědomí</label>
-                        <select id="diag-mental" class="diag-select diag-input">
-                            <option value="">Nezjištěno</option>
-                            <option value="tlum">Útlum / Kóma</option>
-                            <option value="agit">Agitace / Psychóza</option>
-                            <option value="krece">Křeče</option>
-                        </select>
-                    </div>
-                </div>
-                <button class="tab-btn" id="reset-diag" style="width: 100%; background: var(--bg); font-size: 0.8rem;">Resetovat filtry</button>
-            </div>
-            <div id="diag-results"></div>
-        </div>
-
-        <div id="detail-view" class="hidden">
-            <div class="card" style="border-left-color: var(--text-main);">
-                <span class="card-header" id="det-toxidrom">Toxidrom</span>
-                <span class="tox-title" id="det-title">--</span>
-            </div>
-
-            <div class="card">
-                <span class="card-header">Klinické příznaky</span>
-                <ul class="symptom-list" id="det-symptoms"></ul>
-            </div>
-
-            <div class="card">
-                <span class="card-header">Terapie (Dle SPC / TIS)</span>
-                <div id="det-proc" style="margin-bottom: 15px; font-size: 0.95rem;">--</div>
-                <div style="padding: 12px; background: var(--bg); border-radius: 10px;">
-                    <span class="card-header" style="font-size: 0.6rem;">Antidotum / Specifická léčba</span>
-                    <div id="det-antidote" style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">--</div>
-                </div>
-            </div>
-
-            <div class="card warning-card" id="det-warning-card">
-                <span class="card-header" style="color: var(--accent-red);">Pozor</span>
-                <div id="det-warning" style="font-size: 0.9rem; font-weight: 600;">--</div>
-            </div>
-            
-            <button class="tab-btn" id="back-to-list" style="width: 100%; margin-top: 10px;">Zpět na vyhledávání</button>
-        </div>
-
+    <div class="segmented" id="segmented" data-active="search" role="tablist">
+      <span class="thumb" aria-hidden="true"></span>
+      <button type="button" role="tab" id="btn-search" aria-selected="true" aria-controls="tab-search">Hledat</button>
+      <button type="button" role="tab" id="btn-diag" aria-selected="false" aria-controls="tab-diag">Tox-Checker</button>
     </div>
+
+    <section id="tab-search" role="tabpanel">
+      <label class="search glass">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="main-search" placeholder="Látka, lék nebo slang" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="Hledat látku">
+        <button type="button" id="clear-search" class="clear-btn" aria-label="Vymazat hledání" hidden>
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+        </button>
+      </label>
+      <div class="section-label" id="search-label"></div>
+      <div id="search-results"></div>
+    </section>
+
+    <section id="tab-diag" role="tabpanel" hidden>
+      <div class="checker glass" id="checker"></div>
+      <div class="reset-row"><button type="button" class="text-btn" id="reset-diag" disabled>Resetovat nálezy</button></div>
+      <div id="diag-results"></div>
+    </section>
+
+    <div class="tis glass">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span>
+      <div class="grow">
+        <div class="t">TIS – Toxikologické informační středisko</div>
+        <div class="nums"><a href="tel:+420224919293">224 919 293</a> · <a href="tel:+420224915402">224 915 402</a> · nonstop</div>
+      </div>
+    </div>
+    <p class="note">Orientační pomůcka. Dávkování a postup vždy ověř podle platných protokolů a s TIS.</p>
+  </div>
+
+  <div class="dock" id="diag-dock" hidden><button type="button" class="dock-btn glass" id="dock-btn"></button></div>
+
+  <!-- ===== Detail látky ===== -->
+  <div id="detail-view" hidden>
+    <div class="detail-top">
+      <button type="button" class="pill-btn glass" id="back-to-list">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        <span id="back-label">Hledat</span>
+      </button>
+    </div>
+
+    <div class="hero">
+      <span class="kind" id="det-toxidrom">Toxidrom</span>
+      <h2 id="det-title">--</h2>
+      <p class="aliases" id="det-aliases"></p>
+    </div>
+
+    <div class="antidote">
+      <h3>Antidotum / specifická léčba</h3>
+      <p id="det-antidote">--</p>
+    </div>
+
+    <div class="warning" id="det-warning-card">
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3zM12 10v4M12 17.2v.1"/></svg>Pozor</h3>
+      <p id="det-warning">--</p>
+    </div>
+
+    <div class="block glass">
+      <h3>Klinické příznaky</h3>
+      <ul class="symptoms" id="det-symptoms"></ul>
+    </div>
+
+    <div class="block glass">
+      <h3>Terapie (dle SPC / TIS)</h3>
+      <p class="proc" id="det-proc">--</p>
+    </div>
+
+    <div class="tis glass">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span>
+      <div class="grow">
+        <div class="t">Konzultace s TIS</div>
+        <div class="nums"><a href="tel:+420224919293">224 919 293</a> · <a href="tel:+420224915402">224 915 402</a></div>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 <script>
 /**
@@ -408,47 +460,85 @@ const DIAG_WEIGHTS = {
 };
 
 /**
+ * NÁLEZY PRO TOX-CHECKER (stejné hodnoty jako původní výběry)
+ */
+const DIAG_PARAMS = [
+    { key: 'eyes',   label: 'Zornice',     options: [['miosa', 'Mióza (úzké)'], ['mydriasa', 'Mydriáza (široké)'], ['stredni', 'Střední postavení']] },
+    { key: 'tf',     label: 'Puls (TF)',   options: [['high', 'Tachykardie'], ['low', 'Bradykardie'], ['norm', 'Normokardie']] },
+    { key: 'df',     label: 'Dýchání (DF)', options: [['low', 'Bradypnoe / útlum'], ['high', 'Tachypnoe']] },
+    { key: 'skin',   label: 'Kůže',        options: [['sucha', 'Suchá / horká'], ['opocena', 'Vlhká / orosená'], ['cyan', 'Cyanotická']] },
+    { key: 'mental', label: 'Stav vědomí', options: [['tlum', 'Útlum / kóma'], ['agit', 'Agitace / psychóza'], ['krece', 'Křeče']] }
+];
+
+/**
  * APLIKAČNÍ LOGIKA
  */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const CHEV = '<svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>';
+const THEME_KEY = 'resqtox:theme';
+
 const App = {
-    ui: {
-        themeToggle: document.getElementById('theme-toggle'),
-        btnSearch: document.getElementById('btn-search'),
-        btnDiag: document.getElementById('btn-diag'),
-        tabSearch: document.getElementById('tab-search'),
-        tabDiag: document.getElementById('tab-diag'),
-        mainSearch: document.getElementById('main-search'),
-        clearSearch: document.getElementById('clear-search'),
-        searchResults: document.getElementById('search-results'),
-        diagResults: document.getElementById('diag-results'),
-        detailView: document.getElementById('detail-view'),
-        resetDiag: document.getElementById('reset-diag'),
-        backToList: document.getElementById('back-to-list'),
-        detTitle: document.getElementById('det-title'),
-        detToxidrom: document.getElementById('det-toxidrom'),
-        detProc: document.getElementById('det-proc'),
-        detAntidote: document.getElementById('det-antidote'),
-        detSymptoms: document.getElementById('det-symptoms'),
-        detWarningCard: document.getElementById('det-warning-card'),
-        detWarning: document.getElementById('det-warning'),
-        diagInputs: document.querySelectorAll('.diag-input')
-    },
+    tab: 'search',
+    diag: { eyes: '', tf: '', df: '', skin: '', mental: '' },
+    detailPushed: false,
 
     init() {
+        this.applyTheme();
+        this.buildChecker();
         this.bindEvents();
+        this.handleSearch();
+        if (history.state && history.state.tox) this.showDetail(history.state.tox, false);
+    },
+
+    /* ---- Motiv: automaticky podle telefonu, tlačítkem lze přepnout ---- */
+    applyTheme() {
+        let saved = null;
+        try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+        if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+    },
+    toggleTheme() {
+        const current = document.documentElement.dataset.theme ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
     },
 
     bindEvents() {
-        this.ui.themeToggle.addEventListener('click', () => document.body.classList.toggle('dark-mode'));
-        this.ui.btnSearch.addEventListener('click', () => this.switchTab('search'));
-        this.ui.btnDiag.addEventListener('click', () => this.switchTab('diag'));
-        this.ui.mainSearch.addEventListener('input', this.debounce(() => this.handleSearch(), 250));
-        this.ui.clearSearch.addEventListener('click', () => this.resetSearch());
-        this.ui.diagInputs.forEach(input => {
-            input.addEventListener('change', () => this.runDiagnostic());
+        $('theme-toggle').addEventListener('click', () => this.toggleTheme());
+        $('btn-search').addEventListener('click', () => this.switchTab('search'));
+        $('btn-diag').addEventListener('click', () => this.switchTab('diag'));
+        $('main-search').addEventListener('input', this.debounce(() => this.handleSearch(), 120));
+        $('clear-search').addEventListener('click', () => this.resetSearch());
+        $('checker').addEventListener('click', (e) => {
+            const chip = e.target.closest('.chip');
+            if (!chip) return;
+            const key = chip.dataset.key, val = chip.dataset.val;
+            this.diag[key] = this.diag[key] === val ? '' : val;   // druhé klepnutí výběr zruší
+            this.syncChips();
+            this.runDiagnostic();
         });
-        this.ui.resetDiag.addEventListener('click', () => this.resetDiag());
-        this.ui.backToList.addEventListener('click', () => this.switchTab('search'));
+        $('reset-diag').addEventListener('click', () => this.resetDiag());
+        $('dock-btn').addEventListener('click', () => {
+            $('diag-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        if ('IntersectionObserver' in window) {
+            new IntersectionObserver((entries) => {
+                this.resultsVisible = entries[0].isIntersecting;
+                this.updateDock();
+            }).observe($('diag-results'));
+        }
+        $('search-results').addEventListener('click', (e) => this.openFrom(e));
+        $('diag-results').addEventListener('click', (e) => this.openFrom(e));
+        $('back-to-list').addEventListener('click', () => {
+            if (this.detailPushed) history.back(); else this.hideDetail();
+        });
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.tox) this.showDetail(e.state.tox, false);
+            else this.hideDetail();
+        });
     },
 
     debounce(func, timeout = 300) {
@@ -460,85 +550,139 @@ const App = {
     },
 
     switchTab(tab) {
+        this.tab = tab;
         const isSearch = tab === 'search';
-        this.ui.tabSearch.classList.toggle('hidden', !isSearch);
-        this.ui.tabDiag.classList.toggle('hidden', isSearch);
-        this.ui.btnSearch.classList.toggle('active', isSearch);
-        this.ui.btnDiag.classList.toggle('active', !isSearch);
-        this.ui.detailView.classList.add('hidden');
+        $('tab-search').hidden = !isSearch;
+        $('tab-diag').hidden = isSearch;
+        $('btn-search').setAttribute('aria-selected', isSearch);
+        $('btn-diag').setAttribute('aria-selected', !isSearch);
+        $('segmented').dataset.active = tab;
+        this.updateDock();
     },
 
-    handleSearch() {
-        const query = this.ui.mainSearch.value.toLowerCase().trim();
-        this.ui.clearSearch.style.display = query.length > 0 ? 'flex' : 'none';
+    ring(pct, size) {
+        const C = 2 * Math.PI * 21;
+        return `<span class="ring" aria-label="Shoda ${pct} %"><svg viewBox="0 0 50 50">
+            <circle class="track" cx="25" cy="25" r="21" fill="none" stroke-width="5"/>
+            <circle class="val" cx="25" cy="25" r="21" fill="none" stroke-width="5" stroke-linecap="round"
+                stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - pct / 100)).toFixed(1)}"/></svg><b>${pct}%</b></span>`;
+    },
 
-        if (query.length < 2) {
-            this.ui.searchResults.innerHTML = '';
+    /* Lišta dole ukazuje nejlepší shodu, dokud nejsou výsledky vidět na obrazovce */
+    updateDock() {
+        const m = this.matches || [];
+        const show = this.tab === 'diag' && m.length > 0 && !this.resultsVisible && $('detail-view').hidden;
+        $('diag-dock').hidden = !show;
+        if (!show) return;
+        const others = Math.min(m.length, 3) - 1;
+        $('dock-btn').innerHTML = this.ring(m[0].percentage) +
+            `<div class="grow"><div class="name">${esc(m[0].title)}</div><div class="more">${others > 0 ? 'a ' + others + ' další – zobrazit výsledky' : 'Zobrazit výsledek'}</div></div>` +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+    },
+
+    /* ---- Hledání ---- */
+    handleSearch() {
+        const raw = $('main-search').value.trim();
+        const query = norm(raw);
+        $('clear-search').hidden = raw.length === 0;
+
+        const filtered = query
+            ? DB.filter(item =>
+                norm(item.title).includes(query) ||
+                item.aliases.some(a => norm(a).includes(query)) ||
+                norm(item.toxidrom).includes(query))
+            : DB.slice().sort((a, b) => a.title.localeCompare(b.title, 'cs'));
+
+        $('search-label').textContent = query
+            ? (filtered.length ? 'Nalezeno: ' + filtered.length : '')
+            : 'Všechny látky';
+        this.renderSearchResults(filtered, query);
+    },
+
+    renderSearchResults(items, query) {
+        if (!items.length) {
+            $('search-results').innerHTML = '<div class="empty glass"><strong>Nic nenalezeno</strong>Zkus jiný název, účinnou látku nebo slangový výraz.</div>';
             return;
         }
-
-        const filtered = DB.filter(item => 
-            item.title.toLowerCase().includes(query) || 
-            item.aliases.some(a => a.toLowerCase().includes(query)) ||
-            item.toxidrom.toLowerCase().includes(query)
-        );
-
-        this.renderSearchResults(filtered);
-    },
-
-    renderSearchResults(items) {
-        this.ui.searchResults.innerHTML = items.map(item => `
-            <div class="card result-card" data-id="${item.id}" style="cursor:pointer">
-                <span class="card-header">${item.toxidrom}</span>
-                <span style="font-weight:700">${item.title}</span>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
-                    ${item.aliases.join(', ')}
-                </div>
-            </div>
-        `).join('');
-
-        this.ui.searchResults.querySelectorAll('.result-card').forEach(card => {
-            card.addEventListener('click', () => this.showDetail(card.dataset.id));
-        });
+        const mark = (a) => query && norm(a).includes(query) ? '<mark>' + esc(a) + '</mark>' : esc(a);
+        $('search-results').innerHTML = '<div class="list glass view-enter">' + items.map(item => `
+            <button type="button" class="item" data-id="${item.id}">
+                <div class="grow">
+                    <div class="kind">${esc(item.toxidrom)}</div>
+                    <div class="name">${esc(item.title)}</div>
+                    <div class="aliases">${item.aliases.map(mark).join(', ')}</div>
+                </div>${CHEV}
+            </button>`).join('') + '</div>';
     },
 
     resetSearch() {
-        this.ui.mainSearch.value = '';
+        $('main-search').value = '';
         this.handleSearch();
+        $('main-search').focus();
     },
 
-    showDetail(id) {
+    openFrom(e) {
+        const el = e.target.closest('[data-id]');
+        if (el) this.showDetail(el.dataset.id, true);
+    },
+
+    /* ---- Detail ---- */
+    showDetail(id, push) {
         const item = DB.find(x => x.id === id);
         if (!item) return;
+        if (push) { history.pushState({ tox: id }, ''); this.detailPushed = true; }
 
-        this.ui.tabSearch.classList.add('hidden');
-        this.ui.tabDiag.classList.add('hidden');
-        this.ui.detailView.classList.remove('hidden');
+        $('det-title').textContent = item.title;
+        $('det-toxidrom').textContent = item.toxidrom;
+        $('det-aliases').textContent = item.aliases.join(', ');
+        $('det-proc').textContent = item.proc;
+        $('det-antidote').textContent = item.antidote;
+        $('det-symptoms').innerHTML = item.symptoms.map(s => `<li>${esc(s)}</li>`).join('');
+        $('det-warning-card').hidden = !item.warning;
+        $('det-warning').textContent = item.warning || '';
+        $('back-label').textContent = this.tab === 'diag' ? 'Tox-Checker' : 'Hledat';
 
-        this.ui.detTitle.textContent = item.title;
-        this.ui.detToxidrom.textContent = item.toxidrom;
-        this.ui.detProc.textContent = item.proc;
-        this.ui.detAntidote.textContent = item.antidote;
-        this.ui.detSymptoms.innerHTML = item.symptoms.map(s => `<li>${s}</li>`).join('');
+        this.scrollMain = window.scrollY;
+        $('main-view').hidden = true;
+        $('detail-view').hidden = false;
+        $('diag-dock').hidden = true;
+        $('detail-view').classList.remove('view-enter'); void $('detail-view').offsetWidth;
+        $('detail-view').classList.add('view-enter');
+        window.scrollTo(0, 0);
+    },
 
-        if (item.warning) {
-            this.ui.detWarningCard.style.display = 'block';
-            this.ui.detWarning.textContent = item.warning;
-        } else {
-            this.ui.detWarningCard.style.display = 'none';
-        }
-        
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    hideDetail() {
+        this.detailPushed = false;
+        if ($('detail-view').hidden) return;
+        $('detail-view').hidden = true;
+        $('main-view').hidden = false;
+        window.scrollTo(0, this.scrollMain || 0);
+        this.updateDock();
+    },
+
+    /* ---- Tox-Checker ---- */
+    buildChecker() {
+        $('checker').innerHTML = DIAG_PARAMS.map(p => `
+            <div class="param" role="group" aria-label="${esc(p.label)}">
+                <div class="param-head"><span>${esc(p.label)}</span><small id="state-${p.key}">Nezjištěno</small></div>
+                <div class="chips">${p.options.map(([val, label]) =>
+                    `<button type="button" class="chip" data-key="${p.key}" data-val="${val}" aria-pressed="false">${esc(label)}</button>`).join('')}
+                </div>
+            </div>`).join('');
+    },
+
+    syncChips() {
+        document.querySelectorAll('#checker .chip').forEach(c => {
+            c.setAttribute('aria-pressed', this.diag[c.dataset.key] === c.dataset.val);
+        });
+        DIAG_PARAMS.forEach(p => { $('state-' + p.key).textContent = this.diag[p.key] ? '' : 'Nezjištěno'; });
+        $('reset-diag').disabled = !Object.values(this.diag).some(Boolean);
     },
 
     runDiagnostic() {
-        const inputs = {
-            eyes: document.getElementById('diag-eyes').value,
-            tf: document.getElementById('diag-tf').value,
-            df: document.getElementById('diag-df').value,
-            skin: document.getElementById('diag-skin').value,
-            mental: document.getElementById('diag-mental').value
-        };
+        const inputs = this.diag;
+
+        if (!Object.values(inputs).some(Boolean)) { $('diag-results').innerHTML = ''; this.matches = []; this.updateDock(); return; }
 
         const matches = DB.map(item => {
             let score = 0;
@@ -560,41 +704,37 @@ const App = {
         .filter(item => item.percentage > 30)
         .sort((a, b) => b.percentage - a.percentage);
 
+        this.matches = matches;
         this.renderDiagResults(matches);
+        this.updateDock();
     },
 
     renderDiagResults(matches) {
         if (matches.length === 0) {
-            this.ui.diagResults.innerHTML = '<div class="card">Nízká shoda příznaků.</div>';
+            $('diag-results').innerHTML = '<div class="empty glass"><strong>Nízká shoda příznaků</strong>Žádná látka v databázi neodpovídá vybraným nálezům.</div>';
             return;
         }
-
-        const html = `
-            <span class="card-header" style="margin-left:5px">Pravděpodobná shoda</span>
-            ${matches.slice(0, 3).map(item => `
-                <div class="card diag-result-card" data-id="${item.id}" style="cursor:pointer; border-left-color: gold;">
-                    <span class="match-badge">${item.percentage}%</span>
-                    <strong>${item.title}</strong><br>
-                    <small>${item.toxidrom}</small>
-                </div>
-            `).join('')}
-        `;
-
-        this.ui.diagResults.innerHTML = html;
-
-        this.ui.diagResults.querySelectorAll('.diag-result-card').forEach(card => {
-            card.addEventListener('click', () => this.showDetail(card.dataset.id));
-        });
+        $('diag-results').innerHTML = '<div class="section-label">Pravděpodobná shoda</div><div class="list glass">' +
+            matches.slice(0, 3).map(item => `
+            <button type="button" class="item match" data-id="${item.id}">
+                ${this.ring(item.percentage)}
+                <div class="grow">
+                    <div class="name">${esc(item.title)}</div>
+                    <div class="aliases">${esc(item.toxidrom)}</div>
+                </div>${CHEV}
+            </button>`).join('') + '</div>';
     },
 
     resetDiag() {
-        this.ui.diagInputs.forEach(input => input.value = "");
-        this.ui.diagResults.innerHTML = "";
+        Object.keys(this.diag).forEach(k => this.diag[k] = '');
+        this.syncChips();
+        $('diag-results').innerHTML = '';
+        this.matches = [];
+        this.updateDock();
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => App.init());
-
 </script>
 </body>
 </html>
