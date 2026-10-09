@@ -174,6 +174,8 @@ input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offs
 .p-val { display: block; margin-top: 4px; font-family: var(--font-round); font-size: 26px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; line-height: 1.1; }
 .p-unit { font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--ink-3); margin-left: 2px; letter-spacing: 0; }
 
+.neuro-note { border-radius: 20px; padding: 14px 16px; font-size: 14.5px; line-height: 1.45; color: var(--ink-2); }
+.neuro-note b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 4px; }
 .note { margin: 2px 8px 0; font-size: 13px; color: var(--ink-3); text-align: center; line-height: 1.45; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
@@ -228,7 +230,7 @@ input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offs
     <button type="button" class="diag-opt" data-diag="copd" aria-pressed="false"><b>CHOPN</b><span>Obstrukce</span></button>
     <button type="button" class="diag-opt" data-diag="asth" aria-pressed="false"><b>Astma</b><span>Extrémní exspirium</span></button>
     <button type="button" class="diag-opt" data-diag="kpr" aria-pressed="false"><b>KPR</b><span>Kontinuálně</span></button>
-    <button type="button" class="diag-opt" data-diag="head" aria-pressed="false"><b>CNS / neuro</b><span>Hyperventilace</span></button>
+    <button type="button" class="diag-opt" data-diag="head" aria-pressed="false"><b>CNS / neuro</b><span>Normoventilace</span></button>
   </div>
   <input type="hidden" id="diag-select" value="norm">
 
@@ -248,6 +250,10 @@ input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offs
     <div class="param-box glass"><span class="p-label">PEEP</span><span class="p-val"><span id="p-peep">--</span><span class="p-unit">cmH₂O</span></span></div>
     <div class="param-box glass"><span class="p-label">Poměr I:E</span><span class="p-val" id="p-ie">--</span></div>
     <div class="param-box glass"><span class="p-label">Cílová SpO₂</span><span class="p-val" id="p-spo2">--</span></div>
+  </div>
+  <div class="neuro-note glass" id="neuro-note" hidden>
+    <b>Frekvenci dolaď podle kapnometrie na EtCO₂ 35–40 mmHg.</b>
+    Vyhni se hypoxii (SpO₂ pod 90 %) i hyperventilaci. Krátkodobá hyperventilace na EtCO₂ 30–35 mmHg jen při známkách hrozící herniace.
   </div>
   <p class="note">Orientační výchozí nastavení. Ventilaci vždy upravuj podle stavu pacienta, EtCO₂ a platných postupů.</p>
 </div>
@@ -320,9 +326,10 @@ input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offs
                 mode = "VC-CMV (Plná ventilace)";
                 break;
             case 'head':
-                mlKg = 7; freq = "16–18"; peep = "5"; ie = "1:2"; spo2 = "100%";
-                strategy = "Neuro (Hyperventilace)";
-                mode = "VC-CMV (Zajistit pCO₂)";
+                // normoventilace podle doporučení pro poranění mozku (Brain Trauma Foundation)
+                mlKg = 7; freq = "10–12"; peep = "5"; ie = "1:2"; spo2 = "94–98%";
+                strategy = "Neuro (Normoventilace)";
+                mode = "VC-CMV (EtCO₂ 35–40 mmHg)";
                 break;
         }
 
@@ -336,6 +343,7 @@ input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offs
         document.getElementById('p-peep').innerText = peep;
         document.getElementById('p-ie').innerText = ie;
         document.getElementById('p-spo2').innerText = spo2;
+        document.getElementById('neuro-note').hidden = diag !== 'head';
     }
 
     document.getElementById('diag-grid').addEventListener('click', (e) => {
