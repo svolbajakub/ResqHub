@@ -1,276 +1,267 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ResqVent®</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="ResqVent"®>
-    
-    <link rel="apple-touch-icon" href="icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqVent">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<title>ResqVent®</title>
+<style>
+/* ResqVent – vzhled sladěný s ResqHubem */
+:root {
+  --bg: #E4EEEF;
+  --ink: #0A1F23;
+  --ink-2: rgba(10, 31, 35, .6);
+  --ink-3: rgba(10, 31, 35, .34);
+  --petrol: #0B6E79;
+  --petrol-soft: rgba(11, 110, 121, .12);
+  --on-petrol: #FFFFFF;
+  --track: rgba(10, 31, 35, .1);
+  --glow-a: rgba(11, 110, 121, .5);
+  --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .58);
+  --glass-strong: rgba(250, 253, 253, .9);
+  --glass-edge: rgba(255, 255, 255, .78);
+  --glass-hi: rgba(255, 255, 255, .95);
+  --glass-shadow: rgba(6, 55, 62, .13);
+  --hairline: rgba(10, 31, 35, .1);
+  --fill: rgba(10, 31, 35, .06);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A; --track: rgba(255, 255, 255, .12);
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .94);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A; --track: rgba(255, 255, 255, .12);
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .94);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  color-scheme: dark;
+}
 
-    <style>
-        :root {
-            --bg: #ffffff;
-            --surface: #f2f2f7;
-            --card: #ffffff;
-            --text-main: #000000;
-            --text-muted: #6e6e73;
-            --primary: #007AFF;
-            --border: #d1d1d6;
-            --shadow-soft: 0 4px 12px rgba(0,0,0,0.08);
-            --safe-top: env(safe-area-inset-top);
-        }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body {
+  position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden;
+  font-family: var(--font); font-size: 17px; line-height: 1.3;
+  -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
 
-        .dark-mode {
-            --bg: #000000;
-            --surface: #1c1c1e;
-            --card: #2c2c2e;
-            --text-main: #ffffff;
-            --text-muted: #a1a1a6;
-            --primary: #0A84FF;
-            --border: #38383a;
-        }
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%);
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -10px var(--glass-shadow);
+}
 
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            padding-top: var(--safe-top);
-            padding-bottom: 40px;
-            transition: background-color 0.3s ease;
-        }
+.shell {
+  max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px;
+  padding: max(12px, env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));
+}
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-        }
+header { display: flex; align-items: center; justify-content: space-between; padding: 2px 2px 0; }
+.logo { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.logo sup { font-size: .38em; font-weight: 600; color: var(--ink-3); letter-spacing: 0; margin-left: 2px; }
+.round-btn { width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center; color: var(--ink); }
+.round-btn svg { width: 19px; height: 19px; }
+.round-btn:active { transform: scale(.92); }
 
-        .app-title { font-weight: 900; font-size: 1.4rem; letter-spacing: -0.8px; flex: 1; text-align: center; margin-left: 35px; }
-        .trademark { font-size: 0.6rem; vertical-align: top; margin-left: 2px; color: var(--text-muted); }
-        .mode-toggle { font-size: 1.5rem; cursor: pointer; padding: 5px; }
+.section-header { margin: 8px 6px -4px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
 
-        .main-content { padding: 15px; }
+/* ---------- Pacient ---------- */
+.card { border-radius: 24px; overflow: hidden; }
+.row { padding: 14px 16px; }
+.row + .row { border-top: 1px solid var(--hairline); }
 
-        .section-header {
-            font-size: 0.75rem;
-            font-weight: 900;
-            color: var(--primary);
-            text-transform: uppercase;
-            margin: 25px 0 12px;
-            text-align: center;
-            letter-spacing: 0.5px;
-        }
+.segmented { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 16px; background: var(--fill); }
+.segmented .thumb {
+  position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 12px;
+  background: var(--glass-strong); box-shadow: 0 3px 10px -2px var(--glass-shadow), 0 0 0 1px var(--glass-edge);
+  transition: transform .32s cubic-bezier(.3, .7, .3, 1);
+}
+.segmented[data-sex="F"] .thumb { transform: translateX(100%); }
+.segment {
+  position: relative; z-index: 1; height: 40px; border: 0; background: none; border-radius: 12px;
+  font-size: 15px; font-weight: 650; color: var(--ink-2); transition: color .2s;
+}
+.segment.active { color: var(--ink); }
 
-        .card {
-            background: var(--card);
-            border-radius: 25px;
-            padding: 20px;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid var(--border);
-            margin-bottom: 15px;
-        }
+.input-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.label-text { font-size: 15px; font-weight: 650; }
+.label-text small { display: block; font-size: 12.5px; font-weight: 500; color: var(--ink-3); margin-top: 1px; }
+.val-wrap { display: flex; align-items: baseline; gap: 4px; }
+.val-input {
+  width: 76px; height: 40px; border: 0; border-radius: 12px; background: var(--fill); padding: 0 8px;
+  text-align: center; font-family: var(--font-round); font-size: 22px; font-weight: 800; color: var(--ink);
+  outline: none; -moz-appearance: textfield;
+}
+.val-input::-webkit-outer-spin-button, .val-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.val-input:focus { box-shadow: 0 0 0 2px var(--petrol); }
+.val-wrap span { font-size: 14px; font-weight: 600; color: var(--ink-2); width: 22px; }
+input[type=range] {
+  --p: 50%;
+  -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 10px; border-radius: 5px; margin: 16px 0 6px;
+  background: linear-gradient(to right, var(--petrol) 0 var(--p), var(--track) var(--p) 100%); outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .22), 0 0 0 .5px rgba(0, 0, 0, .1);
+}
+input[type=range]::-moz-range-thumb { width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 0; box-shadow: 0 3px 10px rgba(0, 0, 0, .22); }
+input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offset: 6px; }
 
-        .segmented {
-            display: flex;
-            background: var(--surface);
-            padding: 4px;
-            border-radius: 14px;
-            gap: 4px;
-            margin-bottom: 15px;
-        }
+/* ---------- Indikace ---------- */
+.diag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.diag-opt {
+  min-height: 58px; padding: 10px 12px; border-radius: 16px; border: 1px solid var(--hairline); background: var(--glass);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  text-align: left; color: var(--ink); transition: background .15s, border-color .15s, color .15s, transform .1s;
+}
+.diag-opt:active { transform: scale(.97); }
+.diag-opt b { display: block; font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+.diag-opt span { display: block; font-size: 12.5px; color: var(--ink-2); margin-top: 1px; }
+.diag-opt[aria-pressed="true"] { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); box-shadow: 0 8px 20px -10px var(--petrol); }
+.diag-opt[aria-pressed="true"] span { color: inherit; opacity: .8; }
 
-        .segment {
-            flex: 1;
-            padding: 12px 0;
-            text-align: center;
-            font-size: 0.8rem;
-            font-weight: 800;
-            border-radius: 11px;
-            color: var(--text-muted);
-            transition: 0.2s;
-            cursor: pointer;
-        }
+/* ---------- Výsledek ---------- */
+.result-card {
+  border-radius: 28px; padding: 18px 20px 20px; color: #fff; text-align: center;
+  background: linear-gradient(150deg, #16A3AE 0%, #0B6E79 55%, #074B53 100%);
+  box-shadow: 0 16px 34px -16px rgba(11, 110, 121, .85);
+}
+.res-vt-sub { display: block; font-size: 15px; font-weight: 650; opacity: .85; }
+.res-vt-val {
+  display: block; margin: 4px 0 2px; font-family: var(--font-round); font-size: 64px; font-weight: 800;
+  line-height: 1; letter-spacing: -.04em; font-variant-numeric: tabular-nums;
+}
+.res-vt-val small { font-size: 24px; font-weight: 700; letter-spacing: 0; opacity: .85; margin-left: 4px; }
+.mode-box {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; min-height: 38px; padding: 6px 16px;
+  border-radius: 19px; background: rgba(255, 255, 255, .18); border: 1px solid rgba(255, 255, 255, .28);
+  font-size: 15px; font-weight: 700;
+}
+.mode-box svg { width: 17px; height: 17px; flex: none; }
 
-        .segment.active {
-            background: var(--card);
-            color: var(--primary);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
+.param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.param-box { border-radius: 20px; padding: 14px 14px 15px; }
+.p-label { display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.p-val { display: block; margin-top: 4px; font-family: var(--font-round); font-size: 26px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.p-unit { font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--ink-3); margin-left: 2px; letter-spacing: 0; }
 
-        .rollup-select {
-            width: 100%;
-            padding: 16px;
-            border-radius: 15px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            font-size: 1.1rem;
-            font-weight: 700;
-            appearance: none;
-            text-align: center;
-        }
+.note { margin: 2px 8px 0; font-size: 13px; color: var(--ink-3); text-align: center; line-height: 1.45; }
 
-        .input-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .label-text { font-weight: 800; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
-        
-        .val-input {
-            background: transparent;
-            border: none;
-            color: var(--primary);
-            font-weight: 900;
-            font-size: 1.6rem;
-            width: 70px;
-            text-align: right;
-            padding: 0;
-            font-family: inherit;
-        }
-
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 10px;
-            border-radius: 5px;
-            background: var(--surface);
-            margin: 12px 0 25px;
-        }
-
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 26px;
-            height: 26px;
-            background: var(--primary);
-            border-radius: 50%;
-            border: 3px solid #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .result-card {
-            background: var(--primary);
-            color: white;
-            padding: 22px 20px;
-            border-radius: 35px;
-            text-align: center;
-            margin: 15px 0;
-            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
-        }
-
-        .res-vt-val { font-size: 3rem; font-weight: 900; display: block; letter-spacing: -1.5px; }
-        .res-vt-sub { font-size: 0.9rem; font-weight: 700; opacity: 0.9; }
-
-        .mode-box {
-            background: #ff9500;
-            color: white;
-            padding: 12px;
-            border-radius: 18px;
-            text-align: center;
-            margin-bottom: 15px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 10px rgba(255, 149, 0, 0.2);
-        }
-
-        .param-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .param-box {
-            background: var(--surface);
-            padding: 14px;
-            border-radius: 20px;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-
-        .p-label { font-size: 0.6rem; font-weight: 900; color: var(--primary); text-transform: uppercase; display: block; margin-bottom: 3px; }
-        .p-val { font-size: 1.1rem; font-weight: 800; color: var(--text-main); }
-    </style>
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
+</style>
 </head>
 <body>
+<div class="ambient" aria-hidden="true"></div>
 
-    <header>
-        <div style="width: 35px;"></div>
-        <div class="app-title">ResqVent<span class="trademark">®</span></div>
-        <div class="mode-toggle" onclick="document.body.classList.toggle('dark-mode')">🌓</div>
-    </header>
+<div class="shell">
+  <header>
+    <h1 class="logo">ResqVent<sup>®</sup></h1>
+    <button class="round-btn glass" id="theme-toggle" type="button" aria-label="Přepnout světlý nebo tmavý režim">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4v16"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+    </button>
+  </header>
 
-    <div class="main-content">
-        <div class="section-header">Základní údaje</div>
-        <div class="card" style="padding-bottom: 5px;">
-            <div class="segmented">
-                <div id="sex-m" class="segment active" onclick="setSex('M')">MUŽ</div>
-                <div id="sex-f" class="segment" onclick="setSex('F')">ŽENA</div>
-            </div>
-
-            <div style="margin-top: 10px; text-align: center;">
-                <span class="label-text" style="display: block; margin-bottom: 8px;">Indikace / Patologie</span>
-                <select id="diag-select" class="rollup-select" onchange="update()">
-                    <option value="norm">Zdravé plíce / Ostatní</option>
-                    <option value="ards">ARDS (Lung Protective)</option>
-                    <option value="copd">CHOPN (Obstrukce)</option>
-                    <option value="asth">ASTMA (Extrémní exspirium)</option>
-                    <option value="kpr">KPR (Kontinuálně)</option>
-                    <option value="head">CNS / Neuro (Hyperventilace)</option>
-                </select>
-            </div>
-
-            <div style="margin-top: 25px;">
-                <div class="input-row">
-                    <span class="label-text">Výška (cm)</span>
-                    <input type="number" id="h-input" class="val-input" value="175" inputmode="decimal" oninput="sync('h-input', 'h-slider')" onclick="this.select()">
-                </div>
-                <input type="range" id="h-slider" min="100" max="220" value="175" oninput="sync('h-slider', 'h-input')">
-
-                <div class="input-row" style="margin-top: 10px;">
-                    <span class="label-text">Orientační kg</span>
-                    <input type="number" id="w-input" class="val-input" value="85" inputmode="decimal" oninput="sync('w-input', 'w-slider')" onclick="this.select()">
-                </div>
-                <input type="range" id="w-slider" min="30" max="200" value="85" oninput="sync('w-slider', 'w-input')">
-            </div>
-        </div>
-
-        <div class="result-card">
-            <span class="res-vt-sub" id="res-strategy">Ochranná ventilace</span>
-            <span id="res-vt" class="res-vt-val">-- ml</span>
-            <span class="res-vt-sub" id="res-ibw-info">IBW: -- kg</span>
-        </div>
-
-        <div class="section-header">Doporučený režim</div>
-        <div id="res-mode" class="mode-box">CMV / VC-CMV</div>
-
-        <div class="section-header">Parametry</div>
-        <div class="param-grid">
-            <div class="param-box"><span class="p-label">Frekvence (f)</span><span id="p-freq" class="p-val">--</span></div>
-            <div class="param-box"><span class="p-label">PEEP</span><span id="p-peep" class="p-val">--</span></div>
-            <div class="param-box"><span class="p-label">I:E Poměr</span><span id="p-ie" class="p-val">--</span></div>
-            <div class="param-box"><span class="p-label">FiO₂ / SpO₂</span><span id="p-spo2" class="p-val">--</span></div>
-        </div>
+  <div class="section-header">Pacient</div>
+  <div class="card glass">
+    <div class="row">
+      <div class="segmented" id="sex-switch" data-sex="M">
+        <span class="thumb" aria-hidden="true"></span>
+        <button type="button" id="sex-m" class="segment active" onclick="setSex('M')">Muž</button>
+        <button type="button" id="sex-f" class="segment" onclick="setSex('F')">Žena</button>
+      </div>
     </div>
+    <div class="row">
+      <div class="input-row">
+        <label class="label-text" for="h-input">Výška<small>určuje ideální váhu</small></label>
+        <div class="val-wrap">
+          <input type="number" id="h-input" class="val-input" value="175" inputmode="numeric" oninput="sync('h-input', 'h-slider')" onclick="this.select()">
+          <span>cm</span>
+        </div>
+      </div>
+      <input type="range" id="h-slider" min="100" max="220" value="175" oninput="sync('h-slider', 'h-input')" aria-label="Výška v cm">
+    </div>
+    <div class="row">
+      <div class="input-row">
+        <label class="label-text" for="w-input">Skutečná hmotnost<small>jen orientačně, výpočet jede z IBW</small></label>
+        <div class="val-wrap">
+          <input type="number" id="w-input" class="val-input" value="85" inputmode="numeric" oninput="sync('w-input', 'w-slider')" onclick="this.select()">
+          <span>kg</span>
+        </div>
+      </div>
+      <input type="range" id="w-slider" min="30" max="200" value="85" oninput="sync('w-slider', 'w-input')" aria-label="Hmotnost v kg">
+    </div>
+  </div>
+
+  <div class="section-header">Indikace</div>
+  <div class="diag-grid" id="diag-grid">
+    <button type="button" class="diag-opt" data-diag="norm" aria-pressed="true"><b>Zdravé plíce</b><span>Ostatní</span></button>
+    <button type="button" class="diag-opt" data-diag="ards" aria-pressed="false"><b>ARDS</b><span>Lung protective</span></button>
+    <button type="button" class="diag-opt" data-diag="copd" aria-pressed="false"><b>CHOPN</b><span>Obstrukce</span></button>
+    <button type="button" class="diag-opt" data-diag="asth" aria-pressed="false"><b>Astma</b><span>Extrémní exspirium</span></button>
+    <button type="button" class="diag-opt" data-diag="kpr" aria-pressed="false"><b>KPR</b><span>Kontinuálně</span></button>
+    <button type="button" class="diag-opt" data-diag="head" aria-pressed="false"><b>CNS / neuro</b><span>Hyperventilace</span></button>
+  </div>
+  <input type="hidden" id="diag-select" value="norm">
+
+  <div class="result-card" aria-live="polite">
+    <span class="res-vt-sub" id="res-strategy">Ochranná ventilace</span>
+    <span id="res-vt" class="res-vt-val">-- ml</span>
+    <span class="res-vt-sub" id="res-ibw-info">IBW: -- kg</span>
+    <div class="mode-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+      <span id="res-mode">CMV / VC-CMV</span>
+    </div>
+  </div>
+
+  <div class="section-header">Parametry</div>
+  <div class="param-grid">
+    <div class="param-box glass"><span class="p-label">Frekvence (f)</span><span class="p-val"><span id="p-freq">--</span><span class="p-unit">/min</span></span></div>
+    <div class="param-box glass"><span class="p-label">PEEP</span><span class="p-val"><span id="p-peep">--</span><span class="p-unit">cmH₂O</span></span></div>
+    <div class="param-box glass"><span class="p-label">Poměr I:E</span><span class="p-val" id="p-ie">--</span></div>
+    <div class="param-box glass"><span class="p-label">Cílová SpO₂</span><span class="p-val" id="p-spo2">--</span></div>
+  </div>
+  <p class="note">Orientační výchozí nastavení. Ventilaci vždy upravuj podle stavu pacienta, EtCO₂ a platných postupů.</p>
+</div>
 
 <script>
     let sex = 'M';
+    const THEME_KEY = 'resqvent:theme';
 
-    function setSex(s) { 
-        sex = s; 
-        document.getElementById('sex-m').className = s==='M'?'segment active':'segment'; 
-        document.getElementById('sex-f').className = s==='F'?'segment active':'segment'; 
-        update(); 
+    function setSex(s) {
+        sex = s;
+        document.getElementById('sex-m').className = s==='M'?'segment active':'segment';
+        document.getElementById('sex-f').className = s==='F'?'segment active':'segment';
+        document.getElementById('sex-switch').dataset.sex = s;
+        update();
     }
 
     // Synchronizace mezi sliderem a textovým polem
@@ -280,10 +271,17 @@
         update();
     }
 
+    function paintRange(id) {
+        const el = document.getElementById(id);
+        const p = Math.min(100, Math.max(0, (el.value - el.min) / (el.max - el.min) * 100));
+        el.style.setProperty('--p', p + '%');
+    }
+
     function update() {
         const diag = document.getElementById('diag-select').value;
         const h = parseInt(document.getElementById('h-input').value) || 0;
         const w = parseInt(document.getElementById('w-input').value) || 0;
+        paintRange('h-slider'); paintRange('w-slider');
 
         // IBW Výpočet (Devine Formula)
         let ibw = 0;
@@ -329,16 +327,37 @@
         }
 
         const vt = Math.round(ibw * mlKg);
-        document.getElementById('res-vt').innerText = (h > 0) ? vt + " ml" : "-- ml";
+        document.getElementById('res-vt').innerHTML = (h > 0) ? vt + '<small>ml</small>' : '--<small>ml</small>';
         document.getElementById('res-strategy').innerText = strategy;
-        document.getElementById('res-ibw-info').innerText = (h > 0) ? `Ideální váha (IBW): ${Math.round(ibw)} kg` : "Zadejte výšku";
+        document.getElementById('res-ibw-info').innerText = (h > 0) ? `${mlKg} ml/kg ideální váhy (IBW ${Math.round(ibw)} kg)` : "Zadejte výšku";
         document.getElementById('res-mode').innerText = mode;
-        
+
         document.getElementById('p-freq').innerText = freq;
         document.getElementById('p-peep').innerText = peep;
         document.getElementById('p-ie').innerText = ie;
         document.getElementById('p-spo2').innerText = spo2;
     }
+
+    document.getElementById('diag-grid').addEventListener('click', (e) => {
+        const b = e.target.closest('.diag-opt');
+        if (!b) return;
+        document.getElementById('diag-select').value = b.dataset.diag;
+        document.querySelectorAll('.diag-opt').forEach(x => x.setAttribute('aria-pressed', x === b));
+        update();
+    });
+
+    // motiv: automaticky podle telefonu, tlačítkem lze přepnout
+    try {
+        const saved = localStorage.getItem(THEME_KEY);
+        if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+    document.getElementById('theme-toggle').onclick = () => {
+        const current = document.documentElement.dataset.theme ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    };
 
     update();
 </script>
