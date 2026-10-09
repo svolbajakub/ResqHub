@@ -1,337 +1,465 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ResqPedi®</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ResqPedi">
-    
-    <link rel="apple-touch-icon" href="icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqPedi®</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqPedi">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+/* ResqPedi – vzhled sladěný s ResqHubem. Barvy Broselowova pásku zůstávají jako funkční prvek. */
+:root {
+  --bg: #E4EEEF;
+  --ink: #0A1F23;
+  --ink-2: rgba(10, 31, 35, .6);
+  --ink-3: rgba(10, 31, 35, .34);
+  --petrol: #0B6E79;
+  --petrol-soft: rgba(11, 110, 121, .12);
+  --on-petrol: #FFFFFF;
+  --alarm: #E5383B;
+  --glow-a: rgba(11, 110, 121, .5);
+  --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .58);
+  --glass-strong: rgba(250, 253, 253, .92);
+  --glass-edge: rgba(255, 255, 255, .78);
+  --glass-hi: rgba(255, 255, 255, .95);
+  --glass-shadow: rgba(6, 55, 62, .13);
+  --sheet: #EEF4F4;
+  --hairline: rgba(10, 31, 35, .1);
+  --fill: rgba(10, 31, 35, .06);
+  --triage-red: #E5383B;
+  --triage-yellow: #F5B400;
+  --triage-green: #2DB36A;
+  --triage-black: #1C1C1E;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A; --alarm: #FF6B6E;
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .94);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --sheet: #0B1E23; --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    --triage-black: #3A3A3C;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A; --alarm: #FF6B6E;
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .94);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --sheet: #0B1E23; --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  --triage-black: #3A3A3C;
+  color-scheme: dark;
+}
 
-    <style>
-        :root {
-            --bg: #ffffff;
-            --surface: #f2f2f7;
-            --card: #ffffff;
-            --text-main: #000000;
-            --text-muted: #6e6e73;
-            --primary: #007AFF;
-            --accent: #ff3b30;
-            --border: #d1d1d6;
-            --tab-bg: rgba(0, 0, 0, 0.06);
-            --shadow-soft: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-heavy: 0 12px 30px rgba(0,0,0,0.2);
-            --triage-red: #ff3b30;
-            --triage-yellow: #ffcc00;
-            --triage-green: #4cd964;
-            --triage-black: #1c1c1e;
-            --zebra: rgba(0, 0, 0, 0.03);
-            --safe-top: env(safe-area-inset-top);
-        }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body {
+  position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden;
+  font-family: var(--font); font-size: 17px; line-height: 1.3;
+  -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+}
+body.locked { overflow: hidden; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
 
-        .dark-mode {
-            --bg: #000000;
-            --surface: #1c1c1e;
-            --card: #2c2c2e;
-            --text-main: #ffffff;
-            --text-muted: #a1a1a6;
-            --primary: #0A84FF;
-            --accent: #ff453a;
-            --border: #38383a;
-            --tab-bg: rgba(255, 255, 255, 0.1);
-            --zebra: rgba(255, 255, 255, 0.05);
-        }
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
 
-        /* --- INTRO ANIMACE --- */
-        #intro-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999; overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.6s ease-out, visibility 0.6s;
-        }
-        .intro-stripes {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: row;
-        }
-        .intro-stripe {
-            flex: 1; height: 100%;
-            transform: translateY(110%);
-            animation: swipeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-        /* 9 barev Broslow pásku — zleva doprava */
-        .intro-stripe:nth-child(1) { background: #808080; animation-delay: 0.05s; }
-        .intro-stripe:nth-child(2) { background: #FFC0CB; animation-delay: 0.12s; }
-        .intro-stripe:nth-child(3) { background: #FF3B30; animation-delay: 0.19s; }
-        .intro-stripe:nth-child(4) { background: #af52de; animation-delay: 0.26s; }
-        .intro-stripe:nth-child(5) { background: #FFCC00; animation-delay: 0.33s; }
-        .intro-stripe:nth-child(6) { background: #e8e8e8; animation-delay: 0.40s; }
-        .intro-stripe:nth-child(7) { background: #007AFF; animation-delay: 0.47s; }
-        .intro-stripe:nth-child(8) { background: #FF9500; animation-delay: 0.54s; }
-        .intro-stripe:nth-child(9) { background: #4CD964; animation-delay: 0.61s; }
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%);
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -10px var(--glass-shadow);
+}
 
-        @keyframes swipeUp {
-            from { transform: translateY(110%); }
-            to   { transform: translateY(0%); }
-        }
+/* ---------- Úvodní animace (Broselowův pásek) ---------- */
+#intro-layer {
+  position: fixed; inset: 0; z-index: 9999; overflow: hidden; background: #000;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: opacity .5s ease-out, visibility .5s;
+}
+.intro-stripes { position: absolute; inset: 0; display: flex; }
+.intro-stripe { flex: 1; height: 100%; transform: translateY(110%); animation: swipeUp .5s cubic-bezier(.22, 1, .36, 1) forwards; }
+.intro-stripe:nth-child(1) { background: #808080; animation-delay: .05s; }
+.intro-stripe:nth-child(2) { background: #FFC0CB; animation-delay: .1s; }
+.intro-stripe:nth-child(3) { background: #FF3B30; animation-delay: .15s; }
+.intro-stripe:nth-child(4) { background: #af52de; animation-delay: .2s; }
+.intro-stripe:nth-child(5) { background: #FFCC00; animation-delay: .25s; }
+.intro-stripe:nth-child(6) { background: #e8e8e8; animation-delay: .3s; }
+.intro-stripe:nth-child(7) { background: #007AFF; animation-delay: .35s; }
+.intro-stripe:nth-child(8) { background: #FF9500; animation-delay: .4s; }
+.intro-stripe:nth-child(9) { background: #4CD964; animation-delay: .45s; }
+@keyframes swipeUp { to { transform: translateY(0); } }
+.intro-mark { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
+.intro-logo {
+  color: #fff; font-family: var(--font-display); font-size: 60px; font-weight: 800; letter-spacing: -.045em;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, .7), 0 0 80px rgba(0, 0, 0, .5);
+  opacity: 0; transform: scale(.85); animation: popLogo .5s cubic-bezier(.34, 1.56, .64, 1) .7s forwards;
+}
+.intro-logo sup { font-size: .38em; opacity: .8; letter-spacing: 0; }
+.intro-brand { color: rgba(255, 255, 255, .6); font-size: 13px; font-weight: 500; letter-spacing: .08em; margin-top: 2px; opacity: 0; animation: fade .5s ease-out 1s forwards; }
+@keyframes popLogo { to { opacity: 1; transform: scale(1); } }
+@keyframes fade { to { opacity: 1; } }
+.intro-hidden { opacity: 0; visibility: hidden; }
 
-        .intro-logo {
-            position: relative; z-index: 2;
-            color: white; font-size: 3.8rem; font-weight: 900; letter-spacing: -2px;
-            text-shadow: 0 2px 30px rgba(0,0,0,0.7), 0 0 80px rgba(0,0,0,0.5);
-            opacity: 0; transform: scale(0.85);
-            animation: popLogo 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.95s forwards;
-        }
-        .intro-logo sup { font-size: 0.4em; vertical-align: super; opacity: 0.8; letter-spacing: 0; }
-        .intro-brand {
-            position: relative; z-index: 2;
-            color: rgba(255,255,255,0.5); font-size: 0.75rem; font-weight: 500;
-            letter-spacing: 0.12em; text-align: center; margin-top: 4px;
-            opacity: 0;
-            animation: fadeInBrand 0.5s ease-out 1.25s forwards;
-        }
+/* ---------- Kostra ---------- */
+.shell { max-width: 640px; margin: 0 auto; padding: max(12px, env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom)); }
+header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 2px 2px 12px; }
+.app-title { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.app-title sup { font-size: .38em; font-weight: 600; color: var(--ink-3); letter-spacing: 0; margin-left: 2px; }
+.head-btns { display: flex; gap: 8px; }
+.round-btn { width: 42px; height: 42px; border-radius: 50%; flex: none; display: grid; place-items: center; color: var(--ink); }
+.round-btn svg { width: 20px; height: 20px; }
+.round-btn:active { transform: scale(.92); }
+.tools-btn { display: inline-flex; align-items: center; gap: 6px; height: 42px; padding: 0 16px 0 12px; border-radius: 21px; font-weight: 650; font-size: 15px; color: var(--ink); }
+.tools-btn svg { width: 19px; height: 19px; color: var(--petrol); }
+.tools-btn:active { transform: scale(.95); }
 
-        @keyframes popLogo {
-            to { opacity: 1; transform: scale(1); }
-        }
-        @keyframes fadeInBrand {
-            to { opacity: 1; }
-        }
+/* ---------- Pacient ---------- */
+.patient { border-radius: 26px; padding: 14px; }
+.patient-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.info-box { border-radius: 18px; background: var(--fill); padding: 10px 12px 12px; }
+.label-top { display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); margin-bottom: 6px; }
+.input-group { display: flex; gap: 8px; }
+.input-stack { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+.edit-input {
+  width: 100%; height: 48px; border: 0; border-radius: 12px; background: var(--glass-strong);
+  text-align: center; font-family: var(--font-round); font-size: 26px; font-weight: 800; color: var(--ink);
+  outline: none; -moz-appearance: textfield; box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+}
+.edit-input::-webkit-outer-spin-button, .edit-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.edit-input:focus { box-shadow: 0 0 0 2px var(--petrol); }
+.unit-label { font-size: 12.5px; font-weight: 600; color: var(--ink-3); margin-top: 4px; }
 
-        .intro-hidden { opacity: 0; visibility: hidden; }
+.slider-section { margin-top: 14px; }
+.broselow-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.broselow-row .label-top { margin: 0; }
+#broselow-badge {
+  display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border-radius: 17px;
+  font-weight: 800; font-size: 15px; letter-spacing: .01em; font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12), 0 6px 14px -8px rgba(0, 0, 0, .4);
+}
+input[type=range] {
+  -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 16px; border-radius: 8px; margin: 0;
+  background: linear-gradient(to right, #808080 0% 5%, #FFC0CB 5% 10%, #FF3B30 10% 20%, #af52de 20% 30%, #FFCC00 30% 45%, #ffffff 45% 60%, #007AFF 60% 80%, #FF9500 80% 90%, #4CD964 90% 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 34px; height: 34px; border-radius: 50%; background: #fff; border: 0;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, .3), 0 0 0 .5px rgba(0, 0, 0, .15);
+}
+input[type=range]::-moz-range-thumb { width: 34px; height: 34px; border-radius: 50%; background: #fff; border: 0; box-shadow: 0 3px 12px rgba(0, 0, 0, .3); }
+input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offset: 6px; }
+.range-scale { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* ---------- Záložky (lepivá lišta) ---------- */
+.tabbar {
+  position: sticky; top: 0; z-index: 30; margin: 14px -16px 0; padding: max(8px, env(safe-area-inset-top)) 16px 10px;
+  transition: background-color .2s, box-shadow .2s;
+}
+.tabbar.stuck {
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 1px 0 var(--hairline);
+}
+.mini-patient {
+  display: none; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 14px; font-weight: 650; color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.tabbar.stuck .mini-patient { display: flex; }
+.mini-patient .swatch { width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
+.mini-patient b { color: var(--ink); }
+.tab-nav { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-item {
+  flex: none; height: 38px; padding: 0 15px; border-radius: 19px; border: 1px solid var(--hairline);
+  background: var(--glass); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  font-size: 15px; font-weight: 650; color: var(--ink-2); white-space: nowrap;
+}
+.tab-item.active { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
 
-        body {
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            height: 100vh;
-            display: flex; flex-direction: column; overflow: hidden;
-            transition: background-color 0.3s ease;
-            padding-top: var(--safe-top);
-        }
+/* ---------- Seznamy ---------- */
+.section-header { margin: 18px 6px 8px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.group { border-radius: 22px; overflow: hidden; }
+.group > * + * { border-top: 1px solid var(--hairline); }
+.list-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 16px; min-height: 52px; }
+.list-row.tap { cursor: pointer; }
+.list-row.tap:active { background: var(--fill); }
+.list-label { font-size: 16px; font-weight: 550; min-width: 0; }
+.drug-sub-label { display: block; font-size: 13px; font-weight: 500; color: var(--ink-2); margin-top: 2px; }
+.list-val-wrapper { display: flex; align-items: baseline; gap: 4px; flex: none; text-align: right; }
+.list-val { font-family: var(--font-round); font-size: 20px; font-weight: 800; color: var(--petrol); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.list-unit-fixed { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.expand-icon { width: 12px; height: 12px; color: var(--ink-3); margin-left: 4px; align-self: center; transition: transform .25s; }
+.row-open .expand-icon { transform: rotate(180deg); }
 
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 20px; background: var(--surface);
-            border-bottom: 1px solid var(--border); z-index: 100;
-        }
+.variant-container { display: none; background: var(--fill); padding: 4px 0; }
+.variant-container.open { display: block; }
+.variant-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 16px; }
+.variant-info { display: flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 550; }
+.route { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 11px; font-size: 12px; font-weight: 700; color: #fff; }
+.route.iv { background: #E0484B; } .route.im { background: #9B59D0; } .route.pr { background: #A0683C; } .route.in { background: #2DA866; }
+.variant-val { font-family: var(--font-round); font-weight: 800; color: var(--petrol); font-variant-numeric: tabular-nums; text-align: right; }
+.variant-val small { display: block; font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.variant-note { padding: 8px 16px 10px; font-size: 13px; color: var(--ink-2); line-height: 1.4; }
 
-        .app-title { font-weight: 900; font-size: 1.4rem; letter-spacing: -0.8px; }
-        .trademark { font-size: 0.6rem; vertical-align: top; margin-left: 2px; color: var(--text-muted); }
+/* ---------- Panely (nástroje) ---------- */
+.overlay { position: fixed; inset: 0; z-index: 250; background: rgba(2, 20, 24, .42); opacity: 0; pointer-events: none; transition: opacity .3s; }
+.overlay.open { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 300; max-width: 640px; margin: 0 auto;
+  background: var(--sheet); border-radius: 30px 30px 0 0; box-shadow: 0 -10px 40px rgba(0, 0, 0, .2);
+  transform: translateY(105%); transition: transform .4s cubic-bezier(.32, .72, 0, 1);
+  display: flex; flex-direction: column; max-height: calc(100% - max(16px, env(safe-area-inset-top)));
+}
+.sheet.open { transform: none; }
+.sheet.tall { height: calc(100% - max(16px, env(safe-area-inset-top))); }
+.grabber { width: 38px; height: 5px; border-radius: 3px; background: var(--ink-3); margin: 8px auto 0; flex: none; }
+.sheet-head { position: relative; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; min-height: 54px; }
+.sheet-head h2 { position: absolute; left: 60px; right: 60px; text-align: center; margin: 0; font-size: 17px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sheet-head .round-btn { width: 38px; height: 38px; }
+.sheet-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 4px 16px calc(24px + env(safe-area-inset-bottom)); }
 
-        .drawer {
-            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
-            background: var(--card); box-shadow: 5px 0 20px rgba(0,0,0,0.3);
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 300; padding: 25px;
-            display: flex; flex-direction: column;
-            padding-top: calc(var(--safe-top) + 20px);
-        }
-        .drawer.open { left: 0; }
-        .drawer-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); display: none; z-index: 250;
-        }
-        .drawer-item { padding: 18px 0; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 1.05rem; cursor: pointer; }
+.drawer-item { display: flex; align-items: center; gap: 14px; width: 100%; padding: 13px 16px; border: 0; background: none; text-align: left; color: var(--ink); }
+.drawer-item:active { background: var(--fill); }
+.drawer-item .ic { width: 38px; height: 38px; border-radius: 11px; flex: none; display: grid; place-items: center; color: #fff; }
+.drawer-item .ic svg { width: 20px; height: 20px; }
+.drawer-item b { display: block; font-size: 16px; font-weight: 650; }
+.drawer-item span.sub { display: block; font-size: 13px; color: var(--ink-2); margin-top: 1px; }
+.drawer-item .grow { flex: 1; min-width: 0; }
+.chev { width: 8px; height: 14px; color: var(--ink-3); flex: none; }
 
-        .modal {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 92%; max-width: 420px; background: var(--card); 
-            border-radius: 25px; z-index: 400; padding: 20px; display: none;
-            box-shadow: var(--shadow-heavy); border: 1px solid var(--border);
-            max-height: 90vh; overflow-y: auto;
-        }
-        .modal.active { display: block; }
+/* kalkulačka ředění */
+.search-box { position: relative; margin-bottom: 14px; }
+.search-field { display: flex; align-items: center; gap: 8px; height: 50px; padding: 0 12px 0 14px; border-radius: 16px; background: var(--glass-strong); border: 1px solid var(--glass-edge); box-shadow: 0 6px 18px -10px var(--glass-shadow); }
+.search-field svg { width: 19px; height: 19px; color: var(--ink-2); flex: none; }
+.search-field input { flex: 1; min-width: 0; height: 100%; border: 0; background: none; outline: none; font-size: 17px; }
+.search-field input::placeholder { color: var(--ink-2); }
+.clear-btn { width: 26px; height: 26px; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--fill); color: var(--ink-2); flex: none; }
+.clear-btn svg { width: 11px; height: 11px; }
+#drug-scroll-list {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 20; max-height: 240px; overflow-y: auto;
+  border-radius: 16px; background: var(--glass-strong); border: 1px solid var(--glass-edge);
+  -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); box-shadow: 0 16px 40px -12px rgba(0, 0, 0, .35);
+}
+.drug-opt { display: block; width: 100%; padding: 12px 14px; border: 0; background: none; text-align: left; font-size: 16px; font-weight: 600; color: var(--ink); }
+.drug-opt + .drug-opt { border-top: 1px solid var(--hairline); }
+.drug-opt:active { background: var(--fill); }
 
-        .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .calc-field { display: flex; flex-direction: column; gap: 5px; }
-        .calc-label { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
-        .calc-input-row { display: flex; gap: 8px; align-items: center; }
-        .calc-in { flex: 1; padding: 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); color: var(--text-main); font-weight: 700; font-size: 1rem; font-family: inherit; outline: none; width: 100%; }
-        .calc-sel { padding: 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); font-weight: 700; color: var(--text-main); font-family: inherit; }
+.calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.calc-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.calc-field.wide { grid-column: span 2; }
+.calc-label { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.calc-input-row { display: flex; gap: 6px; align-items: center; }
+.calc-in, .calc-sel {
+  height: 46px; border-radius: 14px; border: 1px solid var(--hairline); background: var(--glass-strong); color: var(--ink);
+  font-family: var(--font-round); font-weight: 750; font-size: 18px; outline: none; padding: 0 12px; min-width: 0;
+}
+.calc-in { flex: 1; width: 100%; -moz-appearance: textfield; }
+.calc-in::-webkit-outer-spin-button, .calc-in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.calc-sel { flex: none; width: 74px; padding: 0 8px; -webkit-appearance: none; appearance: none; text-align: center; font-size: 16px; }
+.calc-in:focus, .calc-sel:focus { box-shadow: 0 0 0 2px var(--petrol); }
+.switch-container { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.switch-container::-webkit-scrollbar { display: none; }
+.switch-btn {
+  flex: 1 0 auto; height: 38px; padding: 0 12px; border-radius: 19px; border: 1px solid var(--hairline); background: var(--glass-strong);
+  font-family: var(--font-round); font-size: 15px; font-weight: 700; color: var(--ink); white-space: nowrap;
+}
+.switch-btn.active { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
 
-        .switch-container { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .switch-btn { 
-            padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); 
-            background: var(--surface); font-size: 0.8rem; font-weight: 700; cursor: pointer;
-            white-space: nowrap; flex: 1; text-align: center; color: var(--text-main);
-        }
-        .switch-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.res-pill {
+  border-radius: 24px; padding: 16px 18px; color: #fff; font-size: 15px;
+  background: linear-gradient(150deg, #16A3AE 0%, #0B6E79 55%, #074B53 100%);
+  box-shadow: 0 14px 30px -14px rgba(11, 110, 121, .8); transition: background .3s;
+}
+.res-pill.warning { background: linear-gradient(150deg, #F25C5F 0%, #D7262A 100%); box-shadow: 0 14px 30px -14px rgba(229, 56, 59, .8); }
+.res-pill.idle { text-align: center; font-weight: 650; opacity: .9; }
+.res-highlight { display: block; text-align: center; margin: 4px 0 0; font-family: var(--font-round); font-size: 46px; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.res-divider { border-top: 1px solid rgba(255, 255, 255, .25); margin: 12px 0; }
+.solvent-badge { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 13px; background: rgba(255, 255, 255, .2); font-size: 13px; font-weight: 650; margin-top: 8px; }
+.warning-text { display: block; padding: 9px 12px; margin-bottom: 12px; border-radius: 14px; background: rgba(0, 0, 0, .18); font-size: 14px; font-weight: 700; text-align: center; }
+.res-cap { display: block; text-align: center; font-size: 13px; font-weight: 600; opacity: .85; }
 
-        .res-pill { background: var(--primary); color: white; padding: 18px; border-radius: 20px; margin-top: 10px; transition: background 0.3s; }
-        .res-pill.warning { background: var(--accent); }
-        .res-highlight { font-weight: 900; font-size: 1.6rem; display: block; text-align: center; margin: 10px 0; }
-        .res-divider { border-top: 1px solid rgba(255,255,255,0.3); margin: 12px 0; }
-        .solvent-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.2); font-size: 0.75rem; margin-top: 5px; }
-        .warning-text { font-size: 0.75rem; font-weight: 800; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 10px; margin-bottom: 10px; text-align: center; display: block; }
+/* triage a skóre */
+.triage-step-title { margin: 6px 0 18px; font-size: 22px; font-weight: 750; letter-spacing: -.02em; text-align: center; text-wrap: balance; }
+.triage-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-triage {
+  min-height: 64px; padding: 12px; border-radius: 20px; border: 1px solid var(--glass-edge); background: var(--glass-strong);
+  color: var(--ink); font-weight: 700; font-size: 17px; text-align: center; box-shadow: 0 6px 16px -10px var(--glass-shadow);
+}
+.btn-triage:active { transform: scale(.97); }
+.btn-full { grid-column: span 2; width: 100%; display: block; }
+.btn-primary { background: var(--petrol); color: var(--on-petrol); border-color: var(--petrol); min-height: 52px; }
+.steps-trail { display: flex; justify-content: center; gap: 6px; margin-bottom: 4px; }
+.steps-trail i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); }
+.steps-trail i.on { background: var(--petrol); }
+.result-box { text-align: center; padding: 22px 16px; border-radius: 24px; color: #fff; font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: -.02em; line-height: 1.15; }
+.result-box.dark-ink { color: #1C1C1E; }
+.result-label { display: block; margin-top: 4px; font-family: var(--font); font-size: 14px; font-weight: 700; letter-spacing: .01em; opacity: .9; }
+.score-row { margin-bottom: 14px; }
+.score-label { display: block; margin: 0 4px 6px; font-size: 14px; font-weight: 650; color: var(--ink-2); }
+.score-opts { border-radius: 18px; overflow: hidden; background: var(--glass-strong); border: 1px solid var(--glass-edge); }
+.score-opt { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 14px; border: 0; background: none; text-align: left; color: var(--ink); font-size: 15.5px; }
+.score-opt + .score-opt { border-top: 1px solid var(--hairline); }
+.score-opt .pts { width: 28px; height: 28px; border-radius: 9px; flex: none; display: grid; place-items: center; background: var(--fill); font-family: var(--font-round); font-weight: 800; font-size: 15px; }
+.score-opt[aria-pressed="true"] { background: var(--petrol-soft); font-weight: 650; }
+.score-opt[aria-pressed="true"] .pts { background: var(--petrol); color: var(--on-petrol); }
+.score-sticky { position: sticky; bottom: 0; padding-top: 10px; background: linear-gradient(to bottom, transparent, var(--sheet) 30%); }
 
-        .triage-step-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; text-align: center; }
-        .triage-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        .btn-triage { 
-            padding: 16px; border-radius: 15px; border: 1px solid var(--border); 
-            background: var(--surface); color: var(--text-main); font-weight: 700; cursor: pointer;
-            text-align: center; font-size: 0.95rem;
-        }
-        .btn-full { grid-column: span 2; width: 100%; display: block; }
-        
-        .result-box { text-align: center; padding: 20px; border-radius: 20px; color: white; font-weight: 900; font-size: 1.3rem; line-height: 1.2; }
-        .result-label { display: block; font-size: 0.75rem; font-weight: 700; opacity: 0.9; text-transform: uppercase; margin-top: 4px; }
-
-        .score-row { margin-bottom: 12px; }
-        .score-label { font-size: 0.75rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; display: block; }
-        .score-select {
-            width: 100%; padding: 12px; border-radius: 12px; background: var(--surface);
-            border: 1px solid var(--border); color: var(--text-main); font-size: 0.9rem; font-family: inherit;
-        }
-
-        .patient-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-        .info-box {
-            background: var(--surface); border-radius: 20px; padding: 15px;
-            display: flex; flex-direction: column; align-items: center; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .label-top { font-size: 0.7rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 10px; }
-        .input-group { display: flex; gap: 8px; align-items: center; }
-        .input-stack { display: flex; flex-direction: column; align-items: center; }
-        .edit-input {
-            background: var(--card); border: 1px solid var(--border); color: var(--text-main);
-            font-size: 1.7rem; font-weight: 800; width: 70px; text-align: center;
-            border-radius: 12px; padding: 8px 4px; font-family: inherit;
-        }
-        .unit-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; text-transform: lowercase; }
-
-        .slider-section { padding: 0 20px 20px; text-align: center; }
-        #broselow-badge {
-            display: inline-block; padding: 10px 30px; border-radius: 30px;
-            font-weight: 900; font-size: 1.1rem; margin-bottom: 15px;
-            box-shadow: var(--shadow-soft); border: 1px solid rgba(0,0,0,0.1);
-        }
-        input[type=range] {
-            -webkit-appearance: none; width: 100%; height: 18px; border-radius: 9px;
-            background: linear-gradient(to right, #808080 0% 5%, #FFC0CB 5% 10%, #FF3B30 10% 20%, #af52de 20% 30%, #FFCC00 30% 45%, #ffffff 45% 60%, #007AFF 60% 80%, #FF9500 80% 90%, #4CD964 90% 100%);
-            outline: none;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 36px; height: 36px; background: #fff; border: 4px solid #444; border-radius: 50%;
-        }
-
-        .data-card { flex: 1; background: var(--card); border-top: 1px solid var(--border); border-radius: 35px 35px 0 0; display: flex; flex-direction: column; overflow: hidden; }
-        .tab-nav { display: flex; background: var(--surface); padding: 6px; gap: 4px; overflow-x: auto; scrollbar-width: none; }
-        .tab-item { flex: 1; min-width: 75px; padding: 14px 0; border: none; background: var(--tab-bg); font-size: 0.65rem; font-weight: 800; color: var(--text-muted); border-radius: 14px; transition: background 0.2s, color 0.2s; }
-        .tab-item.active { background: var(--card); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-
-        .tab-content { padding: 10px 0; overflow-y: auto; flex: 1; }
-        .section-header { font-size: 0.75rem; font-weight: 900; color: var(--accent); text-transform: uppercase; margin: 15px 20px 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
-        
-        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--surface); cursor: pointer; }
-        .list-row:nth-child(even) { background: var(--zebra); }
-
-        .list-label { font-size: 1rem; font-weight: 500; color: var(--text-main); }
-        .list-val-wrapper { display: flex; align-items: baseline; gap: 4px; }
-        .list-val { font-size: 1.15rem; font-weight: 900; color: var(--primary); }
-        .list-unit-fixed { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
-        .drug-sub-label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); display: block; margin-top: -2px; }
-
-        .variant-container { display: none; background: var(--surface); padding: 5px 20px; border-bottom: 1px solid var(--border); }
-        .variant-container.open { display: block; }
-        .variant-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .variant-row:last-child { border-bottom: none; }
-        .variant-info { font-size: 0.85rem; font-weight: 600; }
-        .variant-val { font-weight: 800; color: var(--primary); }
-        .expand-icon { font-size: 0.7rem; color: var(--text-muted); margin-left: 8px; transition: transform 0.3s; }
-        .row-open .expand-icon { transform: rotate(180deg); }
-    </style>
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; } }
+</style>
 </head>
 <body>
+<div class="ambient" aria-hidden="true"></div>
 
-    <!-- INTRO LAYER -->
-    <div id="intro-layer">
-        <div class="intro-stripes">
-            <div class="intro-stripe"></div>
-            <div class="intro-stripe"></div>
-            <div class="intro-stripe"></div>
-            <div class="intro-stripe"></div>
-            <div class="intro-stripe"></div>
-            <div class="intro-stripe"></div>
-            <div class="intro-stripe"></div>
-            <div class="intro-stripe"></div>
-            <div class="intro-stripe"></div>
-        </div>
-        <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;">
-            <div class="intro-logo">ResqPedi<sup>®</sup></div>
-            <div class="intro-brand">made by Švampi</div>
-        </div>
+<!-- ÚVODNÍ ANIMACE (klepnutím přeskočíš, ukáže se jednou za spuštění) -->
+<div id="intro-layer" aria-hidden="true">
+  <div class="intro-stripes">
+    <div class="intro-stripe"></div><div class="intro-stripe"></div><div class="intro-stripe"></div>
+    <div class="intro-stripe"></div><div class="intro-stripe"></div><div class="intro-stripe"></div>
+    <div class="intro-stripe"></div><div class="intro-stripe"></div><div class="intro-stripe"></div>
+  </div>
+  <div class="intro-mark">
+    <div class="intro-logo">ResqPedi<sup>®</sup></div>
+    <div class="intro-brand">made by Švampi</div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- NÁSTROJE -->
+<section class="sheet" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+  <div class="grabber"></div>
+  <div class="sheet-head">
+    <span></span><h2 id="drawer-title">Nástroje</h2>
+    <button class="round-btn glass" type="button" onclick="closeAll()" aria-label="Zavřít">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body">
+    <div class="group glass">
+      <button class="drawer-item" type="button" onclick="openCalc()">
+        <span class="ic" style="background:linear-gradient(150deg,#22C1C9,#0B6E79)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4M17 7l3-3M19 9 8.7 19.3a2.4 2.4 0 0 1-3.4 0l-.6-.6a2.4 2.4 0 0 1 0-3.4L15 5M9 11l4 4M5 19l-3 3M14 4l6 6"/></svg></span>
+        <span class="grow"><b>Kalkulačka ředění</b><span class="sub">Příprava léku a objem k podání</span></span>
+        <svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>
+      </button>
+      <button class="drawer-item" type="button" onclick="startJumpstart()">
+        <span class="ic" style="background:linear-gradient(150deg,#F25C5F,#C9282B)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4M12 14v-4M4 13a8 8 0 0 1 8-7 8 8 0 1 1-5.3 14L4 17.6"/><path d="M9 17H4v5"/></svg></span>
+        <span class="grow"><b>JumpSTART triage</b><span class="sub">Třídění dětí při hromadném neštěstí</span></span>
+        <svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>
+      </button>
+      <button class="drawer-item" type="button" onclick="openGCS()">
+        <span class="ic" style="background:linear-gradient(150deg,#7C8CF8,#3D49B5)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M12 5v13"/></svg></span>
+        <span class="grow"><b>GCS</b><span class="sub">Glasgow Coma Scale, dětská verze</span></span>
+        <svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>
+      </button>
+      <button class="drawer-item" type="button" onclick="openApgar()">
+        <span class="ic" style="background:linear-gradient(150deg,#F7B24A,#D1761A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h.01M15 12h.01M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"/></svg></span>
+        <span class="grow"><b>Apgar skóre</b><span class="sub">Hodnocení novorozence</span></span>
+        <svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>
+      </button>
     </div>
+  </div>
+</section>
 
-    <div class="drawer-overlay" id="overlay" onclick="closeAll()"></div>
-    
-    <div class="drawer" id="drawer">
-        <h2 style="margin: 0 0 10px 0;">Nástroje</h2>
-        <div class="drawer-item" onclick="openCalc()">💉 Kalkulačka ředění</div>
-        <div class="drawer-item" onclick="startJumpstart()">🚑 JumpSTART Triage</div>
-        <div class="drawer-item" onclick="openGCS()">🧠 GCS</div>
-        <div class="drawer-item" onclick="openApgar()">👶 Apgar skóre</div>
-        <div style="flex:1"></div>
-        <button class="btn-triage btn-full" style="color:var(--accent); border-color:var(--accent); background:none;" onclick="closeAll()">ZAVŘÍT</button>
+<!-- OKNO NÁSTROJE -->
+<section class="sheet tall" id="tool-modal" role="dialog" aria-modal="true" aria-labelledby="tool-title">
+  <div class="grabber"></div>
+  <div class="sheet-head">
+    <button class="round-btn glass" type="button" onclick="backToTools()" aria-label="Zpět na nástroje">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <h2 id="tool-title">Nástroj</h2>
+    <button class="round-btn glass" type="button" onclick="closeAll()" aria-label="Zavřít">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body" id="modal-content"></div>
+</section>
+
+<div class="shell">
+  <header>
+    <h1 class="app-title">ResqPedi<sup>®</sup></h1>
+    <div class="head-btns">
+      <button class="tools-btn glass" type="button" onclick="toggleMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+        Nástroje
+      </button>
+      <button class="round-btn glass" id="theme-toggle" type="button" aria-label="Přepnout světlý nebo tmavý režim">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4v16"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+      </button>
     </div>
+  </header>
 
-    <div id="tool-modal" class="modal">
-        <div id="modal-content"></div>
-        <button class="btn-triage btn-full" style="margin-top:20px; border-color:transparent; color:var(--primary); background:none;" onclick="closeAll()">HOTOVO</button>
-    </div>
-
-    <header>
-        <div style="font-size: 1.5rem; cursor: pointer; padding: 5px;" onclick="toggleMenu()">☰</div>
-        <div class="app-title">ResqPedi<span class="trademark">®</span></div>
-        <div style="font-size: 1.5rem; cursor: pointer; padding: 5px;" onclick="document.body.classList.toggle('dark-mode')">🌓</div>
-    </header>
-
+  <section class="patient glass" id="patient">
     <div class="patient-grid">
-        <div class="info-box">
-            <span class="label-top">Věk dítěte</span>
-            <div class="input-group">
-                <div class="input-stack"><input type="number" inputmode="decimal" id="in-yr" class="edit-input" onchange="manualUpdate('age')"><span class="unit-label">roky</span></div>
-                <div class="input-stack"><input type="number" inputmode="decimal" id="in-mo" class="edit-input" onchange="manualUpdate('age')"><span class="unit-label">měs.</span></div>
-            </div>
+      <div class="info-box">
+        <span class="label-top">Věk dítěte</span>
+        <div class="input-group">
+          <div class="input-stack"><input type="number" inputmode="decimal" id="in-yr" class="edit-input" onchange="manualUpdate('age')" onclick="this.select()" aria-label="Věk v letech"><span class="unit-label">roky</span></div>
+          <div class="input-stack"><input type="number" inputmode="decimal" id="in-mo" class="edit-input" onchange="manualUpdate('age')" onclick="this.select()" aria-label="Měsíce"><span class="unit-label">měsíce</span></div>
         </div>
-        <div class="info-box">
-            <span class="label-top">Váha / Výška</span>
-            <div class="input-group">
-                <div class="input-stack"><input type="number" inputmode="decimal" id="in-kg" class="edit-input" onchange="manualUpdate('kg')"><span class="unit-label">kg</span></div>
-                <div class="input-stack"><input type="number" inputmode="decimal" id="in-cm" class="edit-input" onchange="manualUpdate('cm')"><span class="unit-label">cm</span></div>
-            </div>
+      </div>
+      <div class="info-box">
+        <span class="label-top">Váha a výška</span>
+        <div class="input-group">
+          <div class="input-stack"><input type="number" inputmode="decimal" id="in-kg" class="edit-input" onchange="manualUpdate('kg')" onclick="this.select()" aria-label="Váha v kg"><span class="unit-label">kg</span></div>
+          <div class="input-stack"><input type="number" inputmode="decimal" id="in-cm" class="edit-input" onchange="manualUpdate('cm')" onclick="this.select()" aria-label="Výška v cm"><span class="unit-label">cm</span></div>
         </div>
+      </div>
     </div>
 
     <div class="slider-section">
-        <div id="broselow-badge">PURPLE (~10 kg)</div>
-        <input type="range" id="main-slider" min="0" max="144" value="12" oninput="syncFromSlider(this.value)">
+      <div class="broselow-row">
+        <span class="label-top">Broselowův pásek</span>
+        <span id="broselow-badge">PURPLE (~10 kg)</span>
+      </div>
+      <input type="range" id="main-slider" min="0" max="144" value="12" oninput="syncFromSlider(this.value)" aria-label="Věk dítěte">
+      <div class="range-scale"><span>novorozenec</span><span>3 roky</span><span>6 let</span><span>9 let</span><span>12 let</span></div>
     </div>
+  </section>
 
-    <div class="data-card">
-        <div class="tab-nav">
-            <button class="tab-item active" onclick="setTab(this, 'NORM')">FYZIOLOG. <br> HODNOTY</button>
-            <button class="tab-item" onclick="setTab(this, 'EQUIP')">VYBAVENÍ</button>
-            <button class="tab-item" onclick="setTab(this, 'RES')">KPR</button>
-            <button class="tab-item" onclick="setTab(this, 'ANE')">ANESTEZIE</button>
-            <button class="tab-item" onclick="setTab(this, 'EMGY')">AKUTNÍ <br> STAVY</button>
-        </div>
-        <div class="tab-content" id="data-view"></div>
+  <div class="tabbar" id="tabbar">
+    <div class="mini-patient" id="mini-patient"></div>
+    <div class="tab-nav" role="tablist">
+      <button class="tab-item active" type="button" role="tab" onclick="setTab(this, 'NORM')">Fyziologie</button>
+      <button class="tab-item" type="button" role="tab" onclick="setTab(this, 'EQUIP')">Vybavení</button>
+      <button class="tab-item" type="button" role="tab" onclick="setTab(this, 'RES')">KPR</button>
+      <button class="tab-item" type="button" role="tab" onclick="setTab(this, 'ANE')">Anestezie</button>
+      <button class="tab-item" type="button" role="tab" onclick="setTab(this, 'EMGY')">Akutní stavy</button>
     </div>
+  </div>
+
+  <div class="tab-content" id="data-view"></div>
+</div>
 
 <script>
-    // SCRIPT PRO ODSTRANĚNÍ INTRA
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            const intro = document.getElementById('intro-layer');
-            intro.classList.add('intro-hidden');
-            setTimeout(() => intro.remove(), 600);
-        }, 2200);
-    });
+    /* ---- Úvodní animace: jednou za spuštění, klepnutím ji přeskočíš ---- */
+    (function () {
+        const intro = document.getElementById('intro-layer');
+        let seen = false;
+        try { seen = sessionStorage.getItem('resqpedi:intro') === '1'; sessionStorage.setItem('resqpedi:intro', '1'); } catch (e) {}
+        if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) { intro.remove(); return; }
+        const hide = () => { if (!intro.isConnected) return; intro.classList.add('intro-hidden'); setTimeout(() => intro.remove(), 500); };
+        intro.addEventListener('click', hide);
+        setTimeout(hide, 1700);
+    })();
 
     const FULL_DB = {
         "GREY":   { etk: "3.0", depth: "9", suction: "6 (světle zelená)", opa: "00 (růž.)", lma: "1", blade: "0 (Miller)", cannula: "24G (žlutá)", io: "15mm (růžová)" },
@@ -355,17 +483,30 @@
         { name: "Sufentanil", dose: 0.0002, unit: "mg", sub: "0.2 µg/kg (i.v.)", tab: "ANE" },
         { name: "Adrenalin (i.m.)", dose: 0.01, unit: "mg", sub: "Anafylaxe", tab: "EMGY" },
         { name: "Dexamethason (i.v./i.m.)", dose: 0.6, unit: "mg", sub: "Laryngitida", tab: "EMGY" },
-        { name: "Adenosin (i.v.)", dose: 0.1, unit: "mg", sub: "SVT (rapidní i.v. podání)", tab: "EMGY" },
+        // Adenocor (adenosin 3 mg/ml) – dávkování podle SPC: 0,1 mg/kg (max 6 mg), navyšovat po 0,1 mg/kg, max 12 mg
+        {
+            id: "drug_adenocor",
+            name: "Adenocor (adenosin)",
+            tab: "EMGY",
+            sub: "SVT · rychlý i.v. bolus, ihned proplach NaCl",
+            conc: 3,
+            steps: [
+                { l: "1. dávka", d: 0.1, max: 6 },
+                { l: "2. dávka", d: 0.2, max: 12 },
+                { l: "3. dávka", d: 0.3, max: 12 }
+            ],
+            note: "Ampule 6 mg / 2 ml (3 mg/ml). Podat co nejblíže srdci, ihned proplachnout NaCl. Další dávka po 1–2 min, pokud SVT trvá. Monitorace EKG."
+        },
         { name: "Diazepam (p.r.)", dose: 0.5, unit: "mg", sub: "Křečové stavy", tab: "EMGY" },
         { name: "Midazolam (i.m.)", dose: 0.2, unit: "mg", sub: "Křeče", tab: "EMGY" },
         { name: "Glukóza 10% (i.v.)", dose: 5, unit: "ml", sub: "Hypoglykémie", tab: "EMGY" },
-        { name: "Naloxon(i.v./i.m.)", dose: 0.01, unit: "mg", sub: "Antidotum opioidů ", tab: "EMGY" },
+        { name: "Naloxon (i.v./i.m.)", dose: 0.01, unit: "mg", sub: "Antidotum opioidů", tab: "EMGY" },
         { name: "Flumazenil (i.v.)", dose: 0.01, unit: "mg", sub: "Antidotum benzodiazepinů", tab: "EMGY" },
-        { 
+        {
             id: "drug_ketamin",
-            name: "Calypsol", 
-            tab: ["ANE", "EMGY"], 
-            sub: "Rozbalit pro cesty a dávky ▼",
+            name: "Calypsol",
+            tab: ["ANE", "EMGY"],
+            sub: "Ketamin · rozbal pro cesty a dávky",
             variants: [
                 { l: "Analgezie (i.v.)", d: 0.3, dMax: 0.5 },
                 { l: "Sedace (i.v.)", d: 0.5, dMax: 1.0 },
@@ -452,34 +593,57 @@
         {n: "Xylocain spr. 10%", d: 0, u: "-", amp: 1, ampV: 1, sol: "Lokálně (sliznice)"}
     ].sort((a,b) => a.n.localeCompare(b.n, 'cs'));
 
-    let activeTab = 'NORM', curB = "PURPLE";
-    let expandedIds = new Set(); 
+    const CHEV_DOWN = '<svg class="expand-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l4 4 4-4"/></svg>';
+    const BROSELOW_COLORS = { GREY: "#808080", PINK: "#ffc0cb", RED: "#ff3b30", PURPLE: "#af52de", YELLOW: "#ffcc00", WHITE: "#ffffff", BLUE: "#007aff", ORANGE: "#ff9500", GREEN: "#4cd964" };
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-    function toggleMenu() { 
-        const d = document.getElementById('drawer'), o = document.getElementById('overlay');
-        d.classList.toggle('open'); o.style.display = d.classList.contains('open') ? 'block' : 'none'; 
+    let activeTab = 'NORM', curB = "PURPLE", curW = "10-11";
+    let expandedIds = new Set();
+
+    /* ---- Panely ---- */
+    function openSheet(id) {
+        document.getElementById('overlay').classList.add('open');
+        document.getElementById(id).classList.add('open');
+        document.body.classList.add('locked');
     }
+    function toggleMenu() {
+        const d = document.getElementById('drawer');
+        if (d.classList.contains('open')) closeAll(); else { closeTool(); openSheet('drawer'); }
+    }
+    function closeTool() { document.getElementById('tool-modal').classList.remove('open'); }
     function closeAll() {
         document.getElementById('drawer').classList.remove('open');
-        document.getElementById('tool-modal').classList.remove('active');
-        document.getElementById('overlay').style.display = 'none';
+        closeTool();
+        document.getElementById('overlay').classList.remove('open');
+        document.body.classList.remove('locked');
     }
-    function setTab(btn, name) { 
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); 
-        btn.classList.add('active'); activeTab = name; render(); 
+    function openTool(title) {
+        document.getElementById('drawer').classList.remove('open');
+        document.getElementById('tool-title').textContent = title;
+        document.getElementById('modal-content').scrollTop = 0;
+        openSheet('tool-modal');
+    }
+    function backToTools() { closeTool(); openSheet('drawer'); }
+
+    function setTab(btn, name) {
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active'); activeTab = name; render();
+        btn.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
     }
     function toggleVariants(id) {
         if (expandedIds.has(id)) expandedIds.delete(id); else expandedIds.add(id);
-        render(); 
+        render();
     }
 
+    /* ---- Pacient (beze změny výpočtů) ---- */
     function syncFromSlider(val) {
+        val = +val;
         const yrs = Math.floor(val/12), mos = val%12;
-        document.getElementById('in-yr').value = yrs; 
+        document.getElementById('in-yr').value = yrs;
         document.getElementById('in-mo').value = mos;
-        
+
         let kg = (yrs >= 1) ? (yrs + 4) * 2 : (val * 0.5 + 3.0);
-        
+
         document.getElementById('in-kg').value = kg.toFixed(kg<10?1:0);
         document.getElementById('in-cm').value = Math.round(45 + (val * 0.7));
         updateBroselow(kg); render();
@@ -487,13 +651,20 @@
     function manualUpdate(src) {
         let m = 0;
         if(src==='age') m = (parseInt(document.getElementById('in-yr').value)||0)*12 + (parseInt(document.getElementById('in-mo').value)||0);
-        else if(src==='kg') { 
+        else if(src==='kg') {
+            document.getElementById('in-kg').dataset.typed = document.getElementById('in-kg').value;
             let k = parseFloat(document.getElementById('in-kg').value)||3;
-            if (k < 3) k = 3; 
-            m = k>10 ? (k/2-4)*12 : (k-3.0)/0.5; 
+            if (k < 3) k = 3;
+            m = k>10 ? (k/2-4)*12 : (k-3.0)/0.5;
         }
-        m = Math.max(0, Math.min(144, m)); 
+        else m = ((parseFloat(document.getElementById('in-cm').value)||45) - 45) / 0.7;   // obrácený vzorec výšky (45 + 0,7 × měsíce)
+        m = Math.round(Math.max(0, Math.min(144, m)));
         document.getElementById('main-slider').value = m; syncFromSlider(m);
+        if (src === 'kg') {
+            // ručně zadaná váha má přednost před odhadem z věku (dávky se počítají ze skutečné váhy)
+            const typed = parseFloat(document.getElementById('in-kg').dataset.typed);
+            if (typed > 0) { document.getElementById('in-kg').value = typed; updateBroselow(typed); render(); }
+        }
     }
     function updateBroselow(kg) {
         let c="#808080", t="GREY", f="white", w="3-5";
@@ -501,20 +672,34 @@
         if(kg>9.5){c="#af52de";t="PURPLE";f="white";w="10-11";} if(kg>11.5){c="#ffcc00";t="YELLOW";f="black";w="12-14";}
         if(kg>14.5){c="#ffffff";t="WHITE";f="black";w="15-18";} if(kg>18.5){c="#007aff";t="BLUE";f="white";w="19-22";}
         if(kg>23.5){c="#ff9500";t="ORANGE";f="black";w="24-28";} if(kg>29.5){c="#4cd964";t="GREEN";f="black";w="30-36";}
-        curB = t; const b = document.getElementById('broselow-badge');
-        b.style.backgroundColor = c; b.style.color = f; b.innerText = `${t} (${w} kg)`;
+        curB = t; curW = w; const b = document.getElementById('broselow-badge');
+        b.style.backgroundColor = c; b.style.color = f; b.innerText = `${t} · ${w} kg`;
+        updateMini();
     }
-    
-    function rowHtml(l, v, u, sub="", onClick="", isOpen=false) { 
-        return `<div class="list-row ${isOpen ? 'row-open' : ''}" onclick="${onClick}">
+    function updateMini() {
+        const kg = document.getElementById('in-kg').value, y = document.getElementById('in-yr').value, m = document.getElementById('in-mo').value;
+        document.getElementById('mini-patient').innerHTML =
+            `<span class="swatch" style="background:${BROSELOW_COLORS[curB]}"></span><b>${curB}</b><span>${kg} kg · ${y} r ${m} m</span>`;
+    }
+
+    /* ---- Výpis ---- */
+    function rowHtml(l, v, u, sub="", onClick="", isOpen=false) {
+        return `<div class="list-row ${onClick ? 'tap' : ''} ${isOpen ? 'row-open' : ''}" ${onClick ? `onclick="${onClick}" role="button" tabindex="0" aria-expanded="${isOpen}"` : ''}>
             <span class="list-label">${l}${sub?`<span class="drug-sub-label">${sub}</span>`:''}</span>
-            <div class="list-val-wrapper">
+            <span class="list-val-wrapper">
                 <span class="list-val">${v}</span>
                 <span class="list-unit-fixed">${u}</span>
-                ${onClick ? '<span class="expand-icon">▼</span>' : ''}
-            </div>
-        </div>`; 
+                ${onClick ? CHEV_DOWN : ''}
+            </span>
+        </div>`;
     }
+    const section = (title, rows) => `<div class="section-header">${title}</div><div class="group glass">${rows}</div>`;
+    const routeTag = (l) => {
+        const m = l.match(/\((i\.v\.|i\.m\.|p\.r\.|i\.n\.)\)/);
+        if (!m) return esc(l);
+        const cls = { 'i.v.': 'iv', 'i.m.': 'im', 'p.r.': 'pr', 'i.n.': 'in' }[m[1]];
+        return `<span class="route ${cls}">${m[1]}</span>${esc(l.replace(m[0], '').trim())}`;
+    };
 
     function render() {
         const view = document.getElementById('data-view'), kg = parseFloat(document.getElementById('in-kg').value)||3, yrs = parseInt(document.getElementById('in-yr').value)||0, d = FULL_DB[curB];
@@ -525,52 +710,59 @@
             const stk = Math.round(70+(yrs*2));
             const dtk = Math.round(stk * 0.66);
             const map = Math.round(dtk + (stk - dtk)/3);
-            html = `<div class="section-header">Vitální hodnoty</div>
-                ${rowHtml("Tepová frekvence (Tf)", yrs<1?'110-160':yrs<5?'90-140':'70-120', "/min")}
-                ${rowHtml("Dechová frekvence (Df)", yrs<1?'30-40':yrs<5?'20-30':'15-20', "/min")}
-                ${rowHtml("Systol. TK (sTK)", stk, "mmHg")}
-                ${rowHtml("Diastol. TK (dTK)", dtk, "mmHg")}
-                ${rowHtml("Střední TK (MAP)", map, "mmHg")}
-                <div class="section-header">Ostatní hodnoty</div>
-                ${rowHtml("Objem krve (EBV)", ebv, "ml")}
-                ${rowHtml("Glukóza (spodní hranice)", yrs<1?'2.5':'3.3', "mmol/l")}`;        
+            html = section("Vitální hodnoty",
+                    rowHtml("Tepová frekvence (Tf)", yrs<1?'110-160':yrs<5?'90-140':'70-120', "/min") +
+                    rowHtml("Dechová frekvence (Df)", yrs<1?'30-40':yrs<5?'20-30':'15-20', "/min") +
+                    rowHtml("Systol. TK (sTK)", stk, "mmHg") +
+                    rowHtml("Diastol. TK (dTK)", dtk, "mmHg") +
+                    rowHtml("Střední TK (MAP)", map, "mmHg")) +
+                section("Ostatní hodnoty",
+                    rowHtml("Objem krve (EBV)", ebv, "ml") +
+                    rowHtml("Glukóza (spodní hranice)", yrs<1?'2.5':'3.3', "mmol/l"));
         } else if(activeTab === 'EQUIP') {
-            html = `<div class="section-header">A (Airway) + B (Breathing)</div>
-                ${rowHtml("Lžíce laryngoskopu", d.blade, "")}
-                ${rowHtml("ET kanyla", d.etk, "mm")}
-                ${rowHtml("Hloubka zavedení ETK", d.depth, "cm")}
-                ${rowHtml("Ústní vzduchovod", d.opa, "")}
-                ${rowHtml("LMA", "vel. " + d.lma, "")}
-                ${rowHtml("Odsávací kanyla", d.suction, "")}
-                <div class="section-header">C (Circulation)</div>
-                ${rowHtml("I.V. kanyla", d.cannula, "")}
-                ${rowHtml("I.O. jehla", d.io, "")}`;
+            html = section("A (Airway) + B (Breathing)",
+                    rowHtml("Lžíce laryngoskopu", d.blade, "") +
+                    rowHtml("ET kanyla", d.etk, "mm") +
+                    rowHtml("Hloubka zavedení ETK", d.depth, "cm") +
+                    rowHtml("Ústní vzduchovod", d.opa, "") +
+                    rowHtml("LMA", "vel. " + d.lma, "") +
+                    rowHtml("Odsávací kanyla", d.suction, "")) +
+                section("C (Circulation)",
+                    rowHtml("I.V. kanyla", d.cannula, "") +
+                    rowHtml("I.O. jehla", d.io, ""));
         } else if(activeTab === 'RES') {
-            html = `<div class="section-header">KPR (ERC 2025)</div>
-                ${rowHtml("Defibrilace (4 J/kg)", (kg*4).toFixed(0), "J")}
-                ${rowHtml("Adrenalin (10 µg/kg)", (kg*0.1).toFixed(1), "ml", "1:10 000 (i.v./i.o.) - 9ml NaCl + 1ml ADR = 0,1mg/ml")}
-                ${rowHtml("Amiodaron (5 mg/kg)", (kg*5).toFixed(0), "mg", "Po 3. a 5. výboji")}
-                ${rowHtml("Atropin (20 µg/kg)", (kg*0.02).toFixed(2), "mg", "Bradykardie")}
-                ${rowHtml("Bolus tekutin", (kg*20).toFixed(0), "ml", "Krystaloid (20ml/kg)")}
-                ${rowHtml("Glukóza 10%", (kg*5).toFixed(0), "ml", "Hypoglykémie (5ml/kg)")}`;
+            html = section("KPR (ERC 2025)",
+                    rowHtml("Defibrilace (4 J/kg)", (kg*4).toFixed(0), "J") +
+                    rowHtml("Adrenalin (10 µg/kg)", (kg*0.1).toFixed(1), "ml", "1:10 000 (i.v./i.o.) - 9ml NaCl + 1ml ADR = 0,1mg/ml") +
+                    rowHtml("Amiodaron (5 mg/kg)", (kg*5).toFixed(0), "mg", "Po 3. a 5. výboji") +
+                    rowHtml("Atropin (20 µg/kg)", (kg*0.02).toFixed(2), "mg", "Bradykardie") +
+                    rowHtml("Bolus tekutin", (kg*20).toFixed(0), "ml", "Krystaloid (20ml/kg)") +
+                    rowHtml("Glukóza 10%", (kg*5).toFixed(0), "ml", "Hypoglykémie (5ml/kg)"));
         } else {
             const title = activeTab === 'ANE' ? "Anestezie" : "Akutní stavy";
-            html = `<div class="section-header">${title}</div>`;
+            let rows = "";
             const filteredDrugs = DRUGS.filter(dr => Array.isArray(dr.tab) ? dr.tab.includes(activeTab) : dr.tab === activeTab)
                                        .sort((a, b) => a.name.localeCompare(b.name, 'cs'));
             filteredDrugs.forEach((dr, index) => {
-                const uid = dr.id || `drug_${index}`; 
+                const uid = dr.id || `drug_${index}`;
                 const isOpen = expandedIds.has(uid);
-                if (dr.variants) {
-                    html += rowHtml(dr.name, "...", "", dr.sub, `toggleVariants('${uid}')`, isOpen);
-                    html += `<div class="variant-container ${isOpen ? 'open' : ''}">`;
+                if (dr.steps) {
+                    // stupňované dávky s maximem a přepočtem na ml (Adenocor)
+                    const first = Math.min(kg * dr.steps[0].d, dr.steps[0].max);
+                    rows += rowHtml(dr.name, first.toFixed(first < 1 ? 2 : 1), "mg", dr.sub, `toggleVariants('${uid}')`, isOpen);
+                    rows += `<div class="variant-container ${isOpen ? 'open' : ''}">`;
+                    dr.steps.forEach(st => {
+                        const raw = kg * st.d, mg = Math.min(raw, st.max), ml = mg / dr.conc;
+                        const capped = raw > st.max;
+                        rows += `<div class="variant-row"><span class="variant-info">${esc(st.l)} <span style="color:var(--ink-2);font-weight:500">${String(st.d).replace('.', ',')} mg/kg, max ${st.max} mg</span></span>
+                            <span class="variant-val">${mg.toFixed(mg < 1 ? 2 : 1)} mg<small>${ml.toFixed(2)} ml${capped ? ' · maximum' : ''}</small></span></div>`;
+                    });
+                    rows += `<div class="variant-note">${esc(dr.note)}</div></div>`;
+                } else if (dr.variants) {
+                    rows += rowHtml(dr.name, "…", "", dr.sub, `toggleVariants('${uid}')`, isOpen);
+                    rows += `<div class="variant-container ${isOpen ? 'open' : ''}">`;
                     dr.variants.forEach(v => {
                         let finalVal; let unit = "mg";
-                        let bgStyle = "";
-                        if (v.l.includes("i.v.")) bgStyle = "background-color: rgba(255, 59, 48, 0.08);";
-                        else if (v.l.includes("i.m.")) bgStyle = "background-color: rgba(175, 82, 222, 0.12);";
-                        else if (v.l.includes("p.r.")) bgStyle = "background-color: rgba(139, 69, 19, 0.1);";
-                        else if (v.l.includes("i.n.")) bgStyle = "background-color: rgba(76, 217, 100, 0.12);";
                         if (v.dMax) {
                             let low = kg * v.d; let high = kg * v.dMax;
                             if (low < 0.1 && low > 0) { low *= 1000; high *= 1000; unit = "µg"; }
@@ -580,52 +772,58 @@
                             if (res < 0.1 && res > 0) { res = res * 1000; unit = "µg"; }
                             finalVal = res.toFixed(res < 10 ? 1 : 0);
                         }
-                        html += `<div class="variant-row" style="${bgStyle} margin: 0 -20px; padding: 10px 20px;"><span class="variant-info">${v.l}</span><span class="variant-val">${finalVal} ${unit}</span></div>`;
+                        rows += `<div class="variant-row"><span class="variant-info">${routeTag(v.l)}</span><span class="variant-val">${finalVal} ${unit}</span></div>`;
                     });
-                    html += `</div>`;
+                    rows += `</div>`;
                 } else {
                     let res = (kg * dr.dose); let unit = dr.unit;
                     if (res < 0.1 && res > 0 && unit === "mg") { res = res * 1000; unit = "µg"; }
                     const total = res.toFixed(res < 1 ? 2 : (res < 10 ? 1 : 0));
-                    html += rowHtml(dr.name, total, unit, dr.sub);
+                    rows += rowHtml(dr.name, total, unit, dr.sub);
                 }
             });
+            html = section(title, rows);
         }
         view.innerHTML = html;
     }
 
+    /* ---- Kalkulačka ředění ---- */
+    const SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
     function openCalc() {
-        toggleMenu(); 
-        document.getElementById('tool-modal').classList.add('active'); 
-        document.getElementById('overlay').style.display = 'block';
+        openTool('Kalkulačka ředění');
         document.getElementById('modal-content').innerHTML = `
-            <h3 style="margin-top:0">💉 Kalkulačka ředění</h3>
-            <div style="position: relative; margin-bottom: 15px; width: 100%;">
-                <input type="text" id="calc-search-input" placeholder="🔍 Hledej lék (např. Torecan)..." oninput="filterDrugList(this.value)" style="width: 100%; padding: 12px 40px 12px 12px; border-radius: 12px; border: 2px solid var(--primary); background: var(--surface); color: var(--text-main); font-weight: 600; font-family: inherit; outline: none; font-size: 0.95rem;">
-                <span id="search-clear" onclick="clearCalcSearch()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 1.5rem; color: var(--text-muted); cursor: pointer; display: none; line-height: 1; z-index: 10;">×</span>
-                <div id="drug-scroll-list" style="position: absolute; top: calc(100% + 4px); left: 0; right: 0; max-height: 200px; overflow-y: auto; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-heavy); z-index: 1000; display: none;"></div>
+            <div class="search-box">
+                <label class="search-field">${SEARCH_ICON}
+                    <input type="text" id="calc-search-input" placeholder="Hledej lék, např. Torecan" oninput="filterDrugList(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
+                    <button type="button" id="search-clear" class="clear-btn" onclick="clearCalcSearch()" aria-label="Vymazat" hidden>
+                        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+                    </button>
+                </label>
+                <div id="drug-scroll-list" hidden></div>
             </div>
             <div class="calc-grid">
-                <div class="calc-field"><label class="calc-label">Obsah ampule</label><div class="calc-input-row"><input type="number" id="ca-amt" class="calc-in" value="1" oninput="doCalc()"><select id="ca-u" class="calc-sel" onchange="doCalc()"><option>mg</option><option>mcg</option></select></div></div>
-                <div class="calc-field"><label class="calc-label">Celkový objem (ml)</label><input type="number" id="ca-v" class="calc-in" value="10" oninput="doCalc()"></div>
-                <div class="calc-field" style="grid-column: span 2;"><label class="calc-label">Objem ampule (ml)</label><div class="switch-container" id="amp-switches">${[1,2,5,10,20].map(v => `<button class="switch-btn" onclick="setAmpV(this, ${v})">${v} ml</button>`).join('')}<button class="switch-btn" onclick="setAmpV(this, null)">Vlastní</button></div><input type="number" id="ca-ampv" class="calc-in" style="display:none; margin-top:5px;" placeholder="Zadej ml..." oninput="doCalc()"></div>
-                <div class="calc-field" style="grid-column: span 2;"><label class="calc-label">Dávka pro pacienta</label><div class="calc-input-row"><input type="number" id="ca-t" class="calc-in" value="0" oninput="doCalc()"><select id="ca-tu" class="calc-sel" onchange="doCalc()"><option>mg</option><option>mcg</option></select></div></div>
+                <div class="calc-field"><label class="calc-label" for="ca-amt">Obsah ampule</label><div class="calc-input-row"><input type="number" id="ca-amt" class="calc-in" value="1" inputmode="decimal" oninput="doCalc()"><select id="ca-u" class="calc-sel" onchange="doCalc()"><option>mg</option><option>mcg</option></select></div></div>
+                <div class="calc-field"><label class="calc-label" for="ca-v">Celkový objem</label><div class="calc-input-row"><input type="number" id="ca-v" class="calc-in" value="10" inputmode="decimal" oninput="doCalc()"><span class="calc-label" style="width:22px">ml</span></div></div>
+                <div class="calc-field wide"><span class="calc-label">Objem ampule</span><div class="switch-container" id="amp-switches">${[1,2,5,10,20].map(v => `<button type="button" class="switch-btn" onclick="setAmpV(this, ${v})">${v} ml</button>`).join('')}<button type="button" class="switch-btn" onclick="setAmpV(this, null)">Vlastní</button></div><input type="number" id="ca-ampv" class="calc-in" style="display:none; margin-top:6px;" placeholder="Objem ampule v ml" inputmode="decimal" oninput="doCalc()"></div>
+                <div class="calc-field wide"><label class="calc-label" for="ca-t">Dávka pro pacienta</label><div class="calc-input-row"><input type="number" id="ca-t" class="calc-in" value="0" inputmode="decimal" oninput="doCalc()"><select id="ca-tu" class="calc-sel" onchange="doCalc()"><option>mg</option><option>mcg</option></select></div></div>
             </div>
-            <div id="ca-res" class="res-pill">Zvol lék ze seznamu</div>`;
-        setAmpV(document.querySelector('.switch-btn'), 1);
+            <div id="ca-res" class="res-pill idle">Vyber lék ze seznamu, nebo zadej hodnoty ručně</div>`;
+        setAmpV(document.querySelector('#amp-switches .switch-btn'), 1, true);
     }
 
     function filterDrugList(q) {
         const list = document.getElementById('drug-scroll-list');
         const clearBtn = document.getElementById('search-clear');
-        const query = q.toLowerCase();
-        if (clearBtn) clearBtn.style.display = q.length > 0 ? 'block' : 'none';
-        if (q.length === 0) { list.style.display = 'none'; list.innerHTML = ""; return; }
-        const filtered = CALC_DB.filter(d => d.n.toLowerCase().includes(query));
+        const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+        const query = norm(q);
+        if (clearBtn) clearBtn.hidden = q.length === 0;
+        if (q.length === 0) { list.hidden = true; list.innerHTML = ""; return; }
+        const filtered = CALC_DB.filter(d => norm(d.n).includes(query));
         if (filtered.length > 0) {
-            list.style.display = 'block';
-            list.innerHTML = filtered.map(d => `<div style="padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 0.95rem; cursor: pointer; font-weight: 600; color: var(--text-main);" onclick="applyPresetByIndex('${d.n}')">${d.n}</div>`).join('');
-        } else { list.style.display = 'none'; }
+            list.hidden = false;
+            list.innerHTML = filtered.map(d => `<button type="button" class="drug-opt" data-name="${esc(d.n)}">${esc(d.n)}</button>`).join('');
+            list.querySelectorAll('.drug-opt').forEach(b => b.onclick = () => applyPresetByIndex(b.dataset.name));
+        } else { list.hidden = true; }
     }
 
     function clearCalcSearch() {
@@ -642,15 +840,15 @@
         const mos = parseInt(document.getElementById('in-mo').value)||0;
         const totalMos = (yrs * 12) + mos;
         document.getElementById('calc-search-input').value = drug.n;
-        document.getElementById('drug-scroll-list').style.display = 'none';
-        document.getElementById('search-clear').style.display = 'block';
-        document.getElementById('ca-amt').value = drug.amp; 
+        document.getElementById('drug-scroll-list').hidden = true;
+        document.getElementById('search-clear').hidden = false;
+        document.getElementById('ca-amt').value = drug.amp;
         document.getElementById('ca-u').value = drug.u.includes('mcg') ? 'mcg' : 'mg';
         const buttons = document.querySelectorAll('#amp-switches .switch-btn'); let found = false;
-        buttons.forEach(b => { if(b.innerText === drug.ampV + " ml") { setAmpV(b, drug.ampV); found = true; } });
-        if(!found) { setAmpV(buttons[buttons.length-1], null); document.getElementById('ca-ampv').value = drug.ampV; }
-        document.getElementById('ca-t').value = (drug.d * kg).toFixed(drug.d*kg < 1 ? 2 : 1); 
-        document.getElementById('ca-tu').value = drug.u.includes('mcg') ? 'mcg' : 'mg'; 
+        buttons.forEach(b => { if(b.innerText === drug.ampV + " ml") { setAmpV(b, drug.ampV, true); found = true; } });
+        if(!found) { setAmpV(buttons[buttons.length-1], null, true); document.getElementById('ca-ampv').value = drug.ampV; }
+        document.getElementById('ca-t').value = (drug.d * kg).toFixed(drug.d*kg < 1 ? 2 : 1);
+        document.getElementById('ca-tu').value = drug.u.includes('mcg') ? 'mcg' : 'mg';
         const resBox = document.getElementById('ca-res');
         resBox.dataset.sol = drug.sol;
         let warning = "";
@@ -660,15 +858,16 @@
             if(drug.limit.minM && totalMos < drug.limit.minM) warning = drug.limit.msg;
         }
         resBox.dataset.warning = warning;
+        resBox.dataset.ready = '1';
         doCalc();
     }
 
-    function setAmpV(btn, val) {
+    function setAmpV(btn, val, silent) {
         document.querySelectorAll('#amp-switches .switch-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const customIn = document.getElementById('ca-ampv');
-        if(val === null) { customIn.style.display = 'block'; customIn.focus(); }
-        else { customIn.style.display = 'none'; customIn.value = val; doCalc(); }
+        if(val === null) { customIn.style.display = 'block'; if (!silent) customIn.focus(); }
+        else { customIn.style.display = 'none'; customIn.value = val; if (!silent) doCalc(); }
     }
 
     function doCalc() {
@@ -682,26 +881,118 @@
         const applyMl = targetInBase / finalConc;
         let concStr = unit === 'mg' ? `${finalConc.toFixed(2)} mg/ml` : `${finalConc.toFixed(1)} µg/ml`;
         if (unit === 'mg' && finalConc < 0.1) concStr = `${(finalConc * 1000).toFixed(1)} µg/ml`;
+        resBox.classList.remove('idle');
         if (warn) resBox.classList.add('warning'); else resBox.classList.remove('warning');
         resBox.innerHTML = `
-            ${warn ? `<span class="warning-text">⚠️ ${warn}</span>` : ''}
-            <div style="font-size:0.85rem"><b>Příprava:</b> ${ampV} ml léku + ${(totalV-ampV).toFixed(1)} ml rozp.</div>
-            <div class="solvent-badge">💧 ${sol}</div>
+            ${warn ? `<span class="warning-text">⚠︎ ${esc(warn)}</span>` : ''}
+            <div><b>Příprava:</b> ${ampV} ml léku + ${(totalV-ampV).toFixed(1)} ml rozpouštědla</div>
+            <div class="solvent-badge">${esc(sol)}</div>
             <div class="res-divider"></div>
-            <div style="text-align:center">
-                <span style="font-size:0.8rem; opacity:0.8">KONCENTRACE: ${concStr}</span>
-                <span class="res-highlight">${isFinite(applyMl)?applyMl.toFixed(2):0} ml</span>
-                <span style="font-size:0.8rem; font-weight:800">DÁVKA PRO PACIENTA</span>
-            </div>`;
+            <span class="res-cap">Koncentrace ${concStr}</span>
+            <span class="res-highlight">${isFinite(applyMl)?applyMl.toFixed(2):0} ml</span>
+            <span class="res-cap">Dávka pro pacienta</span>`;
     }
-    
+
+    /* ---- JumpSTART ---- */
     const jSteps = { walk: { q: "Může dítě chodit?", btns: [{l:"Ano", s:"result-green"}, {l:"Ne", s:"breath"}] }, breath: { q: "Dýchá dítě?", btns: [{l:"Ano", s:"rate"}, {l:"Ne", s:"airway"}] }, airway: { q: "Po uvolnění cest dýchá?", btns: [{l:"Ano", s:"result-red"}, {l:"Ne", s:"pulse"}] }, pulse: { q: "Má hmatný puls?", btns: [{l:"Ano", s:"rescue"}, {l:"Ne", s:"result-black"}] }, rescue: { q: "Dýchá po 5 vdeších?", btns: [{l:"Ano", s:"result-red"}, {l:"Ne", s:"result-black"}] }, rate: { q: "Dechová frekvence?", btns: [{l:"< 15 nebo > 45", s:"result-red"}, {l:"15 - 45 /min", s:"pulseCheck"}] }, pulseCheck: { q: "Hmatný puls?", btns: [{l:"Ne", s:"result-red"}, {l:"Ano", s:"avpu"}] }, avpu: { q: "Reakce (AVPU)?", btns: [{l:"P nebo U", s:"result-red"}, {l:"A nebo V", s:"result-yellow"}] } };
-    function startJumpstart() { toggleMenu(); document.getElementById('tool-modal').classList.add('active'); document.getElementById('overlay').style.display = 'block'; showJumpStep('walk'); }
-    function showJumpStep(id) { const content = document.getElementById('modal-content'); if(id.startsWith('result')) { const color = id.split('-')[1]; const labels = { green: 'NEZÁVAŽNÝ STAV', red: 'KRITICKÝ STAV', black: 'MRTVÉ - P4', yellow: 'URGENTNÍ STAV' }; content.innerHTML = `<div class="triage-step-title">Výsledek triáže</div><div class="result-box" style="background:var(--triage-${color})">${labels[color]}</div><button class="btn-triage btn-full" style="margin-top:20px; background:var(--primary); color:white; border:none;" onclick="startJumpstart()">NOVÝ PACIENT</button>`; return; } const step = jSteps[id]; let btns = step.btns.map(b => `<button class="btn-triage" onclick="showJumpStep('${b.s}')">${b.l}</button>`).join(''); content.innerHTML = `<div class="triage-step-title">${step.q}</div><div class="triage-btns">${btns}</div>`; }
-    function openGCS() { toggleMenu(); document.getElementById('tool-modal').classList.add('active'); document.getElementById('overlay').style.display = 'block'; document.getElementById('modal-content').innerHTML = `<div class="triage-step-title">Glasgow Coma Scale</div><div class="score-row"><span class="score-label">Oči</span><select id="ge" class="score-select" onchange="cGCS()"><option value="4">4 - Spontánně</option><option value="3">3 - Na slovo</option><option value="2">2 - Na bolest</option><option value="1">1 - Nic</option></select></div><div class="score-row"><span class="score-label">Řeč</span><select id="gv" class="score-select" onchange="cGCS()"><option value="5">5 - Žvatlá, usmívá se</option><option value="4">4 - Pláč / Utišitelný</option><option value="3">3 - Křik / Neutišitelný</option><option value="2">2 - Sténání</option><option value="1">1 - Nic</option></select></div><div class="score-row"><span class="score-label">Pohyb</span><select id="gm" class="score-select" onchange="cGCS()"><option value="6">6 - Spontánní</option><option value="5">5 - Lokalizuje</option><option value="4">4 - Únik</option><option value="3">3 - Flexe</option><option value="2">2 - Extenze</option><option value="1">1 - Nic</option></select></div><div id="gr" class="result-box" style="background:var(--triage-green)">15 BODŮ <span class="result-label">NORMA</span></div>`; }
-    function cGCS() { const s = parseInt(document.getElementById('ge').value) + parseInt(document.getElementById('gv').value) + parseInt(document.getElementById('gm').value); let c, txt; if(s < 9) { c="var(--triage-red)"; txt="TĚŽKÁ PORUCHA (KÓMA)"; } else if(s < 13) { c="var(--triage-yellow)"; txt="STŘEDNÍ PORUCHA"; } else { c="var(--triage-green)"; txt="NORMA / LEHKÁ PORUCHA"; } const r = document.getElementById('gr'); r.innerHTML = `${s} BODŮ <span class="result-label">${txt}</span>`; r.style.background = c; }
-    function openApgar() { toggleMenu(); document.getElementById('tool-modal').classList.add('active'); document.getElementById('overlay').style.display = 'block'; document.getElementById('modal-content').innerHTML = `<div class="triage-step-title">Apgar skóre</div><div class="score-row"><span class="score-label">Akce srdeční</span><select class="as score-select" onchange="cAP()"><option value="2">> 100/min</option><option value="1">< 100/min</option><option value="0">Zástava</option></select></div><div class="score-row"><span class="score-label">Dýchání</span><select class="as score-select" onchange="cAP()"><option value="2">Pravidelné / Křik</option><option value="1">Nepravidelné / Lapavé</option><option value="0">Apnoe</option></select></div><div class="score-row"><span class="score-label">Reakce na odsávání</span><select class="as score-select" onchange="cAP()"><option value="2">Kašel, kýchání, křik</option><option value="1">Grimasy</option><option value="0">Bez reakce</option></select></div><div class="score-row"><span class="score-label">Svalový tonus</span><select class="as score-select" onchange="cAP()"><option value="2">Aktivní pohyb</option><option value="1">Mírná flexe končetin</option><option value="0">Chabý</option></select></div><div class="score-row"><span class="score-label">Barva kůže</span><select class="as score-select" onchange="cAP()"><option value="2">Růžová</option><option value="1">Akrocyanóza</option><option value="0">Bledá / Modrá</option></select></div><div id="ar" class="result-box" style="background:var(--triage-green)">10 BODŮ <span class="result-label">FYZIOLOGICKÝ NOVOROZENEC</span></div>`; }
-    function cAP() { const s = Array.from(document.querySelectorAll('.as')).reduce((a, b) => a + parseInt(b.value), 0); let c, txt; if(s < 4) { c="var(--triage-red)"; txt="TĚŽKÁ ASFYXIE"; } else if(s < 8) { c="var(--triage-yellow)"; txt="LEHKÁ PORUCHA ADAPTACE"; } else { c="var(--triage-green)"; txt="FYZIOLOGICKÝ NOVOROZENEC"; } const r = document.getElementById('ar'); r.innerHTML = `${s} BODŮ <span class="result-label">${txt}</span>`; r.style.background = c; }
+    let jTrail = [];
+    function startJumpstart() { openTool('JumpSTART triage'); jTrail = []; showJumpStep('walk'); }
+    function showJumpStep(id) {
+        const content = document.getElementById('modal-content');
+        if(id.startsWith('result')) {
+            const color = id.split('-')[1];
+            const labels = { green: 'NEZÁVAŽNÝ STAV', red: 'KRITICKÝ STAV', black: 'MRTVÉ - P4', yellow: 'URGENTNÍ STAV' };
+            content.innerHTML = `<div class="triage-step-title">Výsledek triage</div>
+                <div class="result-box ${color === 'yellow' ? 'dark-ink' : ''}" style="background:var(--triage-${color})">${labels[color]}</div>
+                <div class="triage-btns" style="margin-top:16px">
+                    <button type="button" class="btn-triage btn-full btn-primary" onclick="startJumpstart()">Nový pacient</button>
+                </div>`;
+            return;
+        }
+        jTrail.push(id);
+        const step = jSteps[id];
+        const btns = step.btns.map(b => `<button type="button" class="btn-triage" onclick="showJumpStep('${b.s}')">${esc(b.l)}</button>`).join('');
+        const back = jTrail.length > 1 ? `<button type="button" class="btn-triage btn-full" style="min-height:48px;font-size:15px;color:var(--ink-2)" onclick="jumpBack()">Krok zpět</button>` : '';
+        content.innerHTML = `<div class="steps-trail">${jTrail.map((_, i) => `<i class="${i === jTrail.length - 1 ? 'on' : ''}"></i>`).join('')}</div>
+            <div class="triage-step-title">${esc(step.q)}</div><div class="triage-btns">${btns}${back}</div>`;
+    }
+    function jumpBack() { jTrail.pop(); const prev = jTrail.pop(); showJumpStep(prev); }
+
+    /* ---- Skóre (GCS, Apgar) – výběr klepnutím ---- */
+    function scoreGroup(key, label, opts, def) {
+        return `<div class="score-row"><span class="score-label">${label}</span><div class="score-opts" data-key="${key}">` +
+            opts.map(([v, t]) => `<button type="button" class="score-opt" data-v="${v}" aria-pressed="${v === def}"><span class="pts">${v}</span>${esc(t)}</button>`).join('') +
+            `</div></div>`;
+    }
+    function bindScores(onChange) {
+        document.querySelectorAll('#modal-content .score-opts').forEach(g => {
+            g.addEventListener('click', (e) => {
+                const b = e.target.closest('.score-opt'); if (!b) return;
+                g.querySelectorAll('.score-opt').forEach(x => x.setAttribute('aria-pressed', x === b));
+                onChange();
+            });
+        });
+    }
+    const scoreVal = (key) => { const b = document.querySelector(`#modal-content .score-opts[data-key="${key}"] [aria-pressed="true"]`); return b ? parseInt(b.dataset.v) : 0; };
+
+    function openGCS() {
+        openTool('Glasgow Coma Scale');
+        document.getElementById('modal-content').innerHTML =
+            scoreGroup('ge', 'Oči', [[4,'Spontánně'],[3,'Na slovo'],[2,'Na bolest'],[1,'Nic']], 4) +
+            scoreGroup('gv', 'Řeč', [[5,'Žvatlá, usmívá se'],[4,'Pláč / utišitelný'],[3,'Křik / neutišitelný'],[2,'Sténání'],[1,'Nic']], 5) +
+            scoreGroup('gm', 'Pohyb', [[6,'Spontánní'],[5,'Lokalizuje'],[4,'Únik'],[3,'Flexe'],[2,'Extenze'],[1,'Nic']], 6) +
+            `<div class="score-sticky"><div id="gr" class="result-box" style="background:var(--triage-green)">15 BODŮ <span class="result-label">NORMA</span></div></div>`;
+        bindScores(cGCS);
+    }
+    function cGCS() {
+        const s = scoreVal('ge') + scoreVal('gv') + scoreVal('gm');
+        let c, txt, dark = false;
+        if(s < 9) { c="var(--triage-red)"; txt="TĚŽKÁ PORUCHA (KÓMA)"; } else if(s < 13) { c="var(--triage-yellow)"; txt="STŘEDNÍ PORUCHA"; dark = true; } else { c="var(--triage-green)"; txt="NORMA / LEHKÁ PORUCHA"; }
+        const r = document.getElementById('gr'); r.innerHTML = `${s} BODŮ <span class="result-label">${txt}</span>`; r.style.background = c; r.classList.toggle('dark-ink', dark);
+    }
+
+    function openApgar() {
+        openTool('Apgar skóre');
+        document.getElementById('modal-content').innerHTML =
+            scoreGroup('a1', 'Akce srdeční', [[2,'> 100/min'],[1,'< 100/min'],[0,'Zástava']], 2) +
+            scoreGroup('a2', 'Dýchání', [[2,'Pravidelné / křik'],[1,'Nepravidelné / lapavé'],[0,'Apnoe']], 2) +
+            scoreGroup('a3', 'Reakce na odsávání', [[2,'Kašel, kýchání, křik'],[1,'Grimasy'],[0,'Bez reakce']], 2) +
+            scoreGroup('a4', 'Svalový tonus', [[2,'Aktivní pohyb'],[1,'Mírná flexe končetin'],[0,'Chabý']], 2) +
+            scoreGroup('a5', 'Barva kůže', [[2,'Růžová'],[1,'Akrocyanóza'],[0,'Bledá / modrá']], 2) +
+            `<div class="score-sticky"><div id="ar" class="result-box" style="background:var(--triage-green)">10 BODŮ <span class="result-label">FYZIOLOGICKÝ NOVOROZENEC</span></div></div>`;
+        bindScores(cAP);
+    }
+    function cAP() {
+        const s = ['a1','a2','a3','a4','a5'].reduce((a, k) => a + scoreVal(k), 0);
+        let c, txt, dark = false;
+        if(s < 4) { c="var(--triage-red)"; txt="TĚŽKÁ ASFYXIE"; } else if(s < 8) { c="var(--triage-yellow)"; txt="LEHKÁ PORUCHA ADAPTACE"; dark = true; } else { c="var(--triage-green)"; txt="FYZIOLOGICKÝ NOVOROZENEC"; }
+        const r = document.getElementById('ar'); r.innerHTML = `${s} BODŮ <span class="result-label">${txt}</span>`; r.style.background = c; r.classList.toggle('dark-ink', dark);
+    }
+
+    /* ---- Motiv ---- */
+    const THEME_KEY = 'resqpedi:theme';
+    try {
+        const saved = localStorage.getItem(THEME_KEY);
+        if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+    document.getElementById('theme-toggle').onclick = () => {
+        const current = document.documentElement.dataset.theme ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    };
+
+    /* ---- Lepivá lišta s mini údaji o pacientovi ---- */
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+            document.getElementById('tabbar').classList.toggle('stuck', !entries[0].isIntersecting);
+        }, { threshold: 0 }).observe(document.getElementById('patient'));
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeAll();
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.list-row.tap')) { e.preventDefault(); e.target.click(); }
+    });
 
     syncFromSlider(12);
 </script>
