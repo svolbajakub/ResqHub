@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ukázková aplikace</title>
+<style>
+  :root { --accent: #0B6E79; --bg: #E4EEEF; --card: rgba(255,255,255,.7); --text: #0A1F23; --text2: rgba(60,60,67,.6); color-scheme: light dark; }
+  @media (prefers-color-scheme: dark) { :root { --accent: #3CC0CB; --bg: #03141A; --card: rgba(255,255,255,.07); --text: #fff; --text2: rgba(235,235,245,.6); } }
+  body { margin: 0; padding: 24px 16px 40px; background: var(--bg); color: var(--text);
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .card { background: var(--card); border-radius: 26px; padding: 24px; max-width: 520px; margin: 0 auto; }
+  h1 { margin: 0 0 8px; font-size: 26px; }
+  p { color: var(--text2); line-height: 1.45; margin: 0 0 14px; }
+  .counter { display: flex; align-items: center; justify-content: center; gap: 22px; margin: 24px 0 6px; }
+  button { width: 54px; height: 54px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; font-size: 28px; }
+  button:active { opacity: .7; }
+  output { font-size: 44px; font-weight: 700; min-width: 70px; text-align: center; font-variant-numeric: tabular-nums; }
+  code { background: rgba(118,118,128,.14); padding: 2px 6px; border-radius: 6px; font-size: 14px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Ahoj z mini aplikace 👋</h1>
+    <p>Tohle je obyčejný HTML soubor ve složce <code>apps/ukazka/</code>. Tvoje aplikace stačí dát vedle do vlastní složky a ve správě hubu jim přiřadit ikonu, název a popis.</p>
+    <p>Počítadlo si pamatuje hodnotu i po zavření – všechny aplikace v hubu sdílí úložiště prohlížeče.</p>
+    <div class="counter">
+      <button id="minus" aria-label="Ubrat">−</button>
+      <output id="val">0</output>
+      <button id="plus" aria-label="Přidat">+</button>
+    </div>
+  </div>
+<script>
+  var KEY = 'ukazka:counter', n = 0;
+  try { n = +localStorage.getItem(KEY) || 0; } catch (e) {}
+  var out = document.getElementById('val');
+  function set(v) { n = v; out.textContent = n; try { localStorage.setItem(KEY, n); } catch (e) {} }
+  document.getElementById('plus').onclick = function () { set(n + 1); };
+  document.getElementById('minus').onclick = function () { set(n - 1); };
+  set(n);
+</script>
+</body>
+</html>
