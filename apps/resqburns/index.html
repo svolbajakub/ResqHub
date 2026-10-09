@@ -1,334 +1,397 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="ResqBurns">
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqBurns">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<title>ResqBurns®</title>
+<style>
+/* ResqBurns – vzhled sladěný s ResqHubem. Petrolejová pro ovládání, žhavě oranžová pro popálené plochy. */
+:root {
+  --bg: #E4EEEF;
+  --ink: #0A1F23;
+  --ink-2: rgba(10, 31, 35, .6);
+  --ink-3: rgba(10, 31, 35, .34);
+  --petrol: #0B6E79;
+  --petrol-soft: rgba(11, 110, 121, .12);
+  --on-petrol: #FFFFFF;
+  --burn: #EE6A2C;
+  --burn-deep: #C9461B;
+  --part: rgba(255, 255, 255, .7);
+  --part-edge: rgba(10, 31, 35, .14);
+  --part-label: rgba(10, 31, 35, .38);
+  --glow-a: rgba(11, 110, 121, .5);
+  --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .58);
+  --glass-strong: rgba(250, 253, 253, .9);
+  --glass-edge: rgba(255, 255, 255, .78);
+  --glass-hi: rgba(255, 255, 255, .95);
+  --glass-shadow: rgba(6, 55, 62, .13);
+  --hairline: rgba(10, 31, 35, .1);
+  --fill: rgba(10, 31, 35, .06);
+  --danger: #D92D30;
+  --sheet: #F6FAFA;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+    --burn: #FF7A3D; --burn-deep: #E0521F;
+    --part: rgba(255, 255, 255, .09); --part-edge: rgba(255, 255, 255, .16); --part-label: rgba(234, 246, 247, .4);
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .94);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08); --danger: #FF6B6E; --sheet: #15262B;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+  --burn: #FF7A3D; --burn-deep: #E0521F;
+  --part: rgba(255, 255, 255, .09); --part-edge: rgba(255, 255, 255, .16); --part-label: rgba(234, 246, 247, .4);
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .94);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08); --danger: #FF6B6E; --sheet: #15262B;
+  color-scheme: dark;
+}
 
-    <title>ResqBurns®</title>
-    <style>
-        :root {
-            --bg: #f2f2f7;
-            --surface: #ffffff;
-            --primary: #003d4d;
-            --logo-color: #003d4d;
-            --accent: #007aff;
-            --text: #1c1c1e;
-            --text-sec: #8e8e93;
-            --border: #d1d1d6;
-            --shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); }
+body {
+  position: fixed; inset: 0; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column;
+  height: 100dvh;
+  font-family: var(--font); font-size: 17px; line-height: 1.3;
+  -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
 
-        .dark-mode {
-            --bg: #000000;
-            --surface: #1c1c1e;
-            --text: #ffffff;
-            --logo-color: #ffffff;
-            --border: #38383a;
-        }
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
 
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            user-select: none;
-        }
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%);
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -10px var(--glass-shadow);
+}
 
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            /* Fix pro 100% výšku na iOS */
-            height: 100dvh; 
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: fixed; 
-            width: 100%;
-            transition: background 0.3s ease;
-        }
+.shell {
+  flex: 1; min-height: 0; width: 100%; max-width: 560px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 10px;
+  padding: max(12px, env(safe-area-inset-top)) 16px calc(12px + env(safe-area-inset-bottom));
+}
 
-        header {
-            padding-top: env(safe-area-inset-top, 20px); 
-            height: auto;
-            min-height: 55px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            flex-shrink: 0;
-            padding-bottom: 5px;
-        }
+/* ---------- Hlavička ---------- */
+header { display: flex; align-items: center; justify-content: space-between; flex: none; padding: 2px 2px 0; }
+.logo { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.logo sup { font-size: .38em; font-weight: 600; color: var(--ink-3); letter-spacing: 0; margin-left: 2px; }
+.round-btn { width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center; color: var(--ink); }
+.round-btn svg { width: 19px; height: 19px; }
+.round-btn:active { transform: scale(.92); }
 
-        .logo { 
-            font-weight: 800; 
-            font-size: 1.1rem; 
-            letter-spacing: -0.5px; 
-            color: var(--logo-color); 
-            transition: color 0.3s ease;
-        }
-        .logo span { color: var(--text-sec); font-size: 0.6rem; vertical-align: top; margin-left: 2px; }
+/* ---------- Výsledky ---------- */
+.dashboard { flex: none; border-radius: 24px; padding: 14px 16px 12px; }
+.results { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stat-label { display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.stat-val {
+  margin-top: 2px; font-family: var(--font-round); font-size: 40px; font-weight: 800; line-height: 1;
+  letter-spacing: -.03em; font-variant-numeric: tabular-nums; color: var(--ink);
+}
+.stat-val.bsa { color: var(--burn); }
+.stat-unit { font-size: 18px; font-weight: 700; margin-left: 2px; color: var(--ink-2); letter-spacing: 0; }
+.stat-hint { display: block; margin-top: 3px; font-size: 12px; color: var(--ink-3); }
+.weight-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--hairline);
+}
+.weight-row label { font-size: 15px; font-weight: 600; }
+.stepper { display: flex; align-items: center; gap: 6px; }
+.stepper button {
+  width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--fill); color: var(--petrol);
+  font-size: 22px; font-weight: 600; line-height: 1; display: grid; place-items: center;
+}
+.stepper button:active { transform: scale(.92); }
+.weight-box { display: flex; align-items: baseline; gap: 3px; padding: 0 4px; }
+.weight-input {
+  width: 62px; height: 38px; border: 0; border-radius: 12px; background: var(--fill);
+  text-align: center; font-family: var(--font-round); font-size: 20px; font-weight: 750; color: var(--ink);
+  outline: none; -webkit-user-select: text; user-select: text; -moz-appearance: textfield;
+}
+.weight-input::-webkit-outer-spin-button, .weight-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.weight-input:focus { box-shadow: 0 0 0 2px var(--petrol); }
+.weight-box span { font-size: 15px; color: var(--ink-2); font-weight: 600; }
 
-        .theme-toggle { 
-            position: absolute; 
-            right: 15px; 
-            bottom: 8px;
-            cursor: pointer; 
-            font-size: 1.1rem; 
-            background: none;
-            border: none;
-        }
+/* ---------- Přepínač přední / zadní ---------- */
+.view-switch {
+  position: relative; flex: none; display: grid; grid-template-columns: 1fr 1fr; padding: 4px;
+  border-radius: 16px; background: var(--fill);
+}
+.view-switch .thumb {
+  position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 12px;
+  background: var(--glass-strong); box-shadow: 0 3px 10px -2px var(--glass-shadow), 0 0 0 1px var(--glass-edge);
+  transition: transform .32s cubic-bezier(.3, .7, .3, 1);
+}
+.view-switch[data-view="back"] .thumb { transform: translateX(100%); }
+.switch-btn {
+  position: relative; z-index: 1; height: 38px; border: 0; background: none; border-radius: 12px;
+  font-size: 15px; font-weight: 600; color: var(--ink-2); display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.switch-btn.active { color: var(--ink); }
+.switch-btn .count { font-size: 12px; font-weight: 700; color: var(--burn); font-variant-numeric: tabular-nums; }
 
-        /* DASHBOARD */
-        .dashboard {
-            background: var(--surface);
-            margin: 8px;
-            padding: 12px;
-            border-radius: 14px;
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            flex-shrink: 0;
-        }
+/* ---------- Mapa těla ---------- */
+.body-canvas {
+  flex: 1; min-height: 0; display: flex; justify-content: center; align-items: center;
+  border-radius: 26px; padding: 10px; overflow: hidden;
+}
+.body-canvas svg.map { height: 100%; width: auto; max-width: 100%; display: none; overflow: visible; }
+.body-canvas svg.map.active { display: block; }
+.part {
+  fill: var(--part); stroke: var(--part-edge); stroke-width: 1.2px; cursor: pointer;
+  transition: fill .18s, stroke .18s;
+}
+.part.selected { fill: url(#burnGrad); stroke: var(--burn-deep); }
+.part-label {
+  font-family: var(--font-round); font-size: 9px; font-weight: 700; fill: var(--part-label);
+  text-anchor: middle; dominant-baseline: central; pointer-events: none; transition: fill .18s;
+}
+.part-label.on { fill: #fff; }
 
-        .stat { text-align: center; }
-        .stat-label { font-size: 0.6rem; font-weight: 700; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: block; }
-        .stat-val { font-size: 1.4rem; font-weight: 900; color: var(--accent); line-height: 1; }
-        .stat-unit { font-size: 0.75rem; font-weight: 600; }
+/* ---------- Akce ---------- */
+.actions { flex: none; display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.btn {
+  height: 52px; border: 0; border-radius: 26px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 16px; font-weight: 650;
+}
+.btn:active { transform: scale(.97); }
+.btn-call { background: var(--petrol); color: var(--on-petrol); box-shadow: 0 10px 24px -12px var(--petrol); }
+.btn-call svg { width: 18px; height: 18px; }
+.btn-reset { padding: 0 18px; color: var(--danger); }
+.btn-reset:disabled { color: var(--ink-3); }
 
-        .weight-input {
-            width: 55px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 3px;
-            font-size: 1rem;
-            font-weight: 700;
-            text-align: center;
-            background: var(--bg);
-            color: var(--text);
-        }
+/* ---------- Akční panely ---------- */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(2, 20, 24, .4); opacity: 0; pointer-events: none; transition: opacity .28s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal {
+  width: 100%; max-width: 520px; padding: 0 10px calc(10px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: 8px;
+  transform: translateY(110%); transition: transform .36s cubic-bezier(.32, .72, 0, 1);
+}
+.modal-overlay.open .modal { transform: none; }
+.sheet { border-radius: 24px; overflow: hidden; background: var(--sheet); text-align: center; box-shadow: 0 12px 30px -12px rgba(0,0,0,.3); }
+.sheet-body { padding: 20px 20px 16px; border-bottom: 1px solid var(--hairline); }
+.sheet h3 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
+.sheet p { margin: 6px 0 0; font-size: 15px; color: var(--ink-2); line-height: 1.4; }
+.sheet .summary { display: flex; justify-content: center; gap: 22px; margin-top: 14px; }
+.sheet .summary div { font-family: var(--font-round); font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.sheet .summary small { display: block; font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--ink-2); margin-top: 2px; }
+.sheet .summary .bsa { color: var(--burn); }
+.sheet .phone { margin-top: 12px; font-size: 15px; color: var(--ink-2); font-variant-numeric: tabular-nums; -webkit-user-select: text; user-select: text; }
+.sheet-btn { display: block; width: 100%; height: 56px; border: 0; background: none; font-size: 18px; color: var(--petrol); font-weight: 600; text-decoration: none; line-height: 56px; }
+.sheet-btn.danger { color: var(--danger); }
+.sheet-btn.cancel { font-weight: 700; color: var(--petrol); }
 
-        .view-switch {
-            margin: 2px auto;
-            background: rgba(118, 118, 128, 0.12);
-            padding: 2px;
-            border-radius: 8px;
-            display: flex;
-            width: 85%;
-            max-width: 280px;
-            flex-shrink: 0;
-        }
-
-        .switch-btn {
-            flex: 1;
-            border: none;
-            background: none;
-            padding: 6px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            border-radius: 6px;
-            color: var(--text);
-        }
-
-        .switch-btn.active {
-            background: var(--surface);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .body-canvas {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 5px;
-            overflow: hidden;
-            min-height: 0; /* Klíčové pro správné smrštění SVG */
-        }
-
-        svg { height: 100%; width: auto; max-width: 100%; display: none; }
-        svg.active { display: block; }
-
-        .part {
-            fill: #e5e5ea;
-            stroke: #c7c7cc;
-            stroke-width: 1px;
-            transition: 0.2s;
-            cursor: pointer;
-        }
-
-        .part.selected {
-            fill: var(--accent) !important;
-            stroke: #005bbd;
-        }
-
-        .actions {
-            padding: 10px 15px calc(10px + env(safe-area-inset-bottom, 15px));
-            background: var(--surface);
-            border-top: 1px solid var(--border);
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 12px;
-            padding: 14px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-call { background: var(--primary); color: white; }
-        .btn-reset { background: rgba(255, 59, 48, 0.1); color: #ff3b30; padding: 10px; }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal {
-            background: var(--surface);
-            width: 85%;
-            max-width: 320px;
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-        }
-
-        .modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
-        .btn-confirm { background: var(--accent); color: white; padding: 12px; border-radius: 10px; border: none; font-weight: 700; }
-        .btn-danger { background: #ff3b30; color: white; padding: 12px; border-radius: 10px; border: none; font-weight: 700; }
-        .btn-cancel { background: none; border: none; color: var(--text-sec); padding: 10px; }
-
-    </style>
+@media (max-height: 640px) {
+  .stat-val { font-size: 32px; }
+  .logo { font-size: 26px; }
+  .weight-row { margin-top: 8px; padding-top: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
+</style>
 </head>
 <body>
+<div class="ambient" aria-hidden="true"></div>
 
-<header>
-    <div class="logo">ResqBurns<span>®</span></div>
-    <button class="theme-toggle" onclick="document.body.classList.toggle('dark-mode')">🌓</button>
-</header>
+<!-- přechod pro popálené plochy, sdílený oběma mapami -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="burnGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF9A4D"/><stop offset="1" stop-color="#E5531F"/>
+    </linearGradient>
+  </defs>
+</svg>
 
-<div class="dashboard">
-    <div class="stat">
-        <span class="stat-label">Plocha (BSA)</span>
-        <div class="stat-val" id="res-pct">0<span class="stat-unit">%</span></div>
-    </div>
-    <div class="stat">
-        <span class="stat-label">Váha</span>
-        <input type="number" id="weight" class="weight-input" value="80" oninput="calculate()">
-        <span class="stat-unit">kg</span>
-    </div>
-    <div class="stat">
-        <span class="stat-label">Tekutiny (1h PNP)</span>
-        <div class="stat-val" id="res-fluids">0<span class="stat-unit">ml</span></div>
-    </div>
-</div>
-
-<div class="view-switch">
-    <button id="btn-front" class="switch-btn active" onclick="switchView('front')">PŘEDNÍ</button>
-    <button id="btn-back" class="switch-btn" onclick="switchView('back')">ZADNÍ</button>
-</div>
-
-<div class="body-canvas">
-    <svg id="svg-front" class="active" viewBox="0 0 220 450">
-        <path class="part" data-pct="4.5" d="M110,20 c-15,0-25,12-25,28 s10,25,25,25 s25-10,25-25 s-10-28-25-28" />
-        <rect class="part" data-pct="9" x="75" y="80" width="70" height="60" rx="4" />
-        <rect class="part" data-pct="9" x="75" y="145" width="70" height="60" rx="4" />
-        <rect class="part" data-pct="1.5" x="48" y="85" width="22" height="40" rx="3" />
-        <rect class="part" data-pct="1.5" x="48" y="128" width="22" height="40" rx="3" />
-        <rect class="part" data-pct="1.5" x="48" y="171" width="22" height="20" rx="3" />
-        <rect class="part" data-pct="1.5" x="150" y="85" width="22" height="40" rx="3" />
-        <rect class="part" data-pct="1.5" x="150" y="128" width="22" height="40" rx="3" />
-        <rect class="part" data-pct="1.5" x="150" y="171" width="22" height="20" rx="3" />
-        <circle class="part" data-pct="1" cx="110" cy="215" r="10" />
-        <rect class="part" data-pct="3" x="75" y="235" width="32" height="70" rx="4" />
-        <rect class="part" data-pct="3" x="75" y="310" width="32" height="70" rx="4" />
-        <rect class="part" data-pct="3" x="75" y="385" width="32" height="20" rx="4" />
-        <rect class="part" data-pct="3" x="113" y="235" width="32" height="70" rx="4" />
-        <rect class="part" data-pct="3" x="113" y="310" width="32" height="70" rx="4" />
-        <rect class="part" data-pct="3" x="113" y="385" width="32" height="20" rx="4" />
-    </svg>
-    <svg id="svg-back" viewBox="0 0 220 450">
-        <path class="part" data-pct="4.5" d="M110,20 c-15,0-25,12-25,28 s10,25,25,25 s25-10,25-25 s-10-28-25-28" />
-        <rect class="part" data-pct="9" x="75" y="80" width="70" height="60" rx="4" />
-        <rect class="part" data-pct="9" x="75" y="145" width="70" height="75" rx="4" />
-        <rect class="part" data-pct="1.5" x="48" y="85" width="22" height="40" rx="3" />
-        <rect class="part" data-pct="1.5" x="48" y="128" width="22" height="40" rx="3" />
-        <rect class="part" data-pct="1.5" x="48" y="171" width="22" height="20" rx="3" />
-        <rect class="part" data-pct="1.5" x="150" y="85" width="22" height="40" rx="3" />
-        <rect class="part" data-pct="1.5" x="150" y="128" width="22" height="40" rx="3" />
-        <rect class="part" data-pct="1.5" x="150" y="171" width="22" height="20" rx="3" />
-        <rect class="part" data-pct="3" x="75" y="235" width="32" height="70" rx="4" />
-        <rect class="part" data-pct="3" x="75" y="310" width="32" height="70" rx="4" />
-        <rect class="part" data-pct="3" x="75" y="385" width="32" height="20" rx="4" />
-        <rect class="part" data-pct="3" x="113" y="235" width="32" height="70" rx="4" />
-        <rect class="part" data-pct="3" x="113" y="310" width="32" height="70" rx="4" />
-        <rect class="part" data-pct="3" x="113" y="385" width="32" height="20" rx="4" />
-    </svg>
-</div>
-
-<div class="actions">
-    <button class="btn btn-call" onclick="showModal('modal-call')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-        Konzultovat s centrem
+<div class="shell">
+  <header>
+    <h1 class="logo">ResqBurns<sup>®</sup></h1>
+    <button class="round-btn glass" id="theme-toggle" type="button" aria-label="Přepnout světlý nebo tmavý režim">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4v16"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
     </button>
-    <button class="btn btn-reset" onclick="showModal('modal-reset')">RESET MAPY</button>
+  </header>
+
+  <div class="dashboard glass">
+    <div class="results">
+      <div class="stat">
+        <span class="stat-label">Plocha (BSA)</span>
+        <div class="stat-val bsa" id="res-pct">0<span class="stat-unit">%</span></div>
+        <span class="stat-hint">pravidlo devíti</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Tekutiny 1. hodinu</span>
+        <div class="stat-val" id="res-fluids">0<span class="stat-unit">ml</span></div>
+        <span class="stat-hint">Parkland, polovina za 8 h</span>
+      </div>
+    </div>
+    <div class="weight-row">
+      <label for="weight">Hmotnost</label>
+      <div class="stepper">
+        <button type="button" onclick="stepWeight(-5)" aria-label="Ubrat 5 kg">−</button>
+        <div class="weight-box">
+          <input type="number" id="weight" class="weight-input" value="80" min="1" max="300" inputmode="numeric" oninput="calculate()">
+          <span>kg</span>
+        </div>
+        <button type="button" onclick="stepWeight(5)" aria-label="Přidat 5 kg">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="view-switch" id="view-switch" data-view="front">
+    <span class="thumb" aria-hidden="true"></span>
+    <button id="btn-front" class="switch-btn active" type="button" onclick="switchView('front')">Přední <span class="count" id="count-front"></span></button>
+    <button id="btn-back" class="switch-btn" type="button" onclick="switchView('back')">Zadní <span class="count" id="count-back"></span></button>
+  </div>
+
+  <div class="body-canvas glass">
+    <svg id="svg-front" class="map active" viewBox="40 14 140 398" role="group" aria-label="Přední strana těla">
+      <path class="part" data-pct="4.5" d="M110,20 c-15,0-25,12-25,28 s10,25,25,25 s25-10,25-25 s-10-28-25-28" />
+      <rect class="part" data-pct="9" x="75" y="80" width="70" height="60" rx="10" />
+      <rect class="part" data-pct="9" x="75" y="145" width="70" height="60" rx="10" />
+      <rect class="part" data-pct="1.5" x="48" y="85" width="22" height="40" rx="8" />
+      <rect class="part" data-pct="1.5" x="48" y="128" width="22" height="40" rx="8" />
+      <rect class="part" data-pct="1.5" x="48" y="171" width="22" height="20" rx="8" />
+      <rect class="part" data-pct="1.5" x="150" y="85" width="22" height="40" rx="8" />
+      <rect class="part" data-pct="1.5" x="150" y="128" width="22" height="40" rx="8" />
+      <rect class="part" data-pct="1.5" x="150" y="171" width="22" height="20" rx="8" />
+      <circle class="part" data-pct="1" cx="110" cy="215" r="10" />
+      <rect class="part" data-pct="3" x="75" y="235" width="32" height="70" rx="10" />
+      <rect class="part" data-pct="3" x="75" y="310" width="32" height="70" rx="10" />
+      <rect class="part" data-pct="3" x="75" y="385" width="32" height="20" rx="8" />
+      <rect class="part" data-pct="3" x="113" y="235" width="32" height="70" rx="10" />
+      <rect class="part" data-pct="3" x="113" y="310" width="32" height="70" rx="10" />
+      <rect class="part" data-pct="3" x="113" y="385" width="32" height="20" rx="8" />
+    </svg>
+    <svg id="svg-back" class="map" viewBox="40 14 140 398" role="group" aria-label="Zadní strana těla">
+      <path class="part" data-pct="4.5" d="M110,20 c-15,0-25,12-25,28 s10,25,25,25 s25-10,25-25 s-10-28-25-28" />
+      <rect class="part" data-pct="9" x="75" y="80" width="70" height="60" rx="10" />
+      <rect class="part" data-pct="9" x="75" y="145" width="70" height="75" rx="10" />
+      <rect class="part" data-pct="1.5" x="48" y="85" width="22" height="40" rx="8" />
+      <rect class="part" data-pct="1.5" x="48" y="128" width="22" height="40" rx="8" />
+      <rect class="part" data-pct="1.5" x="48" y="171" width="22" height="20" rx="8" />
+      <rect class="part" data-pct="1.5" x="150" y="85" width="22" height="40" rx="8" />
+      <rect class="part" data-pct="1.5" x="150" y="128" width="22" height="40" rx="8" />
+      <rect class="part" data-pct="1.5" x="150" y="171" width="22" height="20" rx="8" />
+      <rect class="part" data-pct="3" x="75" y="235" width="32" height="70" rx="10" />
+      <rect class="part" data-pct="3" x="75" y="310" width="32" height="70" rx="10" />
+      <rect class="part" data-pct="3" x="75" y="385" width="32" height="20" rx="8" />
+      <rect class="part" data-pct="3" x="113" y="235" width="32" height="70" rx="10" />
+      <rect class="part" data-pct="3" x="113" y="310" width="32" height="70" rx="10" />
+      <rect class="part" data-pct="3" x="113" y="385" width="32" height="20" rx="8" />
+    </svg>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-call" type="button" onclick="showModal('modal-call')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+      Konzultovat s centrem
+    </button>
+    <button class="btn btn-reset glass" id="btn-reset" type="button" onclick="showModal('modal-reset')" disabled>Vymazat</button>
+  </div>
 </div>
 
-<div id="modal-call" class="modal-overlay">
-    <div class="modal">
-        <h3>Telefonická konzultace PC FNKV?</h3>
-        <p>BSA: <strong id="m-pct">0</strong>% | PNP 1h: <strong id="m-ml">0</strong> ml</p>
-        <div class="modal-btns">
-            <button class="btn-confirm" onclick="window.location.href='tel:+420602322184'">VYTOČIT</button>
-            <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
+<div id="modal-call" class="modal-overlay" onclick="if (event.target === this) closeModal()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="call-title">
+    <div class="sheet">
+      <div class="sheet-body">
+        <h3 id="call-title">Telefonická konzultace PC FNKV</h3>
+        <p>Popáleninové centrum, nahlas tyto hodnoty:</p>
+        <div class="summary">
+          <div class="bsa"><span id="m-pct">0</span> %<small>BSA</small></div>
+          <div><span id="m-ml">0</span> ml<small>PNP 1. hodinu</small></div>
+          <div><span id="m-kg">80</span> kg<small>hmotnost</small></div>
         </div>
+        <div class="phone">+420 602 322 184</div>
+      </div>
+      <a class="sheet-btn" href="tel:+420602322184">Vytočit</a>
     </div>
+    <div class="sheet"><button class="sheet-btn cancel" type="button" onclick="closeModal()">Zrušit</button></div>
+  </div>
 </div>
 
-<div id="modal-reset" class="modal-overlay">
-    <div class="modal">
-        <h3>Smazat vše?</h3>
-        <p>Opravdu chcete vyčistit mapu?</p>
-        <div class="modal-btns">
-            <button class="btn-danger" onclick="resetAll()">SMAZAT</button>
-            <button class="btn-cancel" onclick="closeModal()">Zpět</button>
-        </div>
+<div id="modal-reset" class="modal-overlay" onclick="if (event.target === this) closeModal()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reset-title">
+    <div class="sheet">
+      <div class="sheet-body">
+        <h3 id="reset-title">Vymazat mapu?</h3>
+        <p>Zruší se označení na přední i zadní straně.</p>
+      </div>
+      <button class="sheet-btn danger" type="button" onclick="resetAll()">Vymazat mapu</button>
     </div>
+    <div class="sheet"><button class="sheet-btn cancel" type="button" onclick="closeModal()">Zrušit</button></div>
+  </div>
 </div>
 
 <script>
     let currentPct = 0;
     let currentMl = 0;
+    const THEME_KEY = 'resqburns:theme';
 
     function init() {
+        try {
+            const saved = localStorage.getItem(THEME_KEY);
+            if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+        } catch (e) {}
+        document.getElementById('theme-toggle').onclick = toggleTheme;
+
         document.querySelectorAll('.part').forEach(p => {
+            // popisek s procenty doprostřed každé části
+            // (getBBox nefunguje u skryté zadní mapy, proto střed z atributů)
+            const n = (k) => parseFloat(p.getAttribute(k));
+            const c = p.tagName === 'rect' ? [n('x') + n('width') / 2, n('y') + n('height') / 2]
+                    : p.tagName === 'circle' ? [n('cx'), n('cy')] : [110, 47];
+            const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            t.setAttribute('x', c[0]);
+            t.setAttribute('y', c[1]);
+            t.setAttribute('class', 'part-label');
+            t.textContent = String(p.getAttribute('data-pct')).replace('.', ',');
+            p.after(t);
+            p._label = t;
+
             p.onclick = function() {
                 this.classList.toggle('selected');
+                this._label.classList.toggle('on', this.classList.contains('selected'));
                 calculate();
             };
         });
+        calculate();
+    }
+
+    function toggleTheme() {
+        const current = document.documentElement.dataset.theme ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
     }
 
     function switchView(view) {
@@ -338,32 +401,54 @@
         document.getElementById('btn-back').classList.remove('active');
         document.getElementById('svg-' + view).classList.add('active');
         document.getElementById('btn-' + view).classList.add('active');
+        document.getElementById('view-switch').dataset.view = view;
     }
 
-    function calculate() {
+    function stepWeight(delta) {
+        const input = document.getElementById('weight');
+        const w = parseFloat(input.value) || 0;
+        input.value = Math.min(300, Math.max(5, Math.round((w + delta) / 5) * 5));
+        calculate();
+    }
+
+    function sumOf(selector) {
         let total = 0;
-        document.querySelectorAll('.part.selected').forEach(p => {
-            total += parseFloat(p.getAttribute('data-pct'));
-        });
+        document.querySelectorAll(selector).forEach(p => { total += parseFloat(p.getAttribute('data-pct')); });
+        return total;
+    }
+
+    const fmt = (n) => String(Math.round(n * 10) / 10).replace('.', ',');
+
+    function calculate() {
+        const total = sumOf('.part.selected');
         currentPct = total;
-        const w = document.getElementById('weight').value;
+        const w = parseFloat(document.getElementById('weight').value) || 0;
         currentMl = Math.round(((4 * w * total) / 2) / 8);
-        document.getElementById('res-pct').innerHTML = total + '<span class="stat-unit">%</span>';
+        document.getElementById('res-pct').innerHTML = fmt(total) + '<span class="stat-unit">%</span>';
         document.getElementById('res-fluids').innerHTML = currentMl + '<span class="stat-unit">ml</span>';
+
+        const front = sumOf('#svg-front .part.selected'), back = sumOf('#svg-back .part.selected');
+        document.getElementById('count-front').textContent = front ? fmt(front) + ' %' : '';
+        document.getElementById('count-back').textContent = back ? fmt(back) + ' %' : '';
+        document.getElementById('btn-reset').disabled = total === 0;
     }
 
     function showModal(id) {
-        document.getElementById('m-pct').innerText = currentPct;
+        document.getElementById('m-pct').innerText = fmt(currentPct);
         document.getElementById('m-ml').innerText = currentMl;
-        document.getElementById(id).style.display = 'flex';
+        document.getElementById('m-kg').innerText = parseFloat(document.getElementById('weight').value) || 0;
+        document.getElementById(id).classList.add('open');
     }
 
     function closeModal() {
-        document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
     }
 
     function resetAll() {
-        document.querySelectorAll('.part').forEach(p => p.classList.remove('selected'));
+        document.querySelectorAll('.part').forEach(p => {
+            p.classList.remove('selected');
+            if (p._label) p._label.classList.remove('on');
+        });
         calculate();
         closeModal();
     }
