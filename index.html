@@ -70,7 +70,6 @@
     </button>
     <div class="viewer-title" id="vtitle"></div>
   </div>
-  <iframe id="frame" title="Aplikace" allow="clipboard-write; fullscreen; geolocation; camera; microphone"></iframe>
 </section>
 
 <script src="apps.js"></script>
@@ -81,8 +80,8 @@
   var state = RH.current();
   var apps = state.apps;
   var $ = function (id) { return document.getElementById(id); };
-  var grid = $('grid'), q = $('q'), viewer = $('viewer'), frame = $('frame');
-  var openedFromHub = false, closeTimer;
+  var grid = $('grid'), q = $('q'), viewer = $('viewer'), frame = null;
+  var openedFromHub = false, closeTimer, historyAtOpen = 0;
   var RECENT_KEY = 'resqhub:recent';
   var arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
 
@@ -165,7 +164,17 @@
   /* ---- Prohlížeč aplikace ---- */
   function openViewer(app) {
     clearTimeout(closeTimer);
-    if (frame.dataset.path !== app.path) { frame.src = app.path; frame.dataset.path = app.path; }
+    if (!frame || frame.dataset.path !== app.path) {
+      // Rámeček se pokaždé vytvoří znovu s adresou nastavenou předem.
+      // Změna src u existujícího rámečku by přidala krok do historie a „zpět“ by se muselo mačkat dvakrát.
+      if (frame) frame.remove();
+      frame = document.createElement('iframe');
+      frame.setAttribute('allow', 'clipboard-write; fullscreen; geolocation; camera; microphone');
+      frame.src = app.path;
+      frame.dataset.path = app.path;
+      viewer.appendChild(frame);
+    }
+    historyAtOpen = history.length;
     $('vtitle').innerHTML = RH.iconHtml(app, 'sm') + '<span>' + RH.esc(app.name) + '</span>';
     frame.title = app.name;
     viewer.classList.add('open');
@@ -178,7 +187,7 @@
     viewer.setAttribute('aria-hidden', 'true');
     document.title = 'ResqHub';
     renderRecent();
-    closeTimer = setTimeout(function () { frame.src = 'about:blank'; frame.dataset.path = ''; }, 450);
+    closeTimer = setTimeout(function () { if (frame) { frame.remove(); frame = null; } }, 450);
   }
   function route() {
     var m = location.hash.match(/^#\/app\/(.+)$/);
@@ -189,7 +198,11 @@
     closeViewer();
   }
   $('back').addEventListener('click', function () {
-    if (openedFromHub) { openedFromHub = false; history.back(); }
+    if (openedFromHub) {
+      openedFromHub = false;
+      // Přeskočí i kroky, které si aplikace v rámečku přidala sama (proklikání podstránek)
+      history.go(-Math.max(1, history.length - historyAtOpen + 1));
+    }
     else { history.replaceState(null, '', location.pathname + location.search); route(); }
   });
   window.addEventListener('hashchange', route);
