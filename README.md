@@ -49,7 +49,7 @@ Správa (`…/admin.html`) → Přidat aplikaci → vyplň název a popis → Vy
 **Aplikace s více soubory (obrázky, CSS, JS):**
 Nahraj ji na GitHub do vlastní složky, třeba `apps/kalkulacka/`, a ve správě zadej cestu `apps/kalkulacka/index.html`.
 
-Změny ve správě se nejdřív ukládají jako *koncept* jen v tom telefonu (hub ho hned ukazuje s upozorněním). Ostatním zařízením se projeví po publikování, GitHub Pages je nasadí obvykle do 1–3 minut.
+Změny ve správě se nejdřív ukládají jako *koncept* jen v tom telefonu a hub ho tam hned zobrazuje. Stav konceptu i offline režimu vidíš nahoře ve správě. Ostatním zařízením se projeví po publikování, GitHub Pages je nasadí obvykle do 1–3 minut.
 
 **Bez tokenu:** ve správě dej *Stáhnout apps.js* a nahraj ho na GitHub místo starého.
 

@@ -38,6 +38,14 @@
   </div>
 </div>
 
+<div class="group glass" style="margin-top:12px">
+  <div class="row">
+    <span class="lead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/></svg></span>
+    <span class="grow">Offline režim</span>
+    <span class="value" id="offlineState">Zjišťuji…</span>
+  </div>
+</div>
+
 <div class="group-head"><span>Aplikace</span><button type="button" id="reorderBtn">Seřadit</button></div>
 <div class="group glass with-icons" id="appList"></div>
 <div class="group-foot" id="listFoot">Změny se ukládají jako koncept v tomto telefonu, dokud je nepublikuješ.</div>
@@ -694,7 +702,16 @@
 
   renderAll();
   showGate();
-  RH.registerSW();
+  RH.registerSW().then(function () {
+    var el = $('offlineState');
+    if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) { el.textContent = 'Nedostupný'; return; }
+    function ready() { el.textContent = 'Připraveno'; el.className = 'value ok'; }
+    if (navigator.serviceWorker.controller) ready();
+    else {
+      el.textContent = 'Připraví se po dalším otevření';
+      navigator.serviceWorker.addEventListener('controllerchange', ready);
+    }
+  });
 })();
 </script>
 </body>

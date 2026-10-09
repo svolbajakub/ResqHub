@@ -91,17 +91,8 @@
     if (n >= 2 && n <= 4) return n + ' aplikace';
     return n + ' aplikací';
   }
-  function renderMeta(offlineReady) {
-    var chips = [];
-    if (apps.length) chips.push('<span class="chip glass">' + appsLabel(apps.length) + '</span>');
-    if (state.source === 'draft') {
-      chips.push('<span class="chip glass"><span class="dot warn"></span>Nepublikovaný koncept <a href="admin.html">Publikovat</a></span>');
-    } else if (state.source === 'pending') {
-      chips.push('<span class="chip glass"><span class="dot warn"></span>Nasazuji změny</span>');
-    }
-    if (offlineReady) chips.push('<span class="chip glass"><span class="dot ok"></span>Připraveno offline</span>');
-    else if (!navigator.onLine) chips.push('<span class="chip glass"><span class="dot warn"></span>Bez připojení</span>');
-    $('meta').innerHTML = chips.join('');
+  function renderMeta() {
+    $('meta').innerHTML = apps.length ? '<span class="chip glass">' + appsLabel(apps.length) + '</span>' : '';
   }
 
   /* ---- Vykreslení ---- */
@@ -208,13 +199,12 @@
   window.addEventListener('scroll', onScroll, { passive: true });
 
   render();
-  renderMeta(false);
+  renderMeta();
   route();
   onScroll();
 
   RH.registerSW().then(function () {
     RH.precache(apps.map(function (a) { return a.path; }).filter(Boolean));
-    if (navigator.serviceWorker && navigator.serviceWorker.controller) renderMeta(true);
   });
 })();
 </script>
