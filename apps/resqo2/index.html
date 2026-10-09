@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ResqO2®</title>
+
+<link rel="apple-touch-icon" href="icon.png">
+
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f2f2f7;
+            --card: #ffffff;
+            --text-main: #000000;
+            --text-muted: #6e6e73;
+            --primary: #007AFF;
+            --accent: #ff3b30;
+            --border: #d1d1d6;
+            --safe-top: env(safe-area-inset-top);
+        }
+
+        .dark-mode {
+            --bg: #000000;
+            --surface: #1c1c1e;
+            --card: #2c2c2e;
+            --text-main: #ffffff;
+            --text-muted: #a1a1a6;
+            --border: #38383a;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding-top: var(--safe-top);
+        }
+
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .app-title { font-weight: 900; font-size: 1.4rem; letter-spacing: -0.8px; }
+        .trademark { font-size: 0.6rem; vertical-align: top; margin-left: 2px; color: var(--text-muted); }
+
+        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        
+        .info-box {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .label-top { font-size: 0.7rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block; }
+
+        /* Přepínač litrů (2L vs 10L) */
+        .selector {
+            display: flex;
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .sel-opt {
+            flex: 1;
+            padding: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .sel-opt.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Slidery */
+        .slider-section { padding: 10px 20px 25px; text-align: center; }
+        .slider-val { font-size: 1.8rem; font-weight: 900; margin-bottom: 5px; color: var(--text-main); }
+        .slider-unit { font-size: 0.9rem; color: var(--text-muted); margin-left: 4px; }
+
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px;
+            background: var(--border); outline: none; margin: 15px 0;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 30px; height: 30px; background: #fff; border: 3px solid var(--primary); border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Výsledková karta */
+        .result-card {
+            flex: 1;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            border-radius: 35px 35px 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .time-left { font-size: 4rem; font-weight: 900; color: var(--primary); line-height: 1; }
+        .time-label { font-size: 1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 20px; }
+        
+        .eta-box {
+            background: var(--accent);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="app-title">ResqO2<span class="trademark">®</span></div>
+    </header>
+
+    <div class="config-grid">
+        <div class="info-box">
+            <span class="label-top">Velikost lahve</span>
+            <div class="selector">
+                <div id="opt-2" class="sel-opt active" onclick="setVolume(2)">2 L</div>
+                <div id="opt-10" class="sel-opt" onclick="setVolume(10)">10 L</div>
+            </div>
+        </div>
+        <div class="info-box" style="display: flex; flex-direction: column; justify-content: center;">
+            <span class="label-top">Max. Tlak</span>
+            <div style="font-weight: 800; font-size: 1.2rem;">200 BAR</div>
+        </div>
+    </div>
+
+    <div class="slider-section">
+        <span class="label-top">Aktuální tlak v lahvi</span>
+        <div class="slider-val" id="val-press">150<span class="slider-unit">BAR</span></div>
+        <input type="range" id="press-slider" min="5" max="200" value="150" step="5" oninput="update()">
+    </div>
+
+    <div class="slider-section">
+        <span class="label-top">Průtok (Flow)</span>
+        <div class="slider-val" id="val-flow">5<span class="slider-unit">L / min</span></div>
+        <input type="range" id="flow-slider" min="1" max="25" value="5" step="1" oninput="update()">
+    </div>
+
+    <div class="result-card">
+        <div class="time-left" id="res-time">60</div>
+        <div class="time-label">MINUT ZBÝVÁ</div>
+        
+        <div class="eta-box" id="res-eta">DOJDE V 17:05</div>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 15px; font-weight: 600;">
+            Výpočet s rezervou 5 bar
+        </p>
+    </div>
+
+<script>
+    let volume = 2;
+
+    function setVolume(v) {
+        volume = v;
+        document.getElementById('opt-2').classList.toggle('active', v === 2);
+        document.getElementById('opt-10').classList.toggle('active', v === 10);
+        update();
+    }
+
+    function update() {
+        const press = parseInt(document.getElementById('press-slider').value);
+        const flow = parseInt(document.getElementById('flow-slider').value);
+        
+        document.getElementById('val-press').innerHTML = `${press}<span class="slider-unit">BAR</span>`;
+        document.getElementById('val-flow').innerHTML = `${flow}<span class="slider-unit">L / min</span>`;
+
+        // Výpočet: (Tlak - 5 bar rezerva) * Objem / Průtok
+        let minutes = Math.floor(((press - 5) * volume) / flow);
+        if (minutes < 0) minutes = 0;
+
+        document.getElementById('res-time').innerText = minutes;
+
+        // Výpočet času dojezdu (ETA)
+        const now = new Date();
+        const eta = new Date(now.getTime() + minutes * 60000);
+        const timeStr = eta.getHours().toString().padStart(2, '0') + ':' + eta.getMinutes().toString().padStart(2, '0');
+        
+        document.getElementById('res-eta').innerText = minutes > 0 ? `DOJDE V ${timeStr}` : "LÁHEV JE PRÁZDNÁ";
+        document.getElementById('res-eta').style.background = minutes < 10 ? "var(--accent)" : "var(--primary)";
+    }
+
+    // Spustit úvodní výpočet
+    update();
+</script>
+</body>
+</html>
