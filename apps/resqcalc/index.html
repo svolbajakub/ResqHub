@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqCalc®</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqCalc">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+/* ResqCalc 2 – ředění a dávky. Vzhled sladěný s ResqHubem. */
+:root {
+  --bg: #E4EEEF;
+  --ink: #0A1F23;
+  --ink-2: rgba(10, 31, 35, .6);
+  --ink-3: rgba(10, 31, 35, .34);
+  --petrol: #0B6E79;
+  --petrol-soft: rgba(11, 110, 121, .12);
+  --on-petrol: #FFFFFF;
+  --red: #D92D30;
+  --red-soft: rgba(229, 56, 59, .12);
+  --orange: #C96A0A;
+  --orange-soft: rgba(245, 154, 31, .16);
+  --blue: #2468C9;
+  --blue-soft: rgba(47, 123, 216, .13);
+  --glow-a: rgba(11, 110, 121, .5);
+  --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .58);
+  --glass-strong: rgba(250, 253, 253, .92);
+  --glass-edge: rgba(255, 255, 255, .78);
+  --glass-hi: rgba(255, 255, 255, .95);
+  --glass-shadow: rgba(6, 55, 62, .13);
+  --sheet: #EEF4F4;
+  --hairline: rgba(10, 31, 35, .1);
+  --fill: rgba(10, 31, 35, .06);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+    --red: #FF6B6E; --red-soft: rgba(255, 107, 110, .14); --orange: #FFA94D; --orange-soft: rgba(255, 169, 77, .15);
+    --blue: #6FA8FF; --blue-soft: rgba(111, 168, 255, .15);
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .94);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --sheet: #0B1E23; --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .32);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+  --red: #FF6B6E; --red-soft: rgba(255, 107, 110, .14); --orange: #FFA94D; --orange-soft: rgba(255, 169, 77, .15);
+  --blue: #6FA8FF; --blue-soft: rgba(111, 168, 255, .15);
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .94);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --sheet: #0B1E23; --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden; font-family: var(--font); font-size: 17px; line-height: 1.3; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+body.locked { overflow: hidden; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
+
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%); border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -10px var(--glass-shadow); }
+
+.shell { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; padding: max(12px, env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom)); }
+header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 2px 2px 0; }
+.app-title { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.app-title sup { font-size: .38em; font-weight: 600; color: var(--ink-3); letter-spacing: 0; margin-left: 2px; }
+.round-btn { width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center; color: var(--ink); }
+.round-btn svg { width: 19px; height: 19px; }
+.round-btn:active { transform: scale(.92); }
+.section-header { margin: 6px 6px -4px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+
+/* pacient */
+.weight-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-radius: 20px; padding: 10px 12px 10px 16px; }
+.weight-bar label { font-size: 15px; font-weight: 650; }
+.weight-bar label small { display: block; font-size: 12.5px; font-weight: 500; color: var(--ink-2); }
+.num-wrap { display: flex; align-items: center; gap: 6px; }
+.num-in { width: 84px; height: 44px; border: 0; border-radius: 13px; background: var(--fill); text-align: center; font-family: var(--font-round); font-size: 22px; font-weight: 800; color: var(--ink); outline: none; -moz-appearance: textfield; }
+.num-in::-webkit-outer-spin-button, .num-in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.num-in:focus { box-shadow: 0 0 0 2px var(--petrol); }
+.num-wrap .u { font-size: 14px; font-weight: 600; color: var(--ink-2); min-width: 26px; }
+
+/* výběr léku */
+.drug-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border-radius: 22px; text-align: left; color: var(--ink); }
+.drug-btn .grow { flex: 1; min-width: 0; }
+.drug-btn .name { font-family: var(--font-display); font-size: 24px; font-weight: 800; letter-spacing: -.025em; line-height: 1.1; }
+.drug-btn .str { font-size: 15px; color: var(--ink-2); margin-top: 3px; font-variant-numeric: tabular-nums; }
+.drug-btn .chg { flex: none; height: 34px; padding: 0 14px; border-radius: 17px; background: var(--petrol); color: var(--on-petrol); font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; }
+.drug-btn.alert-high { border: 2px solid var(--red); box-shadow: 0 0 0 4px var(--red-soft), 0 10px 30px -10px var(--glass-shadow); }
+.drug-btn.alert-low { border: 2px solid var(--blue); }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.badge { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 12px; font-size: 12.5px; font-weight: 750; letter-spacing: .01em; }
+.badge.high { background: var(--red); color: #fff; }
+.badge.low { background: var(--blue); color: #fff; }
+.badge.solv { background: var(--petrol-soft); color: var(--petrol); }
+.badge.solv.only { background: var(--orange-soft); color: var(--orange); }
+.badge.form { background: var(--fill); color: var(--ink-2); }
+
+.info { border-radius: 20px; overflow: hidden; }
+.info summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; font-size: 15px; font-weight: 650; cursor: pointer; }
+.info summary::-webkit-details-marker { display: none; }
+.info summary svg { width: 12px; height: 12px; color: var(--ink-3); transition: transform .2s; }
+.info[open] summary svg { transform: rotate(180deg); }
+.info .body { padding: 0 16px 14px; font-size: 14.5px; line-height: 1.45; color: var(--ink-2); }
+.info .body p { margin: 0 0 6px; }
+.info .body b { color: var(--ink); }
+.info .ki { color: var(--red); }
+
+/* režimy */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { min-height: 40px; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--hairline); background: var(--glass); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); font-size: 15px; font-weight: 650; color: var(--ink); text-align: left; line-height: 1.15; }
+.chip small { display: block; font-size: 12px; font-weight: 500; color: var(--ink-2); }
+.chip[aria-pressed="true"] { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
+.chip[aria-pressed="true"] small { color: inherit; opacity: .8; }
+
+/* karty */
+.card { border-radius: 24px; overflow: hidden; }
+.row { padding: 14px 16px; }
+.row + .row { border-top: 1px solid var(--hairline); }
+.row-title { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 15px; font-weight: 650; }
+.row-title small { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.opt { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 16px; border: 0; background: none; text-align: left; color: var(--ink); }
+.opt + .opt { border-top: 1px solid var(--hairline); }
+.opt .dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--ink-3); flex: none; display: grid; place-items: center; }
+.opt[aria-pressed="true"] .dot { border-color: var(--petrol); }
+.opt[aria-pressed="true"] .dot::after { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--petrol); }
+.opt .grow { flex: 1; min-width: 0; }
+.opt b { display: block; font-size: 15.5px; font-weight: 650; }
+.opt span.sub { display: block; font-size: 13px; color: var(--ink-2); margin-top: 1px; font-variant-numeric: tabular-nums; }
+.custom { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 4px 16px 14px; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field span { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.field .num-in { width: 100%; }
+.vol-chips { display: flex; gap: 6px; }
+.vol-chips button { flex: 1; height: 34px; border-radius: 17px; border: 1px solid var(--hairline); background: var(--glass-strong); font-family: var(--font-round); font-size: 14px; font-weight: 700; }
+.vol-chips button[aria-pressed="true"] { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
+
+.prep { padding: 14px 16px 16px; background: var(--petrol-soft); }
+.prep-line { font-size: 16px; font-weight: 650; line-height: 1.4; }
+.prep-line b { font-family: var(--font-round); font-size: 19px; font-weight: 800; color: var(--petrol); font-variant-numeric: tabular-nums; }
+.prep-conc { margin-top: 4px; font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.syringe { margin-top: 10px; }
+.syringe svg { display: block; width: 100%; height: auto; }
+.syr-barrel { fill: var(--glass-strong); stroke: var(--ink-3); stroke-width: 1.5; }
+.syr-drug { fill: var(--petrol); transition: width .3s; }
+.syr-dil { fill: var(--petrol); opacity: .28; transition: x .3s, width .3s; }
+.syr-part { fill: var(--ink-3); }
+
+.segmented { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 16px; background: var(--fill); }
+.segmented .thumb { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 12px; background: var(--glass-strong); box-shadow: 0 3px 10px -2px var(--glass-shadow), 0 0 0 1px var(--glass-edge); transition: transform .3s cubic-bezier(.3, .7, .3, 1); }
+.segmented[data-pos="1"] .thumb { transform: translateX(100%); }
+.segmented button { position: relative; z-index: 1; height: 38px; border: 0; background: none; border-radius: 12px; font-size: 15px; font-weight: 650; color: var(--ink-2); }
+.segmented button[aria-pressed="true"] { color: var(--ink); }
+.dose-line { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.dose-line .num-in { flex: 1; width: auto; min-width: 0; height: 52px; font-size: 26px; }
+.unit-toggle { display: flex; padding: 3px; border-radius: 14px; background: var(--fill); flex: none; }
+.unit-toggle button { height: 44px; padding: 0 12px; border: 0; border-radius: 11px; background: none; font-size: 14.5px; font-weight: 700; color: var(--ink-2); white-space: nowrap; }
+.unit-toggle button[aria-pressed="true"] { background: var(--petrol); color: var(--on-petrol); }
+.hint { margin-top: 8px; font-size: 13px; color: var(--ink-2); }
+
+/* výsledek */
+.result { border-radius: 28px; padding: 18px 20px 20px; color: #fff; text-align: center; background: linear-gradient(150deg, #16A3AE 0%, #0B6E79 55%, #074B53 100%); box-shadow: 0 16px 34px -16px rgba(11, 110, 121, .85); transition: background .3s; }
+.result.orange { background: linear-gradient(150deg, #F6A53E 0%, #D9730F 100%); box-shadow: 0 16px 34px -16px rgba(217, 115, 15, .8); }
+.result.red { background: linear-gradient(150deg, #F25C5F 0%, #C91F23 100%); box-shadow: 0 16px 34px -16px rgba(229, 56, 59, .85); }
+.result .lbl { font-size: 15px; font-weight: 650; opacity: .9; }
+.result .big { margin: 2px 0; font-family: var(--font-round); font-size: 64px; font-weight: 800; line-height: 1; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.result .big small { font-size: 26px; font-weight: 700; letter-spacing: 0; margin-left: 4px; opacity: .9; }
+.result .sub { font-size: 16px; font-weight: 650; opacity: .92; font-variant-numeric: tabular-nums; }
+.result .drugtag { display: inline-flex; margin-top: 12px; height: 28px; padding: 0 12px; border-radius: 14px; background: rgba(255, 255, 255, .2); border: 1px solid rgba(255, 255, 255, .3); font-size: 13.5px; font-weight: 700; align-items: center; }
+.result .empty { font-size: 16px; font-weight: 650; opacity: .9; padding: 12px 0; }
+.warn { border-radius: 18px; padding: 12px 16px; font-size: 14.5px; font-weight: 650; line-height: 1.4; }
+.warn.red { color: var(--red); background: var(--red-soft); border: 1px solid color-mix(in srgb, var(--red) 30%, transparent); }
+.warn.orange { color: var(--orange); background: var(--orange-soft); border: 1px solid color-mix(in srgb, var(--orange) 30%, transparent); }
+.note { margin: 2px 8px 0; font-size: 13px; color: var(--ink-3); text-align: center; line-height: 1.45; }
+
+/* panel výběru léku */
+.overlay { position: fixed; inset: 0; z-index: 250; background: rgba(2, 20, 24, .42); opacity: 0; pointer-events: none; transition: opacity .3s; }
+.overlay.open { opacity: 1; pointer-events: auto; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 300; max-width: 560px; margin: 0 auto; height: calc(100% - max(16px, env(safe-area-inset-top))); background: var(--sheet); border-radius: 30px 30px 0 0; box-shadow: 0 -10px 40px rgba(0, 0, 0, .2); transform: translateY(105%); visibility: hidden; transition: transform .4s cubic-bezier(.32, .72, 0, 1), visibility 0s linear .4s; display: flex; flex-direction: column; }
+.sheet.open { transform: none; visibility: visible; transition: transform .4s cubic-bezier(.32, .72, 0, 1); }
+.grabber { width: 38px; height: 5px; border-radius: 3px; background: var(--ink-3); margin: 8px auto 0; flex: none; }
+.sheet-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px; flex: none; }
+.search { flex: 1; display: flex; align-items: center; gap: 8px; height: 46px; padding: 0 12px; border-radius: 15px; background: var(--glass-strong); border: 1px solid var(--glass-edge); }
+.search svg { width: 18px; height: 18px; color: var(--ink-2); flex: none; }
+.search input { flex: 1; min-width: 0; height: 100%; border: 0; background: none; outline: none; font-size: 17px; }
+.sheet-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 16px calc(24px + env(safe-area-inset-bottom)); }
+.dl { border-radius: 20px; overflow: hidden; }
+.dl-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 14px; border: 0; background: none; text-align: left; color: var(--ink); }
+.dl-item + .dl-item { border-top: 1px solid var(--hairline); }
+.dl-item:active { background: var(--fill); }
+.dl-item .grow { flex: 1; min-width: 0; }
+.dl-item b { display: block; font-size: 16px; font-weight: 650; }
+.dl-item span.sub { display: block; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.dl-item .badge { flex: none; }
+.dl-item[aria-current="true"] { background: var(--petrol-soft); }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+
+<div class="overlay" id="overlay"></div>
+<section class="sheet" id="picker" role="dialog" aria-modal="true" aria-label="Výběr léku">
+  <div class="grabber"></div>
+  <div class="sheet-head">
+    <label class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" id="q" placeholder="Hledat lék" autocomplete="off" autocorrect="off" spellcheck="false">
+    </label>
+    <button class="round-btn glass" type="button" id="close-picker" aria-label="Zavřít">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body"><div class="dl glass" id="drug-list"></div></div>
+</section>
+
+<div class="shell">
+  <header>
+    <h1 class="app-title">ResqCalc<sup>®</sup></h1>
+    <button class="round-btn glass" id="theme-toggle" type="button" aria-label="Přepnout světlý nebo tmavý režim">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4v16"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+    </button>
+  </header>
+
+  <div class="weight-bar glass">
+    <label for="weight">Hmotnost pacienta<small>pro dávky na kg a perfuzor</small></label>
+    <div class="num-wrap"><input type="number" id="weight" class="num-in" inputmode="decimal" value="80" min="1" max="250"><span class="u">kg</span></div>
+  </div>
+
+  <button type="button" class="drug-btn glass" id="drug-btn">
+    <div class="grow">
+      <div class="name" id="d-name">–</div>
+      <div class="str" id="d-str"></div>
+      <div class="badges" id="d-badges"></div>
+    </div>
+    <span class="chg">Změnit</span>
+  </button>
+
+  <details class="info glass" id="info" hidden>
+    <summary><span id="info-title">Upozornění</span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l4 4 4-4"/></svg></summary>
+    <div class="body" id="info-body"></div>
+  </details>
+
+  <div id="regimes-wrap" hidden>
+    <div class="section-header">Režim</div>
+    <div class="chips" id="regimes" style="margin-top:12px"></div>
+  </div>
+
+  <div class="section-header">Příprava stříkačky</div>
+  <div class="card glass">
+    <div id="dil-list"></div>
+    <div class="custom" id="custom" hidden>
+      <label class="field"><span id="custom-drug-label">Léku natáhnout (ml)</span><input type="number" id="c-ml" class="num-in" inputmode="decimal"></label>
+      <label class="field"><span>Doředit do (ml)</span><input type="number" id="c-total" class="num-in" inputmode="decimal"></label>
+      <div class="field" style="grid-column: span 2"><div class="vol-chips" id="c-vols"></div></div>
+    </div>
+    <div class="prep">
+      <div class="prep-line" id="prep-line"></div>
+      <div class="prep-conc" id="prep-conc"></div>
+      <div class="syringe" aria-hidden="true">
+        <svg viewBox="0 0 340 40">
+          <rect class="syr-part" x="0" y="12" width="10" height="16" rx="3"/>
+          <rect class="syr-part" x="10" y="18" width="18" height="4" rx="2"/>
+          <rect class="syr-barrel" x="28" y="6" width="282" height="28" rx="7"/>
+          <rect class="syr-drug" id="syr-drug" x="30" y="8" width="0" height="24" rx="5"/>
+          <rect class="syr-dil" id="syr-dil" x="30" y="8" width="0" height="24" rx="5"/>
+          <rect class="syr-part" x="310" y="15" width="14" height="10" rx="2"/>
+          <rect class="syr-part" x="324" y="18" width="16" height="4" rx="2"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">Dávka</div>
+  <div class="card glass">
+    <div class="row">
+      <div class="segmented" id="mode-switch" data-pos="0">
+        <span class="thumb" aria-hidden="true"></span>
+        <button type="button" data-mode="bolus" aria-pressed="true">Bolus</button>
+        <button type="button" data-mode="perf" aria-pressed="false">Perfuzor</button>
+      </div>
+      <div class="dose-line">
+        <input type="number" id="dose" class="num-in" inputmode="decimal" placeholder="dávka" aria-label="Požadovaná dávka">
+        <div class="unit-toggle" id="unit-toggle"></div>
+      </div>
+      <div class="hint" id="hint"></div>
+    </div>
+  </div>
+
+  <div class="result" id="result" aria-live="polite"></div>
+  <div id="warnings"></div>
+  <p class="note">Orientační kalkulačka. Dávku a ředění vždy ověř podle protokolu a stavu pacienta.</p>
+</div>
+
+<script>
+/* =====================================================================
+   LÉKY
+   base  = jednotka účinné látky (mg, µg, g, IU, mmol)
+   conc  = base v 1 ml (u prášku po rozpuštění)
+   amp   = ml v jedné ampuli (po rozpuštění)
+   dil   = možnosti přípravy: {l, ml, total} – ml léku do celkem total ml; null ml = neředit
+   reg   = režimy (výchozí dávky), max = {red, orange} jako {abs} nebo {kg}
+   perf  = perfuzor {unit, range:[od,do], def}
+   ===================================================================== */
+const N = (l = 'Neředit', sub = '') => ({ l, ml: null, sub });
+const DRUGS = [
+  { id: 'adenocor', n: 'Adenocor', s: '6 mg / 2 ml', base: 'mg', conc: 3, amp: 2, solv: 'proplach FR',
+    dil: [N('Neředit', 'rychlý bolus, ihned proplachnout FR')],
+    reg: [{ l: '1. dávka', d: 6 }, { l: '2. a 3. dávka', d: 12 }, { l: 'Dítě', d: 0.1, kg: true, sub: '0,1 mg/kg' }],
+    max: { red: { abs: 12, t: 'jednotlivá dávka max. 12 mg' } } },
+  { id: 'adrenalin', n: 'Adrenalin', s: '1 mg / 1 ml', base: 'mg', conc: 1, amp: 1, solv: 'FR',
+    dil: [{ l: '1 ml + 9 ml FR', ml: 1, total: 10 }, N('Neředit', 'i.m.'), { l: 'Perfuzor 1 mg do 20 ml FR', ml: 1, total: 20 }],
+    reg: [{ l: 'KPR', d: 1, dil: 0, sub: '1 mg i.v./i.o.' }, { l: 'Anafylaxe', d: 0.5, dil: 1, sub: '0,5 mg i.m.' }],
+    perf: { unit: 'µg/kg/min', range: [0.05, 0.5], def: 0.05, dil: 2 },
+    max: { red: { abs: 1, t: 'KPR 1 mg, anafylaxe 0,5 mg i.m.' } } },
+  { id: 'analgin', n: 'Analgin', s: '2,5 g / 5 ml (metamizol)', base: 'mg', conc: 500, amp: 5, solv: 'FR / G5 %',
+    dil: [{ l: 'Doředit do 10 ml', ml: 5, total: 10 }, { l: 'Infuze 100 ml', ml: 5, total: 100 }, N('Neředit', 'i.v. velmi pomalu')],
+    def: { d: 1000 }, max: { red: { abs: 2500, t: 'max. 2,5 g jednotlivě, 5 g za den' } } },
+  { id: 'apaurin', n: 'Apaurin', s: '10 mg / 2 ml (diazepam)', base: 'mg', conc: 5, amp: 2, solv: 'neředit',
+    dil: [N('Neředit', 'ředěním se sráží; i.v. pomalu')] },
+  { id: 'arduan', n: 'Arduan', s: '4 mg prášek → 1 mg/ml', base: 'mg', conc: 1, amp: 4, form: 'Rozpustit FR do 4 ml', solv: 'FR',
+    dil: [N('Po rozpuštění do 4 ml', '4 mg + FR do 4 ml = 1 mg/ml')],
+    reg: [{ l: 'Myorelaxace 0,05', d: 0.05, kg: true, sub: '0,05 mg/kg' }, { l: 'Myorelaxace 0,1', d: 0.1, kg: true, sub: '0,1 mg/kg' }],
+    ki: 'hypersenzitivita na účinnou látku', cave: 'apnoe, bronchokonstrikce, bradykardie, přechodné snížení TK' },
+  { id: 'atropin', n: 'Atropin', s: '0,5 mg / 1 ml', base: 'mg', conc: 0.5, amp: 1, solv: 'FR',
+    dil: [N(), { l: '1 ml + 4 ml FR (děti)', ml: 1, total: 5 }],
+    def: { d: 0.5 }, max: { orange: { abs: 0.5, t: 'obvyklá jednotlivá dávka 0,5 mg' }, red: { abs: 3, t: 'max. 3 mg celkem' } } },
+  { id: 'betaloc', n: 'Betaloc', s: '5 mg / 5 ml (metoprolol)', base: 'mg', conc: 1, amp: 5, solv: 'neředit',
+    dil: [N('Neředit', 'i.v. pomalu 1–2 mg/min')], max: { red: { abs: 5, t: 'max. 5 mg jednotlivě, 15 mg celkem' } } },
+  { id: 'bricanyl', n: 'Bricanyl', s: '0,5 mg / 1 ml (terbutalin)', base: 'mg', conc: 0.5, amp: 1, solv: 'FR / G5 % pro infuzi',
+    dil: [N('Neředit', 's.c.; i.v. jen jako infuze')] },
+  { id: 'cacl', n: 'Calcium chloratum 10 %', s: '10 ml = 4,56 mmol Ca', base: 'mmol', conc: 0.456, amp: 10, solv: 'neředit',
+    dil: [N('Neředit', 'i.v. velmi pomalu 3–10 min; při KPR rychlý bolus')],
+    def: { d: 4.56 }, max: { red: { abs: 4.56, t: 'max. 10 ml (4,56 mmol) jednotlivě' } } },
+  { id: 'calypsol', n: 'Calypsol', s: '500 mg / 10 ml (ketamin)', base: 'mg', conc: 50, amp: 10, solv: 'FR',
+    dil: [{ l: '2 ml + 8 ml FR', ml: 2, total: 10 }, { l: '4 ml + 6 ml FR', ml: 4, total: 10 }, N('Neředit', 'i.m. a i.n.')],
+    reg: [{ l: 'Analgezie', d: 0.5, kg: true, dil: 0, sub: '0,5 mg/kg' }, { l: 'Analgosedace', d: 1, kg: true, dil: 0, sub: '1 mg/kg' }, { l: 'Anestezie', d: 2, kg: true, dil: 1, sub: '2 mg/kg' }],
+    ki: 'nezajištěné DC, maligní hypertenze v OA, srdeční selhání, penetrující poranění oka', cave: 'psychoaktivace, vyšší salivace, laryngospasmus' },
+  { id: 'cefotaxim', n: 'Cefotaxim', s: '1 g prášek → 100 mg/ml', base: 'mg', conc: 100, amp: 10, form: 'Rozpustit v 10 ml Aqua / FR', solv: 'Aqua / FR',
+    dil: [N('Po rozpuštění v 10 ml', 'i.v. během 3–5 min')] },
+  { id: 'cordarone', n: 'Cordarone', s: '150 mg / 3 ml (amiodaron)', base: 'mg', conc: 50, amp: 3, solv: 'G5 %', solvOnly: true,
+    dil: [N('Neředit', 'KPR'), { l: '300 mg doředit G5 % do 20 ml', ml: 6, total: 20 }],
+    reg: [{ l: 'KPR 1. dávka', d: 300, dil: 0, sub: '300 mg' }, { l: 'KPR 2. dávka', d: 150, dil: 0, sub: '150 mg' }],
+    max: { red: { abs: 300, t: 'KPR 300 mg, pak 150 mg; 1,2 g / 24 h' } } },
+  { id: 'dexamed', n: 'Dexamed', s: '8 mg / 2 ml (dexamethason)', base: 'mg', conc: 4, amp: 2, solv: 'FR / G5 %', dil: [N()] },
+  { id: 'dithiaden', n: 'Dithiaden', s: '1 mg / 2 ml (bisulepin)', base: 'mg', conc: 0.5, amp: 2, solv: 'neředit', dil: [N('Neředit', 'i.v. pomalu nebo i.m.')] },
+  { id: 'dolmina', n: 'Dolmina', s: '75 mg / 3 ml (diklofenak)', base: 'mg', conc: 25, amp: 3, solv: 'FR / G5 %',
+    dil: [N('Neředit', 'jen i.m.'), { l: 'Infuze 75 mg do 100 ml', ml: 3, total: 100 }],
+    def: { d: 75 }, max: { red: { abs: 75, t: 'max. 75 mg jednotlivě, 150 mg za den' } } },
+  { id: 'ebrantil', n: 'Ebrantil', s: '25 mg / 5 ml (urapidil)', base: 'mg', conc: 5, amp: 5, solv: 'FR / G5 %', dil: [N('Neředit', 'bolus')] },
+  { id: 'exacyl', n: 'Exacyl', s: '500 mg / 5 ml (k. tranexamová)', base: 'mg', conc: 100, amp: 5, solv: 'FR',
+    dil: [N('Neředit', 'i.v. pomalu, max. 1 ml/min')], def: { d: 1000 }, max: { red: { abs: 1000, t: 'max. 1 g' } } },
+  { id: 'flumazenil', n: 'Flumazenil', s: '0,5 mg / 5 ml', base: 'mg', conc: 0.1, amp: 5, solv: 'neředit',
+    dil: [N('Neředit', 'titrovat po 0,1–0,2 mg')], def: { d: 0.2 }, max: { red: { abs: 1, t: 'max. 1 mg celkem' } } },
+  { id: 'furosemid', n: 'Furosemid', s: '20 mg / 2 ml', base: 'mg', conc: 10, amp: 2, solv: 'FR', solvOnly: true, dil: [N()] },
+  { id: 'glukoza40', n: 'Glukóza 40 %', s: '4 g / 10 ml', base: 'g', conc: 0.4, amp: 10, solv: 'Aqua',
+    dil: [N('Neředit', 'dospělí, velká žíla'), { l: 'Na 10 %: 10 ml + 30 ml Aqua', ml: 10, total: 40 }] },
+  { id: 'haloperidol', n: 'Haloperidol', s: '5 mg / 1 ml', base: 'mg', conc: 5, amp: 1, solv: 'neředit', dil: [N('Neředit', 'standardně i.m.')] },
+  { id: 'heparin', n: 'Heparin', s: '50 000 IU / 10 ml', base: 'IU', conc: 5000, amp: 10, solv: 'FR', dil: [N('Neředit', 'bolus')] },
+  { id: 'kardegic', n: 'Kardégic', s: '0,5 g prášek → 100 mg/ml', base: 'mg', conc: 100, amp: 5, form: 'Rozpustit přiloženými 5 ml', solv: 'Aqua',
+    dil: [N('Po rozpuštění v 5 ml', 'i.v. během 1–3 min')], def: { d: 500 },
+    max: { orange: { abs: 500, t: 'SPC u AKS 250–500 mg' } } },
+  { id: 'mesocain', n: 'Mesocain 1 %', s: '100 mg / 10 ml (trimekain)', base: 'mg', conc: 10, amp: 10, solv: 'neředit', dil: [N()] },
+  { id: 'methylergometrin', n: 'Methylergometrin', s: '0,2 mg / 1 ml', base: 'mg', conc: 0.2, amp: 1, solv: 'neředit',
+    dil: [N('Neředit', 'přednostně i.m.; i.v. pomalu aspoň 60 s')] },
+  { id: 'mgso4', n: 'MgSO4 20 %', s: '2 g / 10 ml', base: 'g', conc: 0.2, amp: 10, solv: 'FR / G5 %',
+    dil: [{ l: 'Doředit do 20 ml', ml: 10, total: 20 }, { l: 'Infuze 100 ml', ml: 10, total: 100 }, N()],
+    def: { d: 2 }, max: { orange: { abs: 2, t: 'obvykle 1–2 g; eklampsie 4 g, SVT 3–4 g' } } },
+  { id: 'midazolam', n: 'Midazolam', s: '5 mg / 1 ml', base: 'mg', conc: 5, amp: 1, solv: 'FR / G5 %',
+    dil: [{ l: '1 ml + 4 ml FR', ml: 1, total: 5 }, N('Neředit', 'i.m. a i.n.')] },
+  { id: 'morphin', n: 'Morphin 1 %', s: '10 mg / 1 ml', base: 'mg', conc: 10, amp: 1, solv: 'FR',
+    dil: [{ l: '1 ml + 9 ml FR', ml: 1, total: 10 }, N()] },
+  { id: 'naloxone', n: 'Naloxone', s: '0,4 mg / 1 ml', base: 'mg', conc: 0.4, amp: 1, solv: 'FR',
+    dil: [{ l: '1 ml + 9 ml FR', ml: 1, total: 10 }, N('Neředit', 'i.m. a i.n.')], def: { d: 0.04 } },
+  { id: 'noradrenalin', n: 'Noradrenalin', s: '1 mg / 1 ml', base: 'mg', conc: 1, amp: 1, solv: 'G5 %', solvOnly: true,
+    dil: [{ l: '2 mg doředit G5 % do 20 ml', ml: 2, total: 20 }, { l: '5 mg doředit G5 % do 50 ml', ml: 5, total: 50 }],
+    perfOnly: true, perf: { unit: 'µg/kg/min', range: [0.05, 0.5], def: 0.1, dil: 0 } },
+  { id: 'ondansetron', n: 'Ondansetron', s: '8 mg / 4 ml', base: 'mg', conc: 2, amp: 4, solv: 'FR / G5 %',
+    dil: [N('Neředit', 'i.v. pomalu, aspoň 30 s')], def: { d: 4 }, max: { red: { abs: 8, t: 'max. 8 mg jednotlivě, 16 mg za den' } } },
+  { id: 'perfalgan', n: 'Perfalgan', s: '1 g / 100 ml (paracetamol)', base: 'mg', conc: 10, amp: 100, solv: 'neředit',
+    dil: [N('Neředit', 'infuze 15 min')], def: { d: 1000 }, max: { red: { abs: 1000, t: 'max. 1 g jednotlivě, 4 g za den; pod 50 kg 15 mg/kg' } } },
+  { id: 'perlinganit', n: 'Perlinganit', s: '10 mg / 10 ml (nitroglycerin)', base: 'mg', conc: 1, amp: 10, solv: 'FR / G5 %',
+    dil: [{ l: 'Zvolené mg doředit do 10 ml', ml: 10, total: 10, custom: true }], perfOnly: true,
+    perf: { unit: 'mg/h', range: [0.6, 12], def: 1, dil: 0 } },
+  { id: 'propofol1', n: 'Propofol 1 %', s: '200 mg / 20 ml = 10 mg/ml', base: 'mg', conc: 10, amp: 20, solv: 'neředit', strength: { cls: 'low', t: '1 % · 10 mg/ml' },
+    dil: [N()], reg: [{ l: 'Úvod do CA', d: 2, kg: true, sub: '2 mg/kg' }, { l: 'Sedace', d: 1, kg: true, sub: '1 mg/kg' }],
+    perf: { unit: 'mg/kg/h', range: [4, 12], def: 4, dil: 0 },
+    ki: 'alergie na sóju, lecitin, arašídy; sedace pacientů mladších 16 let', cave: 'hypotenze, bradykardie, palčivost v žíle' },
+  { id: 'propofol2', n: 'Propofol 2 %', s: '1 000 mg / 50 ml = 20 mg/ml', base: 'mg', conc: 20, amp: 50, solv: 'neředit',
+    strength: { cls: 'high', t: '2 % · DVOJNÁSOBNÁ KONCENTRACE' },
+    dil: [N()], reg: [{ l: 'Úvod do CA', d: 2, kg: true, sub: '2 mg/kg' }, { l: 'Sedace', d: 1, kg: true, sub: '1 mg/kg' }],
+    perf: { unit: 'mg/kg/h', range: [4, 12], def: 4, dil: 0 },
+    ki: 'alergie na sóju, lecitin, arašídy; sedace pacientů mladších 16 let', cave: 'hypotenze, bradykardie, palčivost v žíle' },
+  { id: 'rocuronium', n: 'Rocuronium', s: '50 mg / 5 ml', base: 'mg', conc: 10, amp: 5, solv: 'neředit',
+    dil: [N()], reg: [{ l: 'Neurgentní', d: 0.6, kg: true, sub: '0,6 mg/kg' }, { l: 'RSI', d: 1.2, kg: true, sub: '1,2 mg/kg' }],
+    max: { orange: { kg: 1.2, t: 'SPC: intubace 0,6, RSI 1,0 mg/kg; protokol 1,2 mg/kg' } },
+    ki: 'hypersenzitivita na účinnou látku', cave: 'anafylaktická a anafylaktoidní reakce, myalgie' },
+  { id: 'solumedrol', n: 'Solu-Medrol', s: '40 mg prášek → 40 mg/ml', base: 'mg', conc: 40, amp: 1, form: 'Rozpustit přiloženým 1 ml', solv: 'FR / G5 % pro infuzi',
+    dil: [N('Po rozpuštění v 1 ml')] },
+  { id: 'sufenta_mite', n: 'Sufentanil MITE', s: '10 µg / 2 ml = 5 µg/ml', base: 'µg', conc: 5, amp: 2, solv: 'FR',
+    strength: { cls: 'low', t: 'MITE · NÍZKÁ SÍLA 5 µg/ml' }, dil: [N()] },
+  { id: 'sufenta_forte', n: 'Sufentanil FORTE', s: '250 µg / 5 ml = 50 µg/ml', base: 'µg', conc: 50, amp: 5, solv: 'FR',
+    strength: { cls: 'high', t: 'FORTE · 10× SILNĚJŠÍ NEŽ MITE' }, dil: [N()] },
+  { id: 'suxamethonium', n: 'Suxamethonium', s: '100 mg prášek → 10 mg/ml', base: 'mg', conc: 10, amp: 10, form: 'Rozpustit v 10 ml FR', solv: 'FR',
+    dil: [N('Po rozpuštění v 10 ml', '100 mg + 10 ml FR = 10 mg/ml')], reg: [{ l: 'Úvod do CA', d: 1, kg: true, sub: '1 mg/kg' }],
+    max: { orange: { kg: 1.5, t: 'obvykle 1 mg/kg; SPC celkem max. 500 mg/h' } },
+    ki: 'nezajištění DC, maligní hypertermie, svalová dystrofie', cave: 'bradykardie, hyperkalémie, myalgie' },
+  { id: 'syntophyllin', n: 'Syntophyllin', s: '240 mg / 10 ml (aminofylin)', base: 'mg', conc: 24, amp: 10, solv: 'FR / G5 %',
+    dil: [{ l: 'Doředit do 20 ml', ml: 10, total: 20 }, { l: 'Infuze 100 ml', ml: 10, total: 100 }, N('Neředit', 'i.v. velmi pomalu')] }
+].sort((a, b) => a.n.localeCompare(b.n, 'cs'));
+
+/* ===================== pomocné funkce ===================== */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+function fmt(n, max = 2) {
+  if (!isFinite(n)) return '–';
+  const d = Math.abs(n) >= 100 ? 0 : Math.abs(n) >= 10 ? Math.min(1, max) : max;
+  return (Math.round(n * 10 ** d) / 10 ** d).toLocaleString('cs-CZ', { maximumFractionDigits: d });
+}
+// převod mezi jednotkami látky
+const FACT = { 'g': 1e6, 'mg': 1e3, 'µg': 1 };
+function conv(v, from, to) {
+  if (from === to) return v;
+  if (FACT[from] && FACT[to]) return v * FACT[from] / FACT[to];
+  return NaN;
+}
+// koncentrace hezky: mg/ml, případně µg/ml
+function concText(c, base) {
+  if (base === 'mg' && c < 0.1) return fmt(c * 1000) + ' µg/ml';
+  return fmt(c, 3) + ' ' + base + '/ml';
+}
+function amountText(a, base) {
+  if (base === 'mg' && a > 0 && a < 0.1) return fmt(a * 1000) + ' µg';
+  if (base === 'mg' && a >= 1000) return fmt(a / 1000, 2) + ' g';
+  return fmt(a) + ' ' + base;
+}
+
+/* ===================== stav ===================== */
+const S = { drug: null, dil: 0, custom: { ml: null, total: null }, mode: 'bolus', perKg: false, dose: '', reg: -1 };
+const KEY = 'resqcalc:';
+const store = { get(k) { try { return localStorage.getItem(KEY + k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(KEY + k, v); } catch (e) {} } };
+
+function weight() { return parseFloat($('weight').value) || 0; }
+
+function selectDrug(id, keepDose) {
+  const d = DRUGS.find(x => x.id === id) || DRUGS[0];
+  S.drug = d; S.dil = 0; S.reg = -1;
+  S.custom = { ml: d.dil[0].ml ?? d.amp, total: d.dil[0].total ?? d.amp };
+  S.mode = d.perfOnly ? 'perf' : 'bolus';
+  if (S.mode === 'perf') applyPerfDefaults(); else {
+    S.perKg = d.def ? !!d.def.kg : false;
+    S.dose = d.def ? String(d.def.d) : '';
+  }
+  if (!d.perfOnly && d.reg && d.reg.length && !d.def) applyRegime(0, true);
+  store.set('drug', d.id);
+  renderDrug(); renderAll();
+}
+
+function applyPerfDefaults() {
+  const p = S.drug.perf;
+  S.dose = String(p.def);
+  if (p.dil !== undefined) { S.dil = p.dil; syncCustomFromDil(); }
+}
+
+function applyRegime(i, silent) {
+  const r = S.drug.reg[i];
+  S.reg = i; S.mode = 'bolus';
+  S.perKg = !!r.kg; S.dose = String(r.d);
+  if (r.dil !== undefined) S.dil = r.dil;
+  syncCustomFromDil();
+  if (!silent) renderAll();
+}
+
+function syncCustomFromDil() {
+  const o = S.drug.dil[S.dil];
+  if (o && o.ml !== null && o.ml !== undefined) S.custom = { ml: o.ml, total: o.total };
+}
+
+/* ===================== výpočty ===================== */
+function preparation() {
+  const d = S.drug;
+  const opt = S.dil === -1 ? { custom: true } : d.dil[S.dil];
+  let drugMl, total;
+  if (opt.custom) { drugMl = parseFloat(S.custom.ml) || 0; total = parseFloat(S.custom.total) || 0; }
+  else if (opt.ml === null || opt.ml === undefined) { drugMl = null; total = null; }
+  else { drugMl = opt.ml; total = opt.total; }
+  if (drugMl === null) return { neat: true, conc: d.conc, drugMl: null, total: null, amount: null };
+  const amount = drugMl * d.conc;
+  return { neat: false, conc: total > 0 ? amount / total : NaN, drugMl, total, amount, dilMl: Math.max(0, total - drugMl), over: drugMl > total };
+}
+
+function checkMax(amount) {
+  const m = S.drug.max; if (!m) return null;
+  const w = weight();
+  const lim = (x) => x.abs !== undefined ? x.abs : (x.kg !== undefined && w ? x.kg * w : Infinity);
+  const tol = 1e-9;
+  if (m.red && amount > lim(m.red) + tol) return { level: 'red', t: m.red.t, lim: lim(m.red) };
+  if (m.orange && amount > lim(m.orange) + tol) return { level: 'orange', t: m.orange.t, lim: lim(m.orange) };
+  return null;
+}
+
+/* ===================== vykreslení ===================== */
+function renderDrug() {
+  const d = S.drug;
+  $('d-name').textContent = d.n;
+  $('d-str').textContent = d.s;
+  const b = [];
+  if (d.strength) b.push(`<span class="badge ${d.strength.cls}">${esc(d.strength.t)}</span>`);
+  b.push(`<span class="badge solv${d.solvOnly ? ' only' : ''}">${d.solvOnly ? 'jen ' : ''}${esc(d.solv)}</span>`);
+  if (d.form) b.push(`<span class="badge form">${esc(d.form)}</span>`);
+  $('d-badges').innerHTML = b.join('');
+  $('drug-btn').classList.toggle('alert-high', !!(d.strength && d.strength.cls === 'high'));
+  $('drug-btn').classList.toggle('alert-low', !!(d.strength && d.strength.cls === 'low'));
+
+  if (d.ki || d.cave) {
+    $('info').hidden = false;
+    $('info-title').textContent = 'Kontraindikace a upozornění';
+    $('info-body').innerHTML = (d.ki ? `<p class="ki"><b>KI:</b> ${esc(d.ki)}</p>` : '') + (d.cave ? `<p><b>CAVE:</b> ${esc(d.cave)}</p>` : '');
+  } else $('info').hidden = true;
+}
+
+function renderRegimes() {
+  const d = S.drug;
+  const show = d.reg && d.reg.length && S.mode === 'bolus';
+  $('regimes-wrap').hidden = !show;
+  if (!show) return;
+  $('regimes').innerHTML = d.reg.map((r, i) =>
+    `<button type="button" class="chip" data-i="${i}" aria-pressed="${i === S.reg}">${esc(r.l)}${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</button>`).join('');
+}
+
+function renderDil() {
+  const d = S.drug;
+  const opts = d.dil.map((o, i) => {
+    let sub = o.sub || '';
+    if (o.ml !== null && o.ml !== undefined && !o.custom) {
+      const c = o.ml * d.conc / o.total;
+      sub = `${concText(c, d.base)} · ${fmt(o.total)} ml` + (sub ? ' · ' + sub : '');
+    } else if (!o.custom) sub = concText(d.conc, d.base) + (sub ? ' · ' + sub : '');
+    return `<button type="button" class="opt" data-i="${i}" aria-pressed="${i === S.dil}"><span class="dot"></span><span class="grow"><b>${esc(o.l)}</b><span class="sub">${esc(sub)}</span></span></button>`;
+  });
+  const hasCustomPreset = d.dil.some(o => o.custom);
+  if (!hasCustomPreset && d.dil.some(o => o.ml !== null && o.ml !== undefined) || (!hasCustomPreset && !d.form && d.dil.length)) {
+    opts.push(`<button type="button" class="opt" data-i="-1" aria-pressed="${S.dil === -1}"><span class="dot"></span><span class="grow"><b>Vlastní ředění</b><span class="sub">zadáš ml léku a celkový objem</span></span></button>`);
+  }
+  $('dil-list').innerHTML = opts.join('');
+
+  const cur = S.dil === -1 ? { custom: true } : d.dil[S.dil];
+  const showCustom = !!cur.custom;
+  $('custom').hidden = !showCustom;
+  if (showCustom) {
+    const isPerl = !!(d.dil[S.dil] && d.dil[S.dil].custom);
+    $('custom-drug-label').textContent = isPerl ? `Léku natáhnout (${d.base})` : 'Léku natáhnout (ml)';
+    const mlVal = isPerl ? S.custom.ml * d.conc : S.custom.ml;
+    if (document.activeElement !== $('c-ml')) $('c-ml').value = mlVal ?? '';
+    if (document.activeElement !== $('c-total')) $('c-total').value = S.custom.total ?? '';
+    $('c-total').disabled = isPerl;
+    $('c-vols').hidden = isPerl;
+    $('c-vols').innerHTML = [5, 10, 20, 50].map(v => `<button type="button" data-v="${v}" aria-pressed="${+S.custom.total === v}">${v} ml</button>`).join('');
+  }
+
+  const p = preparation();
+  const W = 278;
+  if (p.neat) {
+    const full = d.form ? `${esc(d.form)}, natáhni bez dalšího ředění.` : 'Natáhni přímo z ampule, bez ředění.';
+    $('prep-line').innerHTML = full;
+    $('prep-conc').textContent = 'Koncentrace ' + concText(d.conc, d.base) + ` · 1 ampule = ${fmt(d.amp)} ml = ${amountText(d.amp * d.conc, d.base)}`;
+    $('syr-drug').setAttribute('width', W); $('syr-dil').setAttribute('width', 0);
+  } else {
+    const solvName = d.solvOnly ? d.solv : (d.solv.includes('G5') && !d.solv.includes('FR') ? 'G5 %' : (d.solv.startsWith('Aqua') ? 'Aqua' : 'FR'));
+    $('prep-line').innerHTML = `Natáhni <b>${fmt(p.drugMl)} ml</b> léku (${esc(amountText(p.amount, d.base))}) + <b>${fmt(p.dilMl)} ml</b> ${esc(solvName)} → celkem <b>${fmt(p.total)} ml</b>`;
+    const amps = p.drugMl / d.amp;
+    $('prep-conc').textContent = 'Výsledná koncentrace ' + concText(p.conc, d.base) + ` · spotřeba ${fmt(amps)} amp.`;
+    const f = p.total > 0 ? Math.min(1, p.drugMl / p.total) : 0;
+    $('syr-drug').setAttribute('width', (W * f).toFixed(1));
+    $('syr-dil').setAttribute('x', (30 + W * f).toFixed(1));
+    $('syr-dil').setAttribute('width', (W * (1 - f)).toFixed(1));
+  }
+  return p;
+}
+
+function renderDose() {
+  const d = S.drug;
+  const ms = $('mode-switch');
+  ms.hidden = !d.perf || d.perfOnly;
+  ms.dataset.pos = S.mode === 'perf' ? 1 : 0;
+  ms.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === S.mode));
+  if (document.activeElement !== $('dose')) $('dose').value = S.dose;
+
+  if (S.mode === 'perf') {
+    $('unit-toggle').innerHTML = `<button type="button" aria-pressed="true" disabled>${esc(d.perf.unit)}</button>`;
+    $('hint').textContent = `Obvyklé rozmezí ${fmt(d.perf.range[0])}–${fmt(d.perf.range[1])} ${d.perf.unit}` + (d.perf.unit.includes('/kg') ? ` · hmotnost ${fmt(weight())} kg` : '');
+  } else {
+    $('unit-toggle').innerHTML = `<button type="button" data-kg="0" aria-pressed="${!S.perKg}">${esc(d.base)}</button><button type="button" data-kg="1" aria-pressed="${S.perKg}">${esc(d.base)}/kg</button>`;
+    $('hint').textContent = S.perKg ? `× ${fmt(weight())} kg` : '';
+  }
+}
+
+function renderResult(p) {
+  const d = S.drug, res = $('result'), warns = [];
+  res.className = 'result';
+  const dose = parseFloat(String(S.dose).replace(',', '.'));
+  const conc = p.conc;
+  const tag = `<div class="drugtag">${esc(d.n)} · ${esc(concText(conc, d.base))}</div>`;
+
+  if (p.over) warns.push({ level: 'red', t: 'Objem léku je větší než celkový objem stříkačky. Uprav ředění.' });
+
+  if (!(dose > 0)) {
+    res.innerHTML = `<div class="empty">Zadej požadovanou dávku</div>${tag}`;
+  } else if (S.mode === 'perf') {
+    const u = d.perf.unit;                      // např. µg/kg/min
+    const [amtU, ...rest] = u.split('/');
+    const perKg = rest.includes('kg'), perMin = rest.includes('min');
+    const w = weight();
+    if (perKg && !(w > 0)) { res.innerHTML = `<div class="empty">Zadej hmotnost pacienta</div>${tag}`; }
+    else {
+      let perH = dose * (perKg ? w : 1) * (perMin ? 60 : 1);   // v amtU za hodinu
+      const perHBase = conv(perH, amtU, d.base);
+      const mlh = perHBase / conc;
+      res.innerHTML = `<div class="lbl">Rychlost perfuzoru</div><div class="big">${fmt(mlh)}<small>ml/h</small></div>
+        <div class="sub">${fmt(dose, 3)} ${esc(u)} = ${esc(amountText(perHBase, d.base))}/h</div>${tag}`;
+      if (p.total && mlh > 0) {
+        const mins = p.total / mlh * 60;
+        warns.push({ level: 'info', t: `Stříkačka ${fmt(p.total)} ml vydrží přibližně ${mins >= 120 ? fmt(mins / 60, 1) + ' h' : Math.round(mins) + ' min'}.` });
+      }
+      const [lo, hi] = d.perf.range;
+      if (dose > hi) { res.classList.add('orange'); warns.push({ level: 'orange', t: `Nad obvyklým rozmezím (${fmt(lo)}–${fmt(hi)} ${u}).` }); }
+    }
+  } else {
+    const w = weight();
+    if (S.perKg && !(w > 0)) { res.innerHTML = `<div class="empty">Zadej hmotnost pacienta</div>${tag}`; }
+    else {
+      const amount = S.perKg ? dose * w : dose;
+      const ml = amount / conc;
+      const detail = S.perKg ? `${fmt(dose, 3)} ${d.base}/kg × ${fmt(w)} kg = ${amountText(amount, d.base)}` : amountText(amount, d.base);
+      res.innerHTML = `<div class="lbl">Podej</div><div class="big">${fmt(ml)}<small>ml</small></div><div class="sub">${esc(detail)}</div>${tag}`;
+      const mx = checkMax(amount);
+      if (mx) {
+        res.classList.add(mx.level);
+        warns.push({ level: mx.level, t: (mx.level === 'red' ? 'Překročeno maximum: ' : 'Nad obvyklou dávkou: ') + mx.t + '.' });
+      }
+      const avail = p.neat ? null : p.total;
+      if (avail && ml > avail + 1e-9) warns.push({ level: 'red', t: `Dávka (${fmt(ml)} ml) je větší než připravená stříkačka (${fmt(avail)} ml).` });
+      if (p.neat && ml > d.amp + 1e-9) warns.push({ level: 'info', t: `Potřebuješ ${fmt(ml / d.amp, 1)} ampule (${fmt(d.amp)} ml / ampule).` });
+    }
+  }
+  $('warnings').innerHTML = warns.map(w => w.level === 'info'
+    ? `<p class="note" style="margin-top:0">${esc(w.t)}</p>`
+    : `<div class="warn ${w.level}" style="margin-bottom:10px">${esc(w.t)}</div>`).join('');
+}
+
+function renderAll() {
+  renderRegimes();
+  const p = renderDil();
+  renderDose();
+  renderResult(p);
+}
+
+/* ===================== výběr léku ===================== */
+function renderList() {
+  const q = norm($('q').value.trim());
+  const list = DRUGS.filter(d => !q || norm(d.n + ' ' + d.s).includes(q));
+  $('drug-list').innerHTML = list.length ? list.map(d =>
+    `<button type="button" class="dl-item" data-id="${d.id}" aria-current="${S.drug && S.drug.id === d.id}">
+      <span class="grow"><b>${esc(d.n)}</b><span class="sub">${esc(d.s)}</span></span>
+      ${d.strength ? `<span class="badge ${d.strength.cls}">${d.strength.cls === 'high' ? 'VYSOKÁ SÍLA' : 'NÍZKÁ SÍLA'}</span>` : ''}
+    </button>`).join('') : '<div style="padding:18px;text-align:center;color:var(--ink-2)">Nic nenalezeno</div>';
+}
+function openPicker() {
+  $('q').value = ''; renderList();
+  $('overlay').classList.add('open'); $('picker').classList.add('open'); document.body.classList.add('locked');
+  setTimeout(() => $('q').focus(), 350);
+}
+function closePicker() { $('overlay').classList.remove('open'); $('picker').classList.remove('open'); document.body.classList.remove('locked'); }
+
+/* ===================== události ===================== */
+$('drug-btn').addEventListener('click', openPicker);
+$('overlay').addEventListener('click', closePicker);
+$('close-picker').addEventListener('click', closePicker);
+$('q').addEventListener('input', renderList);
+$('drug-list').addEventListener('click', (e) => { const b = e.target.closest('.dl-item'); if (!b) return; selectDrug(b.dataset.id); closePicker(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+$('regimes').addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (b) applyRegime(+b.dataset.i); });
+$('dil-list').addEventListener('click', (e) => {
+  const b = e.target.closest('.opt'); if (!b) return;
+  S.dil = +b.dataset.i;
+  if (S.dil >= 0) syncCustomFromDil();
+  else if (S.custom.ml == null) S.custom = { ml: S.drug.amp, total: 10 };
+  renderAll();
+});
+$('c-ml').addEventListener('input', () => {
+  const d = S.drug, isPerl = !!(d.dil[S.dil] && d.dil[S.dil].custom);
+  const v = parseFloat($('c-ml').value);
+  S.custom.ml = isPerl ? (v / d.conc) : v;
+  renderAll();
+});
+$('c-total').addEventListener('input', () => { S.custom.total = parseFloat($('c-total').value); renderAll(); });
+$('c-vols').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.custom.total = +b.dataset.v; renderAll(); });
+
+$('mode-switch').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b || b.dataset.mode === S.mode) return;
+  S.mode = b.dataset.mode; S.reg = -1;
+  if (S.mode === 'perf') applyPerfDefaults();
+  else { S.dil = 0; syncCustomFromDil(); S.dose = S.drug.def ? String(S.drug.def.d) : ''; S.perKg = false; if (S.drug.reg && !S.drug.def) applyRegime(0, true); }
+  renderAll();
+});
+$('unit-toggle').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-kg]'); if (!b) return;
+  const kg = b.dataset.kg === '1'; if (kg === S.perKg) return;
+  // převeď zadanou dávku, ať zůstane stejné množství látky
+  const w = weight(), v = parseFloat(String(S.dose).replace(',', '.'));
+  if (v > 0 && w > 0) S.dose = String(Math.round((kg ? v / w : v * w) * 1000) / 1000);
+  S.perKg = kg; S.reg = -1; renderAll();
+});
+$('dose').addEventListener('input', () => { S.dose = $('dose').value; S.reg = -1; renderRegimes(); renderResult(preparation()); });
+$('weight').addEventListener('input', () => { store.set('weight', $('weight').value); renderDose(); renderResult(preparation()); });
+
+/* motiv */
+const THEME_KEY = 'resqcalc:theme';
+try { const t = localStorage.getItem(THEME_KEY); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+$('theme-toggle').onclick = () => {
+  const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+};
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePicker(); });
+
+/* start */
+const savedW = store.get('weight'); if (savedW) $('weight').value = savedW;
+selectDrug(store.get('drug') || 'calypsol');
+</script>
+</body>
+</html>
