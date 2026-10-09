@@ -23,7 +23,7 @@
     Hub
   </a>
   <span class="mini-title">Správa</span>
-  <span style="width:42px"></span>
+  <button type="button" class="round-btn glass" id="lockBtn" aria-label="Zamknout správu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg></button>
 </header>
 
 <section class="hero" id="hero">
@@ -40,7 +40,7 @@
 
 <div class="group-head"><span>Aplikace</span><button type="button" id="reorderBtn">Seřadit</button></div>
 <div class="group glass with-icons" id="appList"></div>
-<div class="group-foot">Změny se ukládají jako koncept v tomto telefonu, dokud je nepublikuješ.</div>
+<div class="group-foot" id="listFoot">Změny se ukládají jako koncept v tomto telefonu, dokud je nepublikuješ.</div>
 
 <div class="group-head"><span>Publikování</span></div>
 <div class="group glass">
@@ -74,6 +74,25 @@
 <div class="group-foot">Token vytvoříš na GitHubu v Settings › Developer settings › Fine-grained tokens. Povol jen tento repozitář a oprávnění Contents: Read and write. Token zůstává uložený jen v tomto telefonu.</div>
 
 <div class="spacer"></div>
+
+<!-- Zámek správy -->
+<div class="gate" id="gate">
+  <div class="gate-card glass">
+    <div class="gate-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg></div>
+    <h2 id="gateTitle">Správa je zamčená</h2>
+    <p id="gateText">Zadej heslo ke správě.</p>
+    <form id="gateForm" novalidate>
+      <input type="password" class="gate-input" id="gPw" placeholder="Heslo" autocomplete="current-password" aria-label="Heslo">
+      <input type="password" class="gate-input" id="gPw2" placeholder="Heslo znovu" autocomplete="new-password" aria-label="Heslo znovu" hidden>
+      <button type="submit" class="cta" id="gateBtn">Odemknout</button>
+      <div class="gate-err" id="gateErr" role="alert" hidden></div>
+    </form>
+    <div class="gate-links">
+      <button type="button" id="gateReset">Zapomněl jsem heslo</button>
+      <a href="index.html">Zpět do hubu</a>
+    </div>
+  </div>
+</div>
 
 <!-- Editor aplikace -->
 <div class="scrim" id="backdrop"></div>
@@ -158,24 +177,117 @@
   var form = null;       // rozpracovaná data v editoru
 
   /* ================= GitHub nastavení ================= */
-  var GH_KEY = 'resqhub:github';
-  var gh = { owner: '', repo: '', branch: 'main', folder: '', token: '' };
-  try { Object.assign(gh, JSON.parse(RH.sGet(GH_KEY) || '{}')); } catch (e) {}
+  /* Připojení (včetně tokenu) je v telefonu uložené zašifrované heslem ke správě.
+     Klíč existuje jen v paměti, dokud je správa odemčená. */
+  var LEGACY_KEY = 'resqhub:github', VAULT_KEY = 'resqhub:vault';
+  var EMPTY_GH = { owner: '', repo: '', branch: 'main', folder: '', token: '' };
+  var gh = Object.assign({}, EMPTY_GH);
+  var vault = { key: null, salt: null };
 
-  // Na GitHub Pages se uživatel a repozitář doplní sami z adresy
-  var host = location.hostname.match(/^([^.]+)\.github\.io$/i);
-  if (host && !gh.owner) {
-    gh.owner = host[1];
-    var seg = location.pathname.split('/').filter(Boolean)[0];
-    gh.repo = seg && !/\.html?$/i.test(seg) ? seg : host[1] + '.github.io';
+  function u8(b64) { var b = atob(b64), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  async function deriveKey(pw, salt) {
+    var base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: salt, iterations: 300000, hash: 'SHA-256' },
+      base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+  async function sealVault() {
+    if (!vault.key) return;
+    var iv = crypto.getRandomValues(new Uint8Array(12));
+    var data = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, vault.key, new TextEncoder().encode(JSON.stringify(gh))));
+    RH.sSet(VAULT_KEY, JSON.stringify({ v: 1, salt: bytesToB64(vault.salt), iv: bytesToB64(iv), data: bytesToB64(data) }));
+  }
+  function storedVault() { try { return JSON.parse(RH.sGet(VAULT_KEY)); } catch (e) { return null; } }
+
+  function fillGhInputs() {
+    var host = location.hostname.match(/^([^.]+)\.github\.io$/i);  // na GitHub Pages se doplní samo
+    if (host && !gh.owner) {
+      gh.owner = host[1];
+      var seg = location.pathname.split('/').filter(Boolean)[0];
+      gh.repo = seg && !/\.html?$/i.test(seg) ? seg : host[1] + '.github.io';
+    }
+    document.querySelectorAll('#ghGroup input.field').forEach(function (inp) { inp.value = gh[inp.dataset.k] || ''; });
   }
 
+  var sealTimer;
   document.querySelectorAll('#ghGroup input.field').forEach(function (inp) {
-    inp.value = gh[inp.dataset.k] || '';
     inp.addEventListener('input', function () {
       gh[inp.dataset.k] = inp.value.trim();
-      RH.sSet(GH_KEY, JSON.stringify(gh));
+      clearTimeout(sealTimer); sealTimer = setTimeout(sealVault, 300);
     });
+  });
+
+  /* ---- Zámek správy ---- */
+  function showGate() {
+    var setup = !storedVault();
+    $('gateTitle').textContent = setup ? 'Nastav heslo ke správě' : 'Správa je zamčená';
+    $('gateText').textContent = setup
+      ? 'Heslem se v tomhle telefonu zašifruje i připojení ke GitHubu. Aspoň 8 znaků.'
+      : 'Zadej heslo ke správě.';
+    $('gPw2').hidden = !setup;
+    $('gPw').autocomplete = setup ? 'new-password' : 'current-password';
+    $('gateBtn').textContent = setup ? 'Nastavit heslo' : 'Odemknout';
+    $('gateReset').hidden = setup;
+    $('gateErr').hidden = true;
+    $('gPw').value = ''; $('gPw2').value = '';
+    $('gate').hidden = false;
+    document.body.classList.add('gated');
+    setTimeout(function () { $('gPw').focus(); }, 50);
+  }
+  function hideGate() {
+    $('gate').hidden = true;
+    document.body.classList.remove('gated');
+    fillGhInputs();
+    renderAll();
+  }
+  function gateError(msg) { var e = $('gateErr'); e.textContent = msg; e.hidden = false; }
+
+  $('gateForm').addEventListener('submit', async function (ev) {
+    ev.preventDefault();
+    var pw = $('gPw').value, btn = $('gateBtn'), stored = storedVault();
+    if (!window.crypto || !crypto.subtle) return gateError('Správa potřebuje zabezpečenou adresu (https).');
+    if (!stored) {
+      if (pw.length < 8) return gateError('Heslo musí mít aspoň 8 znaků.');
+      if (pw !== $('gPw2').value) return gateError('Hesla se neshodují.');
+      btn.disabled = true;
+      vault.salt = crypto.getRandomValues(new Uint8Array(16));
+      vault.key = await deriveKey(pw, vault.salt);
+      // převezme dříve uložené (nešifrované) připojení a smaže ho
+      try { Object.assign(gh, JSON.parse(RH.sGet(LEGACY_KEY) || '{}')); } catch (e) {}
+      await sealVault();
+      try { localStorage.removeItem(LEGACY_KEY); } catch (e) {}
+      btn.disabled = false;
+      hideGate();
+      RH.toast('Heslo nastaveno');
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'Odemykám…';
+    try {
+      var salt = u8(stored.salt), key = await deriveKey(pw, salt);
+      var plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: u8(stored.iv) }, key, u8(stored.data));
+      gh = Object.assign({}, EMPTY_GH, JSON.parse(new TextDecoder().decode(plain)));
+      vault.key = key; vault.salt = salt;
+      hideGate();
+    } catch (e) {
+      gateError('Špatné heslo.');
+      $('gPw').select();
+    }
+    btn.disabled = false; btn.textContent = 'Odemknout';
+  });
+
+  $('gateReset').addEventListener('click', function () {
+    RH.confirm('Smaže se heslo ke správě i uložené připojení ke GitHubu včetně tokenu. Aplikace v hubu ani koncept se nezmění.', 'Resetovat správu').then(function (ok) {
+      if (!ok) return;
+      try { localStorage.removeItem(VAULT_KEY); localStorage.removeItem(LEGACY_KEY); } catch (e) {}
+      gh = Object.assign({}, EMPTY_GH);
+      showGate();
+    });
+  });
+
+  $('lockBtn').addEventListener('click', function () {
+    vault.key = null; vault.salt = null;
+    gh = Object.assign({}, EMPTY_GH);
+    fillGhInputs();
+    showGate();
   });
 
   function ghReady() { return gh.owner && gh.repo && gh.token; }
@@ -259,6 +371,7 @@
   }
 
   var chev = '<svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>';
+  var grip = '<svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="5" width="14" height="2" rx="1"/><rect x="3" y="9" width="14" height="2" rx="1"/><rect x="3" y="13" width="14" height="2" rx="1"/></svg>';
   var up = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l5-5 5 5"/></svg>';
   var down = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5l5 5 5-5"/></svg>';
 
@@ -266,8 +379,7 @@
     var html = apps.map(function (a, i) {
       var sub = a.path ? RH.esc(a.path) : null;
       var tail = reordering
-        ? '<div class="reorder"><button type="button" data-move="-1" data-i="' + i + '" aria-label="Posunout nahoru"' + (i === 0 ? ' disabled' : '') + '>' + up + '</button>' +
-          '<button type="button" data-move="1" data-i="' + i + '" aria-label="Posunout dolů"' + (i === apps.length - 1 ? ' disabled' : '') + '>' + down + '</button></div>'
+        ? '<span class="grip" data-grip aria-hidden="true">' + grip + '</span>'
         : chev;
       var tag = reordering ? 'div' : 'button type="button"';
       return '<' + tag + ' class="row" data-edit="' + i + '">' + RH.iconHtml(a, 'sm') +
@@ -277,26 +389,74 @@
     if (!reordering) html += '<button class="row action" type="button" id="addBtn"><span class="lead" style="width:38px;height:38px;border-radius:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="grow">Přidat aplikaci</span></button>';
     $('appList').innerHTML = html;
     $('reorderBtn').textContent = reordering ? 'Hotovo' : 'Seřadit';
+    $('appList').classList.toggle('sorting', reordering);
+    $('listFoot').textContent = reordering
+      ? 'Chyť aplikaci za úchyt vpravo a přetáhni ji nahoru nebo dolů. Pořadí platí i pro hub.'
+      : 'Změny se ukládají jako koncept v tomto telefonu, dokud je nepublikuješ.';
     $('reorderBtn').hidden = apps.length < 2 && !reordering;
   }
 
   function renderAll() { renderStatus(); renderList(); }
 
   $('appList').addEventListener('click', function (e) {
-    var mv = e.target.closest('[data-move]');
-    if (mv) {
-      var i = +mv.dataset.i, j = i + (+mv.dataset.move);
-      if (j < 0 || j >= apps.length) return;
-      var t = apps[i]; apps[i] = apps[j]; apps[j] = t;
-      save();
-      return;
-    }
     if (e.target.closest('#addBtn')) return openSheet(-1);
     var row = e.target.closest('[data-edit]');
     if (row && !reordering) openSheet(+row.dataset.edit);
   });
 
   $('reorderBtn').addEventListener('click', function () { reordering = !reordering; renderList(); });
+
+  /* ---- Řazení přetažením (prst i myš) ---- */
+  var drag = null;
+  var list = $('appList');
+  function rowsNow() { return Array.prototype.slice.call(list.querySelectorAll('.row[data-edit]')); }
+  list.addEventListener('pointerdown', function (e) {
+    var g = e.target.closest('[data-grip]');
+    if (!g || !reordering) return;
+    e.preventDefault();
+    var row = g.closest('.row');
+    try { g.setPointerCapture(e.pointerId); } catch (err) {}
+    drag = { row: row, startY: e.clientY, moved: false };
+    row.classList.add('dragging');
+    if (navigator.vibrate) navigator.vibrate(8);
+  });
+  list.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    e.preventDefault();
+    var rows = rowsNow(), i = rows.indexOf(drag.row);
+    drag.row.style.transform = 'translateY(' + (e.clientY - drag.startY) + 'px)';
+    var r = drag.row.getBoundingClientRect(), mid = r.top + r.height / 2;
+    var next = rows[i + 1], prev = rows[i - 1];
+    // Přesouvá se vždy soused, ne tažený řádek – ten tak neztratí „úchop“ prstu.
+    if (next) {
+      var n = next.getBoundingClientRect();
+      if (mid > n.top + n.height / 2) {
+        list.insertBefore(next, drag.row);
+        drag.startY += n.height; drag.moved = true;
+      }
+    }
+    if (prev) {
+      var p = prev.getBoundingClientRect();
+      if (mid < p.top + p.height / 2) {
+        list.insertBefore(prev, drag.row.nextSibling);
+        drag.startY -= p.height; drag.moved = true;
+      }
+    }
+    drag.row.style.transform = 'translateY(' + (e.clientY - drag.startY) + 'px)';
+  });
+  function endDrag() {
+    if (!drag) return;
+    var moved = drag.moved;
+    drag.row.classList.remove('dragging');
+    drag.row.style.transform = '';
+    var order = rowsNow().map(function (r) { return +r.dataset.edit; });
+    drag = null;
+    if (!moved) return;
+    apps = order.map(function (i) { return apps[i]; });
+    save();
+  }
+  list.addEventListener('pointerup', endDrag);
+  list.addEventListener('pointercancel', endDrag);
 
   /* ================= Editor ================= */
   function uniqueId(base) {
@@ -533,6 +693,7 @@
   }, { passive: true });
 
   renderAll();
+  showGate();
   RH.registerSW();
 })();
 </script>

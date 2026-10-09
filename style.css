@@ -311,6 +311,20 @@ button.row:active, .row.tap:active { background: var(--fill); }
 .status .title { font-weight: 650; font-size: 17px; }
 .status .sub { font-size: 14px; color: var(--ink-2); margin-top: 2px; }
 
+/* Řazení přetažením */
+.grip {
+  width: 40px; height: 40px; margin-right: -8px; flex: none; display: grid; place-items: center;
+  color: var(--ink-3); touch-action: none; cursor: grab;
+}
+.grip svg { width: 20px; height: 20px; }
+.group.sorting { overflow: visible; }
+.row.dragging {
+  z-index: 5; cursor: grabbing; border-radius: 16px; background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  box-shadow: 0 16px 34px -12px var(--glass-shadow), 0 0 0 1px var(--glass-edge);
+}
+.row.dragging::before, .row.dragging + .row::before { opacity: 0; }
+
 /* iOS přepínač */
 .switch { position: relative; width: 52px; height: 32px; flex: none; }
 .switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
@@ -363,6 +377,26 @@ button.row:active, .row.tap:active { background: var(--fill); }
 .action-sheet button.danger { color: var(--danger); }
 .action-sheet button.cancel { font-weight: 650; }
 .action-scrim { z-index: 80; }
+
+/* ---------- Zámek správy ---------- */
+.gate {
+  position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 24px 16px;
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  -webkit-backdrop-filter: blur(30px) saturate(160%); backdrop-filter: blur(30px) saturate(160%);
+}
+body.gated { overflow: hidden; }
+.gate-card { width: 100%; max-width: 360px; padding: 30px 22px 18px; border-radius: 30px; text-align: center; background: var(--glass-strong); }
+.gate-icon { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 18px; display: grid; place-items: center; color: #fff; background: linear-gradient(150deg, #22C1C9, #0B6E79); }
+.gate-icon svg { width: 30px; height: 30px; }
+.gate-card h2 { margin: 0; font-size: 23px; letter-spacing: -.02em; }
+.gate-card p { margin: 6px 0 20px; color: var(--ink-2); font-size: 15px; line-height: 1.4; }
+.gate-card form { display: flex; flex-direction: column; gap: 10px; }
+.gate-input { height: 50px; border: 0; border-radius: 16px; background: var(--fill); padding: 0 16px; font-size: 17px; outline: none; }
+.gate-input:focus { box-shadow: 0 0 0 2px var(--petrol); }
+.gate-card .cta { height: 50px; margin-top: 4px; }
+.gate-err { color: var(--danger); font-size: 14px; font-weight: 550; }
+.gate-links { display: flex; justify-content: center; gap: 18px; margin-top: 16px; }
+.gate-links button, .gate-links a { border: 0; background: none; padding: 6px 2px; color: var(--ink-2); font-size: 14px; text-decoration: none; }
 
 /* ---------- Toast ---------- */
 .toast {

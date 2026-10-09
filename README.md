@@ -6,6 +6,7 @@ Rozcestník mini aplikací pro telefon. Běží na GitHub Pages, dá se přidat 
 
 ```
 index.html          rozcestník (hub)
+lock.js             zamykání aplikací heslem
 admin.html          správa – ikony, názvy, popisy, pořadí, publikování
 apps.js             seznam aplikací (generuje správa)
 style.css, common.js  sdílený vzhled a logika
@@ -36,14 +37,14 @@ Aby šlo publikovat přímo z telefonu, potřebuje správa token:
 2. *Repository access*: **Only select repositories** → vyber `resqhub`.
 3. *Permissions → Repository permissions → Contents*: **Read and write**.
 4. Vygeneruj a zkopíruj token.
-5. V hubu klepni na ikonu vpravo nahoře → **Správa** → sekce *Připojení ke GitHubu*. Uživatel a repozitář se na GitHub Pages doplní samy, stačí vložit token a dát **Ověřit připojení**.
+5. Správu otevřeš zadáním adresy hubu s `admin.html` na konci, třeba `https://tvoje-jmeno.github.io/ResqHub/admin.html`. V hubu na ni žádný odkaz není. Ulož si ji do záložek. Při prvním otevření si nastav heslo ke správě. Pak v sekci *Připojení ke GitHubu* vlož token a dej **Ověřit připojení**. Uživatel a repozitář se na GitHub Pages doplní samy.
 
 Token zůstává uložený jen v prohlížeči daného telefonu, nikam se neodesílá kromě GitHubu.
 
 ## 4. Přidání aplikace
 
 **Jednosouborová aplikace (jeden .html):**
-Správa → Přidat aplikaci → vyplň název a popis → Vybrat ikonu → **Nahrát HTML soubor na GitHub…** → Hotovo → **Publikovat na GitHub**.
+Správa (`…/admin.html`) → Přidat aplikaci → vyplň název a popis → Vybrat ikonu → **Nahrát HTML soubor na GitHub…** → Hotovo → **Publikovat na GitHub**.
 
 **Aplikace s více soubory (obrázky, CSS, JS):**
 Nahraj ji na GitHub do vlastní složky, třeba `apps/kalkulacka/`, a ve správě zadej cestu `apps/kalkulacka/index.html`.
@@ -52,6 +53,19 @@ Změny ve správě se nejdřív ukládají jako *koncept* jen v tom telefonu (hu
 
 **Bez tokenu:** ve správě dej *Stáhnout apps.js* a nahraj ho na GitHub místo starého.
 
+## 5. Zamčení aplikace heslem
+
+1. Ve správě otevři aplikaci a zapni **Zamknout heslem**.
+2. Zadej heslo (aspoň 8 znaků) a dej **Zašifrovat a nahrát HTML soubor**. Vyber HTML soubor aplikace.
+3. Dej **Uložit** a **Publikovat**.
+
+Soubor se zašifruje přímo v telefonu (AES-256) ještě před nahráním. Na GitHubu je jen nečitelný obsah a heslo se neukládá nikam, ani do správy, ani do repozitáře. Dlaždice dostane zámek a po otevření se zeptá na heslo, telefon si ho může zapamatovat.
+
+- **Zapomenuté heslo nejde obnovit.** Aplikaci prostě nahraj znovu s novým heslem.
+- Funguje pro aplikace z **jednoho HTML souboru**. Obrázky vlož přímo do HTML, soubory vedle by zůstaly veřejné.
+- Název, popis a ikona zamčené aplikace zůstávají v hubu viditelné.
+- Odemčení: vypni přepínač a nahraj soubor znovu bez hesla.
+
 ## Tipy
 
 - Názvy souborů a složek piš **malými písmeny, bez mezer a diakritiky**. GitHub rozlišuje velikost písmen, telefon a počítač často ne.
@@ -59,4 +73,5 @@ Změny ve správě se nejdřív ukládají jako *koncept* jen v tom telefonu (hu
 - Všechny aplikace sdílí úložiště prohlížeče (localStorage). Používej v nich klíče s předponou, třeba `kalkulacka:nastaveni`, ať si nepřepisují data.
 - Volba *Otevírat uvnitř hubu* zobrazí nad aplikací lištu „‹ ResqHub“. Na iPhonu v režimu z plochy jinak tlačítko zpět chybí.
 - Když změníš samotný hub (`index.html`, `style.css`…), zvyš v `sw.js` číslo `VERSION`, ať si telefony stáhnou novou verzi.
-- Správa není chráněná heslem. Bez tokenu ale nikdo nic nepublikuje, cizí úpravy by zůstaly jen v jeho prohlížeči.
+- **Správa** se otevírá jen ručně zadanou adresou `…/admin.html`. Je chráněná heslem, kterým se v telefonu šifruje i token. Zapomenuté heslo: *Zapomněl jsem heslo* smaže uložené připojení, token pak vložíš znovu. Aplikace ani hub se tím nezmění.
+- Skutečnou ochranou proti cizím úpravám je token. Bez něj nikdo nic nepublikuje, ani kdyby se do správy dostal.
