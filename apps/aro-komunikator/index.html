@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ARO Komunikátor</title>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ARO Komunikátor">
+<meta name="theme-color" content="#1D9E75">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --tl:#1D9E75;--tld:#0F6E56;--tldd:#085041;
+  --tll:#9FE1CB;--tlxl:#E1F5EE;--tlxxl:#F2FAF7;
+  --bg:#FFFFFF;--bg2:#F5FBF8;--bg3:#EDF7F2;
+  --tx:#12211C;--tx2:#4A6A5E;--tx3:#7A9A8E;
+  --br:rgba(15,110,86,.12);--br2:rgba(15,110,86,.22);
+  --red:#A32D2D;--redl:#FCEBEB;
+  --amb:#854F0B;--ambl:#FAEEDA;
+  --blu:#185FA5;--blul:#E6F1FB;
+  --pur:#534AB7;--purl:#EEEDFE;
+  --sh:0 2px 12px rgba(15,110,86,.08);
+  --shl:0 8px 32px rgba(15,110,86,.14);
+  --r:12px;--rl:18px;--rxl:24px;
+}
+.dark{
+  --bg:#0D1F18;--bg2:#112318;--bg3:#162C20;
+  --tx:#E8F5EE;--tx2:#7FB89A;--tx3:#4A7A5E;
+  --br:rgba(160,220,190,.1);--br2:rgba(160,220,190,.2);
+  --tlxl:#0D2E20;--tlxxl:#0A2018;
+  --redl:#2C0D0D;--ambl:#2A1A05;--blul:#0A1E30;--purl:#1A1840;
+  --sh:0 2px 12px rgba(0,0,0,.25);--shl:0 8px 32px rgba(0,0,0,.4);
+}
+html,body{height:100%;width:100%;margin:0;padding:0;font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--tx);transition:background .25s,color .25s}
+button{cursor:pointer;font-family:"DM Sans",sans-serif;border:none;background:none;color:inherit}
+input,select{font-family:"DM Sans",sans-serif;color:var(--tx)}
+#app{display:flex;flex-direction:column;height:100vh;width:100%;background:var(--bg);transition:background .25s}
+.hdr{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--br);flex-shrink:0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:9px;flex:1;min-width:160px}
+.logom{width:30px;height:30px;background:var(--tl);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logon{font-size:16px;font-weight:700;color:var(--tl);line-height:1.1}
+.logos{font-size:10px;color:var(--tx2);font-weight:300}
+.htabs{display:flex;gap:3px;background:var(--bg3);border-radius:9px;padding:3px}
+.htab{padding:5px 12px;border-radius:7px;font-size:12px;font-weight:500;color:var(--tx2);transition:all .15s;white-space:nowrap}
+.htab.active{background:var(--bg);color:var(--tl);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.htab:hover:not(.active){color:var(--tl)}
+.hright{display:flex;align-items:center;gap:6px;margin-left:auto}
+.langsel{padding:5px 7px;border-radius:7px;border:1px solid var(--br);background:var(--bg2);font-size:12px;color:var(--tx);outline:none;cursor:pointer;max-width:130px}
+.dktog{width:30px;height:30px;border-radius:7px;border:1px solid var(--br);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .15s}
+.dktog:hover{background:var(--bg3)}
+/* BUILDER */
+.builder{display:flex;flex:1;overflow:hidden}
+.sidebar{width:185px;flex-shrink:0;border-right:1px solid var(--br);padding:12px 9px;overflow-y:auto;background:var(--bg2)}
+.seclbl{font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;padding:0 5px;margin-bottom:7px;margin-top:2px}
+.catbtn{width:100%;text-align:left;padding:9px 10px;border-radius:8px;font-size:14px;color:var(--tx2);display:flex;align-items:center;gap:7px;transition:all .12s;margin-bottom:2px}
+.catbtn.active{background:var(--bg);color:var(--tl);font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.catbtn:hover:not(.active){background:var(--bg);color:var(--tx)}
+.catdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.catcnt{margin-left:auto;font-size:12px;color:var(--tx3);background:var(--bg3);padding:1px 5px;border-radius:8px}
+.maincol{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.cardsarea{flex:1;padding:12px 14px;overflow-y:auto}
+.cathd{font-size:22px;font-weight:700;color:var(--tl);margin-bottom:11px}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.icard{background:var(--bg2);border:1.5px solid transparent;border-radius:var(--r);padding:16px 12px;cursor:pointer;transition:all .18s;text-align:center;position:relative}
+.icard:hover{background:var(--tlxl);border-color:var(--tll)}
+.icard.sel{background:var(--tlxl);border-color:var(--tl);box-shadow:0 0 0 3px rgba(29,158,117,.12)}
+.icard-ic{font-size:32px;margin-bottom:8px;line-height:1}
+.icard-tx{font-size:14px;font-weight:500;color:var(--tx);line-height:1.35}
+.icard-ck{position:absolute;top:5px;right:5px;width:16px;height:16px;background:var(--tl);border-radius:50%;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s}
+.icard.sel .icard-ck{opacity:1}
+/* QUEUE */
+.qpanel{padding:10px 14px 12px;background:var(--bg);border-top:1px solid var(--br);flex-shrink:0}
+.qtop{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.qlbl{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em}
+.qbadge{background:var(--tl);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px}
+.qscroll{display:flex;flex-direction:row;gap:8px;overflow-x:auto;padding-bottom:6px;min-height:100px;align-items:stretch}
+.qscroll::-webkit-scrollbar{height:4px}
+.qscroll::-webkit-scrollbar-thumb{background:var(--tll);border-radius:2px}
+.qempty{font-size:12px;color:var(--tx3);font-style:italic}
+
+.qi{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:var(--bg2);border:1.5px solid var(--br);border-radius:12px;padding:10px 8px;width:88px;min-width:88px;height:88px;flex-shrink:0;position:relative;cursor:grab;touch-action:none;transition:all .15s;text-align:center}
+.qi.dragging{opacity:.3;cursor:grabbing;transform:scale(.92);filter:brightness(.9)}
+.qi-sep{width:4px;min-width:4px;height:88px;border-radius:2px;background:transparent;flex-shrink:0;transition:all .15s;position:relative;align-self:center}
+.qi-sep.active{width:28px;min-width:28px;background:var(--tl);box-shadow:0 0 0 3px rgba(29,158,117,.2)}
+.qi-sep.active::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:10px;height:10px;background:#fff;border:2px solid var(--tl);border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.qi-drag-handle{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--tx3);letter-spacing:1px;line-height:1;user-select:none;cursor:grab}
+.qi-pos{position:absolute;top:-7px;left:-7px;width:20px;height:20px;background:var(--tl);color:#fff;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.qi-ic{font-size:28px;line-height:1}
+.qi-tx{font-size:11px;font-weight:500;color:var(--tx);line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;width:100%}
+.qi-rm{position:absolute;top:-7px;right:-7px;width:18px;height:18px;background:var(--red);color:#fff;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;opacity:0;transition:opacity .15s}
+.qi:hover .qi-rm{opacity:1}
+
+.qacts{display:flex;gap:7px;margin-top:8px}
+.clrbtn{padding:9px 14px;border-radius:8px;font-size:13px;color:var(--tx2);border:1px solid var(--br);transition:all .12s}
+.clrbtn:hover{background:var(--redl);border-color:var(--red);color:var(--red)}
+.strbtn{flex:1;padding:11px;border-radius:8px;background:var(--tl);color:#fff;font-size:15px;font-weight:600;transition:all .15s;box-shadow:0 2px 8px rgba(15,110,86,.22)}
+.strbtn:hover:not(:disabled){background:var(--tld);transform:translateY(-1px)}
+.strbtn:disabled{opacity:.35;cursor:not-allowed}
+/* PRESENT */
+.ph{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--br);flex-shrink:0;background:var(--bg)}
+.pbk{padding:6px 11px;border-radius:7px;font-size:12px;color:var(--tx2);border:1px solid var(--br);transition:all .12s}
+.pbk:hover{background:var(--bg2);color:var(--tl)}
+.pctr{font-size:12px;color:var(--tx2);font-weight:500}
+.pdots{display:flex;gap:4px;flex:1;justify-content:center;flex-wrap:wrap;align-items:center}
+.pdot{height:6px;border-radius:3px;background:var(--br2);transition:all .25s;cursor:pointer}
+.pdot.done{background:var(--tll)}
+.pdot.act{background:var(--tl);width:20px!important}
+.pstage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;text-align:center;background:linear-gradient(155deg,var(--tlxxl) 0%,var(--bg) 55%);overflow:hidden;position:relative;user-select:none}
+.pcatl{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;padding:6px 18px;border-radius:20px;margin-bottom:18px}
+.picon{font-size:120px;line-height:1;margin-bottom:24px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.1))}
+.picon.an{animation:ipop .3s cubic-bezier(.34,1.56,.64,1)}
+.ptxt{font-size:clamp(28px,6vw,52px);font-weight:700;color:var(--tx);line-height:1.2;max-width:620px}
+.ptxt.an{animation:tin .22s ease}
+.psub{font-size:18px;color:var(--tx2);margin-top:14px;font-weight:300;font-style:italic}
+.psub.an{animation:tin .22s ease .04s both}
+@keyframes ipop{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pnav{display:flex;gap:10px;padding:13px 16px;border-top:1px solid var(--br);flex-shrink:0;background:var(--bg)}
+.pprev{flex:1;padding:16px;border-radius:var(--r);font-size:17px;font-weight:500;color:var(--tx2);border:1.5px solid var(--br);transition:all .15s}
+.pprev:hover:not(:disabled){background:var(--bg2);border-color:var(--br2);color:var(--tl)}
+.pprev:disabled{opacity:.28;cursor:default}
+.pnext{flex:2;padding:16px;border-radius:var(--r);font-size:17px;font-weight:600;color:#fff;background:var(--tl);border:none;transition:all .15s;box-shadow:0 2px 10px rgba(15,110,86,.22)}
+.pnext:hover{background:var(--tld);transform:translateY(-1px)}
+.pfin{flex:2;padding:16px;border-radius:var(--r);font-size:17px;font-weight:600;color:var(--tl);background:var(--tlxl);border:1.5px solid var(--tll);transition:all .15s}
+.pfin:hover{background:var(--tll)}
+/* COMM */
+.comm-hdr{padding:11px 16px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:10px;flex-shrink:0;background:var(--bg);flex-wrap:wrap}
+.comm-title{font-size:21px;font-weight:700;color:var(--tl);flex:1}
+.comm-crumb{display:flex;align-items:center;gap:5px;font-size:14px;color:var(--tx2)}
+.crumb{color:var(--tl);cursor:pointer;font-weight:500}
+.crumb:hover{text-decoration:underline}
+.comm-grid{flex:1;overflow-y:auto;display:grid;gap:8px;align-content:start}
+.ccell{border-radius:var(--r);width:200px;height:200px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;border:2px solid transparent;transition:all .18s;padding:12px}
+.ccell:hover{transform:scale(1.02);box-shadow:var(--sh)}
+.ccell:active{transform:scale(.97)}
+.ccell-ic{font-size:44px;line-height:1}
+.ccell-tx{font-size:16px;font-weight:600;line-height:1.3}
+.comm-result{background:var(--tlxl);border:2px solid var(--tll);border-radius:var(--rl);padding:14px 16px;margin:12px;display:flex;align-items:center;gap:11px;flex-shrink:0}
+.comm-rtx{flex:1;font-size:17px;font-weight:500;color:var(--tld)}
+.comm-clr{padding:10px 16px;border-radius:8px;font-size:14px;color:var(--tx2);border:1px solid var(--br2);transition:all .12s}
+.comm-reset-btn{padding:14px 24px;border-radius:12px;font-size:18px;font-weight:700;color:#fff;background:var(--tl);border:none;cursor:pointer;transition:all .15s;flex-shrink:0;box-shadow:0 3px 10px rgba(15,110,86,.25)}
+.comm-reset-btn:hover{background:var(--tld);transform:scale(1.04)}
+.comm-reset-btn:active{transform:scale(.97)}
+.comm-clr:hover{background:var(--redl);color:var(--red);border-color:var(--red)}
+/* ADMIN */
+.adminlayout{display:flex;flex:1;overflow:hidden}
+.adminsb{width:175px;flex-shrink:0;border-right:1px solid var(--br);padding:12px 9px;background:var(--bg2);overflow-y:auto}
+.adminmain{flex:1;overflow-y:auto;padding:12px}
+.ashed{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.astitle{font-size:19px;font-weight:700;color:var(--tl)}
+.aadd{padding:6px 13px;border-radius:8px;background:var(--tl);color:#fff;font-size:12px;font-weight:600;transition:all .15s}
+.aadd:hover{background:var(--tld)}
+.anavbtn{width:100%;text-align:left;padding:9px 10px;border-radius:8px;font-size:13px;color:var(--tx2);display:flex;align-items:center;gap:7px;transition:all .12s;margin-bottom:2px}
+.anavbtn.active{background:var(--bg);color:var(--tl);font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.anavbtn:hover:not(.active){background:var(--bg);color:var(--tx)}
+.apanel{display:none}
+.apanel.active{display:block}
+.atable{width:100%;border-collapse:collapse}
+.atable th{font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;padding:5px 9px;text-align:left;border-bottom:1px solid var(--br)}
+.atable td{padding:9px 10px;border-bottom:1px solid var(--br);font-size:13px;vertical-align:middle}
+.atable tr:last-child td{border-bottom:none}
+.atable tr:hover td{background:var(--bg2)}
+.a-ic{font-size:19px;text-align:center;width:36px}
+.abadge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.adot{width:6px;height:6px;border-radius:50%}
+.abtns{display:flex;gap:4px;justify-content:flex-end}
+.aedit{padding:4px 9px;border-radius:6px;font-size:11px;color:var(--tx2);border:1px solid var(--br);transition:all .12s}
+.aedit:hover{background:var(--tlxl);color:var(--tl);border-color:var(--tll)}
+.adel{padding:4px 7px;border-radius:6px;font-size:11px;color:var(--red);border:1px solid var(--redl);transition:all .12s}
+.adel:hover{background:var(--redl)}
+.asearch{width:100%;padding:9px 11px;border:1px solid var(--br);border-radius:8px;font-size:14px;background:var(--bg2);outline:none;margin-bottom:11px;color:var(--tx)}
+.asearch:focus{border-color:var(--tl)}
+.ltabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.ltab{padding:4px 10px;border-radius:7px;font-size:11px;font-weight:500;border:1px solid var(--br);color:var(--tx2);transition:all .12s;cursor:pointer}
+.ltab.active{background:var(--tl);color:#fff;border-color:var(--tl)}
+.ltab:hover:not(.active){border-color:var(--tll);color:var(--tl)}
+.swrow{width:6px;height:6px;border-radius:3px;display:inline-block;margin-right:6px}
+/* COLOR SWATCHES */
+.ccolrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px}
+.cswatch{width:24px;height:24px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all .12s;flex-shrink:0}
+.cswatch.active{border-color:var(--tx);transform:scale(1.18)}
+/* MODAL */
+.mbg{display:none;position:fixed;inset:0;background:rgba(5,18,12,.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.mbg.open{display:flex}
+.modal{background:var(--bg);border-radius:var(--rxl);padding:20px;width:370px;max-width:min(520px,95vw);box-shadow:0 24px 64px rgba(0,0,0,.22);border:1px solid var(--br);animation:min .2s cubic-bezier(.34,1.4,.64,1);max-height:90vh;overflow-y:auto}
+@keyframes min{from{transform:scale(.88) translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.modal h3{font-size:18px;font-weight:700;color:var(--tl);margin-bottom:14px}
+.frow{margin-bottom:11px}
+.flbl{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;display:block}
+.finput,.fsel{width:100%;padding:7px 10px;border:1.5px solid var(--br);border-radius:8px;font-size:12px;color:var(--tx);background:var(--bg2);transition:border-color .12s;outline:none}
+.finput:focus,.fsel:focus{border-color:var(--tl);background:var(--bg)}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mbtns{display:flex;gap:7px;margin-top:14px}
+.mbc{flex:1;padding:8px;border-radius:8px;font-size:12px;color:var(--tx2);border:1.5px solid var(--br);background:var(--bg2);transition:all .12s}
+.mbs{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:600;color:#fff;background:var(--tl);transition:all .15s}
+.mbs:hover{background:var(--tld)}
+.lrow{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.lflag{width:20px;text-align:center;font-size:15px;flex-shrink:0}
+.llbl{width:68px;font-size:11px;color:var(--tx2);flex-shrink:0}
+.lfield{flex:1;padding:5px 9px;border:1px solid var(--br);border-radius:6px;font-size:12px;color:var(--tx);background:var(--bg2);outline:none}
+.lfield:focus{border-color:var(--tl)}
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--tld);color:#fff;padding:8px 16px;border-radius:30px;font-size:12px;font-weight:500;opacity:0;transition:all .28s;z-index:400;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.vas-face{font-size:44px;cursor:pointer;transition:transform .15s;text-align:center;line-height:1;opacity:.55;filter:grayscale(30%)}
+.vas-face.active,.vas-face:hover{transform:scale(1.25);opacity:1;filter:none}
+.vas-num{font-size:15px;font-weight:600;color:var(--tx3);width:18px;text-align:center;transition:color .15s,transform .15s;display:inline-block}
+.vas-num.active{color:var(--tx);transform:scale(1.3)}
+
+/* dual language labels */
+.icard-staff{font-size:11px;color:var(--tx3);margin-top:2px;line-height:1.3;font-style:italic}
+.qi-staff{font-size:9px;font-style:italic;color:var(--tx3);overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;width:100%;color:var(--tx3);font-style:italic;text-align:center;max-width:66px;line-height:1.2;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.pstaff{font-size:18px;color:var(--tx2);font-style:italic;margin-bottom:8px;display:none;letter-spacing:.01em}
+.ccell-staff{font-size:13px;font-style:italic;margin-top:2px;opacity:.75;line-height:1.2;text-align:center}
+.comm-rtx{flex:1;font-size:17px;font-weight:500;color:var(--tld);display:flex;flex-direction:column;gap:2px}
+.comm-rtx-staff{font-size:14px;font-weight:400;color:var(--tx2);font-style:italic}
+
+/* Body model */
+.bm-panel{display:flex;flex-direction:row;align-items:stretch;height:100%;min-width:0;gap:0}
+.bm-svgwrap{display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;align-items:center}
+.bm-sidelabel{font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;padding:4px 0;flex-shrink:0}
+.bm-svgwrap svg{flex:1;min-height:0;min-width:0;width:100%;height:100%}
+.bm-lblcol{position:relative;width:130px;flex-shrink:0;padding-top:20px}
+
+.bml{background:#fff;border:2px solid var(--tl);border-radius:8px;padding:7px 10px;font-size:13px;font-weight:600;color:var(--tld);cursor:pointer;text-align:center;line-height:1.3;width:120px;display:flex;flex-direction:column;gap:2px;position:absolute}
+.bml:hover{background:var(--tlxl)}
+.bml-staff{font-size:10px;font-weight:400;color:var(--tx2);font-style:italic}
+
+.lang-block{display:flex;flex-direction:column;gap:5px}
+.lang-row{display:flex;align-items:center;gap:5px}
+.lang-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;width:52px;text-align:right;flex-shrink:0;white-space:nowrap}
+.lang-lbl.pat{color:var(--tx3)}
+.lang-lbl.sta{color:var(--tl)}
+.swap-btn{padding:4px 8px;border-radius:7px;border:1px solid var(--br);background:var(--bg2);font-size:14px;font-weight:700;cursor:pointer;color:var(--tl);transition:all .12s;flex-shrink:0}
+.swap-btn:hover{background:var(--tlxl);border-color:var(--tl)}
+
+.comm-body-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--tlxl);border:2px solid var(--tl);border-radius:var(--r-lg,18px);padding:16px 12px;cursor:pointer;transition:all .18s;text-align:center;height:100%;min-height:200px}
+.comm-body-tile:hover{background:var(--tll);transform:scale(1.02)}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="hdr">
+  <div class="logo">
+    <div class="logom">🏥</div>
+    <div>
+      <div class="logon">ARO Komunikátor</div>
+      <div class="logos">Pomůcka pro sluchově postižené pacienty</div>
+    </div>
+  </div>
+  <div class="htabs">
+    <button class="htab active" id="tab-builder" onclick="showView('builder')">Sekvence</button>
+    <button class="htab" id="tab-comm" onclick="showView('comm')">Komunikační karta</button>
+    <button class="htab" id="tab-admin" onclick="showView('admin')">⚙ Admin</button>
+  </div>
+  <div style="width:1px;height:28px;background:var(--br2);margin:0 8px;flex-shrink:0"></div>
+  <div class="hright">
+    <div class="lang-block">
+      <div class="lang-row">
+        <span class="lang-lbl pat">Pacient</span>
+        <select class="langsel" id="langsel" onchange="changeLang(this.value)" title="Jazyk pacienta"></select>
+      </div>
+      <div class="lang-row">
+        <span class="lang-lbl sta">Personál</span>
+        <select class="langsel" id="stafflangsel" onchange="changeStaffLang(this.value)" title="Jazyk personálu" style="border-color:var(--tl)"></select>
+      </div>
+    </div>
+    <button onclick="swapLangs()" title="Prohodit jazyky pacienta a personálu" class="swap-btn">⇄</button>
+    <div style="width:1px;height:28px;background:var(--br2);margin:0 6px;flex-shrink:0"></div>
+    <button class="dktog" id="dktog" onclick="toggleDark()" title="Světlý/tmavý režim">🌙</button>
+  </div>
+</div>
+
+<!-- BUILDER -->
+<div id="view-builder" style="display:flex;flex:1;overflow:hidden">
+  <div class="sidebar">
+    <div class="seclbl">Kategorie</div>
+    <div id="catlist"></div>
+  </div>
+  <div class="maincol">
+    <div class="cardsarea">
+      <div class="cathd" id="cathd"></div>
+      <div class="cgrid" id="cgrid"></div>
+    </div>
+    <div class="qpanel">
+      <div class="qtop">
+        <div class="qlbl">Sekvence</div>
+        <div class="qbadge" id="qbadge">0</div>
+      </div>
+      <div class="qscroll" id="qscroll"><span class="qempty">Přidejte pokyny kliknutím na karty výše</span></div>
+      <div class="qacts">
+        <button class="clrbtn" onclick="clearQ()">Vymazat vše</button>
+        <button class="strbtn" id="strbtn" disabled onclick="startPresent()">▶ Spustit prezentaci</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRESENT -->
+<div id="view-present" style="display:none;flex-direction:column;flex:1">
+  <div class="ph">
+    <button class="pbk" onclick="showView('builder')">← Zpět</button>
+    <span class="pctr" id="pctr">1/1</span>
+    <div class="pdots" id="pdots"></div>
+  </div>
+  <div class="pstage" id="pstage">
+    <div class="pcatl" id="pcatl"></div>
+    <div class="pstaff" id="pstaff"></div>
+    <div class="picon" id="picon"></div>
+    <div class="ptxt"  id="ptxt"></div>
+    <div class="psub"  id="psub"></div>
+  </div>
+  <div class="pnav" id="pnav"></div>
+</div>
+
+<!-- COMM CARD -->
+<div id="view-comm" style="display:none;flex-direction:column;flex:1;position:relative;overflow:hidden">
+  <div class="comm-hdr">
+    <div class="comm-title" id="comm-title">Komunikační karta</div>
+    <div class="comm-crumb" id="comm-crumb"></div>
+  </div>
+  <!-- Body part context bar -->
+  <div id="body-part-bar" style="display:none;align-items:center;gap:10px;padding:8px 16px;background:var(--tlxl);border-bottom:1px solid var(--tll);flex-shrink:0">
+    <span style="font-size:16px">🫀</span>
+    <span style="font-size:14px;font-weight:600;color:var(--tld)" id="body-part-bar-text"></span>
+    <span style="font-size:12px;color:var(--tx2)">— vyberte co chcete sdělit</span>
+    <button onclick="clearBodyPartCtx()" style="margin-left:auto;padding:4px 10px;border-radius:6px;border:1px solid var(--br2);background:var(--bg);font-size:12px;color:var(--tx2);cursor:pointer">✕ Zrušit</button>
+  </div>
+  <div id="comm-res" style="display:none" class="comm-result">
+    <span style="font-size:21px" id="comm-ric"></span>
+    <span class="comm-rtx" id="comm-rtx"></span>
+    <button class="comm-reset-btn" onclick="commReset()" id="comm-reset-btn">↩ Znovu</button>
+  </div>
+  <!-- VAS panel -->
+  <div id="vas-panel" style="display:none;flex-direction:column;flex:1;padding:16px 14px;gap:14px;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="vasClose()" style="padding:9px 16px;border-radius:10px;border:2px solid var(--br2);background:var(--bg3);font-size:15px;font-weight:600;color:var(--tx2);cursor:pointer">&#8592; Zpět</button>
+      <div style="font-size:17px;font-weight:700;color:var(--tl)" id="vas-title">Jak silná je bolest?</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;padding:0 2px">
+      <div class="vas-face" data-v="0" onclick="vasUpdate(0)">&#128522;</div>
+      <div class="vas-face" data-v="2" onclick="vasUpdate(2)">&#128578;</div>
+      <div class="vas-face" data-v="4" onclick="vasUpdate(4)">&#128528;</div>
+      <div class="vas-face" data-v="6" onclick="vasUpdate(6)">&#128543;</div>
+      <div class="vas-face" data-v="8" onclick="vasUpdate(8)">&#128546;</div>
+      <div class="vas-face" data-v="10" onclick="vasUpdate(10)">&#128549;</div>
+    </div>
+    <div style="position:relative;height:26px;border-radius:13px;background:linear-gradient(to right,#2E9E2E,#7DC52E,#D4C400,#E08000,#D04010,#C01010);box-shadow:0 2px 6px rgba(0,0,0,.15)">
+      <div id="vas-thumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid #333;box-shadow:0 2px 8px rgba(0,0,0,.25);left:0%;pointer-events:none"></div>
+    </div>
+    <input type="range" id="vas-slider" min="0" max="10" value="0" step="1" style="width:100%;opacity:0;height:26px;margin-top:-42px;cursor:pointer;position:relative;z-index:2" oninput="vasUpdate(parseInt(this.value))">
+    <div style="display:flex;justify-content:space-between;padding:0 6px;margin-top:-6px">
+      <span id="vn0"  class="vas-num active">0</span><span id="vn1"  class="vas-num">1</span><span id="vn2"  class="vas-num">2</span>
+      <span id="vn3"  class="vas-num">3</span><span id="vn4"  class="vas-num">4</span><span id="vn5"  class="vas-num">5</span>
+      <span id="vn6"  class="vas-num">6</span><span id="vn7"  class="vas-num">7</span><span id="vn8"  class="vas-num">8</span>
+      <span id="vn9"  class="vas-num">9</span><span id="vn10" class="vas-num">10</span>
+    </div>
+    <div id="vas-box" style="display:flex;align-items:center;justify-content:center;gap:16px;padding:16px;border-radius:16px;background:var(--bg2);border:2px solid var(--br)">
+      <span id="vas-big-face" style="font-size:56px">&#128522;</span>
+      <div><div id="vas-big-num" style="font-size:52px;font-weight:700;line-height:1;color:#2E9E2E">0</div>
+      <div id="vas-big-lbl" style="font-size:13px;color:var(--tx2);margin-top:3px">Žádná bolest</div></div>
+    </div>
+    <button onclick="vasConfirm()" style="padding:15px;border-radius:12px;background:var(--tl);color:#fff;font-size:16px;font-weight:600;border:none;cursor:pointer;box-shadow:0 2px 10px rgba(15,110,86,.22)">Potvrdit &#8594; zobrazit sestře</button>
+  </div>
+  <!-- BODY MODEL -->
+  <div id="body-model" style="display:none;flex-direction:column;position:absolute;inset:0;z-index:50;background:var(--bg)">
+    <div id="body-hdr" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--br);flex-shrink:0">
+      <button id="body-back-btn" onclick="bodyBack()" style="display:none;padding:8px 14px;border-radius:10px;border:2px solid var(--br2);background:var(--bg3);font-size:14px;font-weight:600;color:var(--tx2);cursor:pointer">← Zpět</button>
+      <div id="body-title" style="font-size:16px;font-weight:700;color:var(--tl)">Kde vás bolí? Klepněte na oblast.</div>
+    </div>
+    <div id="body-stage" style="display:flex;flex-direction:row;align-items:stretch;justify-content:center;gap:8px;padding:0;overflow:hidden"></div>
+  </div>
+  <div class="comm-grid" id="comm-grid"></div>
+</div>
+
+<!-- ADMIN -->
+<div id="view-admin" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+  <div class="adminlayout">
+    <div class="adminsb">
+      <div class="seclbl">Sekce</div>
+      <button class="anavbtn active" id="anav-inst" onclick="adminNav('inst')">📋 Pokyny</button>
+      <button class="anavbtn" id="anav-cats" onclick="adminNav('cats')">🏷 Kategorie</button>
+      <button class="anavbtn" id="anav-comm" onclick="adminNav('comm')">💬 Kom. karta</button>
+    </div>
+    <div class="adminmain">
+      <div id="ap-inst" class="apanel active">
+        <div class="ashed"><div class="astitle">Pokyny</div><button class="aadd" onclick="openInstrM(null)">+ Přidat pokyn</button></div>
+        <input class="asearch" id="asearch" placeholder="Hledat pokyn…" oninput="renderAInst()">
+        <div class="ltabs" id="altabs"></div>
+        <table class="atable"><thead><tr><th style="width:36px"></th><th>Pokyn</th><th>Kategorie</th><th></th></tr></thead><tbody id="aitbody"></tbody></table>
+      </div>
+      <div id="ap-cats" class="apanel">
+        <div class="ashed"><div class="astitle">Kategorie</div><button class="aadd" onclick="openCatM(null)">+ Přidat</button></div>
+        <table class="atable"><thead><tr><th style="width:36px">Barva</th><th>Název</th><th style="width:55px">Pokynů</th><th></th></tr></thead><tbody id="actbody"></tbody></table>
+      </div>
+      <div id="ap-comm" class="apanel">
+        <div class="ashed"><div class="astitle">Komunikační karta</div><button class="aadd" onclick="openCommM(null,null)">+ Přidat kategorii</button></div>
+        <div id="acm-tree"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: POKYN -->
+<div class="mbg" id="mi">
+<div class="modal" style="width:520px">
+  <h3 id="mi-h">Pokyn</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">
+    <div>
+      <label class="flbl">Emoji ikona</label>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <div id="mi-ic-preview" style="width:52px;height:52px;border:1.5px solid var(--br);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--bg2);flex-shrink:0">➕</div>
+        <input type="text" id="mi-ic" placeholder="Napište nebo vložte emoji"
+          class="finput" style="font-size:20px"
+          oninput="document.getElementById('mi-ic-preview').textContent=this.value.trim()||'➕'">
+      </div>
+    </div>
+    <div>
+      <label class="flbl">Kategorie</label>
+      <select class="fsel" id="mi-cat" style="margin-top:4px"></select>
+    </div>
+  </div>
+  <div class="frow"><label class="flbl">Překlady</label><div id="mi-langs"></div></div>
+  <div class="frow"><label class="flbl">Doplňující text (český, volitelný)</label><input class="finput" id="mi-sub" placeholder="Pomalu, klidně…"></div>
+  <div class="mbtns"><button class="mbc" onclick="closeM('mi')">Zrušit</button><button class="mbs" onclick="saveInstrM()">Uložit</button></div>
+</div>
+</div>
+
+<!-- MODAL: KATEGORIE -->
+<div class="mbg" id="mc">
+<div class="modal">
+  <h3 id="mc-h">Kategorie</h3>
+  <div class="frow"><label class="flbl">Název</label><input class="finput" id="mc-n" placeholder="Dýchání"></div>
+  <div class="frow"><label class="flbl">Barva</label><div class="ccolrow" id="mc-cols"></div></div>
+  <div class="mbtns"><button class="mbc" onclick="closeM('mc')">Zrušit</button><button class="mbs" onclick="saveCatM()">Uložit</button></div>
+</div>
+</div>
+
+<!-- MODAL: COMM -->
+<div class="mbg" id="mcm">
+<div class="modal" style="width:520px">
+  <h3 id="mcm-h">Položka komunikační karty</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">
+    <div>
+      <label class="flbl">Emoji ikona</label>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <div id="mcm-ic-preview"
+          style="width:56px;height:56px;border:1.5px solid var(--br);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:34px;cursor:text;background:var(--bg2);flex-shrink:0">➕</div>
+        <input type="text" id="mcm-ic-real" placeholder="Napište nebo vložte emoji"
+          class="finput" style="font-size:20px"
+          oninput="document.getElementById('mcm-ic-preview').textContent=this.value.trim()||'➕'">
+      </div>
+    </div>
+    <div>
+      <label class="flbl">Barva</label>
+      <div class="ccolrow" id="mcm-cols" style="margin-top:8px"></div>
+    </div>
+  </div>
+  <div class="frow">
+    <label class="flbl">Nadřazená kategorie (prázdné = hlavní)</label>
+    <select class="fsel" id="mcm-par"></select>
+  </div>
+  <div class="frow">
+    <label class="flbl">Překlady</label>
+    <div id="mcm-langs"></div>
+  </div>
+  <div class="mbtns">
+    <button class="mbc" onclick="closeM('mcm')">Zrušit</button>
+    <button class="mbs" onclick="saveCommM()">Uložit</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const LANGS=[
+  {id:"cs",lb:"Čeština",fl:"🇨🇿"},{id:"en",lb:"English",fl:"🇬🇧"},{id:"de",lb:"Deutsch",fl:"🇩🇪"},
+  {id:"uk",lb:"Українська",fl:"🇺🇦"},{id:"vi",lb:"Tiếng Việt",fl:"🇻🇳"},{id:"mn",lb:"Монгол",fl:"🇲🇳"},
+  {id:"fr",lb:"Français",fl:"🇫🇷"},{id:"es",lb:"Español",fl:"🇪🇸"},{id:"ar",lb:"العربية",fl:"🇸🇦",rtl:1},
+  {id:"ro",lb:"Romani",fl:"🏴"},{id:"ru",lb:"Русский",fl:"🇷🇺"},
+];
+const COLORS=["#1D9E75","#185FA5","#A32D2D","#534AB7","#854F0B","#3B6D11","#993556","#0F6E56","#BA7517","#2D7A9A"];
+
+let CATS=[
+  {id:"dychani",name:"Dýchání",color:"#185FA5"},
+  {id:"pohyb",name:"Pohyb",color:"#BA7517"},
+  {id:"bolest",name:"Bolest / stav",color:"#A32D2D"},
+  {id:"komunikace",name:"Komunikace",color:"#534AB7"},
+  {id:"procedury",name:"Procedury",color:"#1D9E75"},
+  {id:"vysetreni",name:"Vyšetření",color:"#3B6D11"},
+];
+
+let INST=[
+  {id:1,ic:"😮‍💨",cat:"dychani",sub:"Pomalu, zhluboka",t:{cs:"Zhluboka se nadechněte",en:"Take a deep breath",de:"Tief einatmen",uk:"Зробіть глибокий вдих",vi:"Hít thở sâu",mn:"Гүнзгий амьсгал ав",fr:"Respirez profondément",es:"Respire profundamente",ar:"خذ نفساً عميقاً",ro:"Kher pharo sasimos",ru:"Сделайте глубокий вдох"}},
+  {id:2,ic:"💨",cat:"dychani",sub:"Klidně, bez spěchu",t:{cs:"Vydechněte pomalu",en:"Exhale slowly",de:"Langsam ausatmen",uk:"Видихніть повільно",vi:"Thở ra từ từ",mn:"Удаан амьсгал гарга",fr:"Expirez lentement",es:"Exhale lentamente",ar:"ازفر ببطء",ro:"Pharo sas lungo",ru:"Медленно выдыхайте"}},
+  {id:3,ic:"🫁",cat:"dychani",sub:"Silně odkašlejte",t:{cs:"Odkašlejte si",en:"Please cough",de:"Bitte husten",uk:"Покашляйте",vi:"Hãy ho",mn:"Ханиад гар",fr:"Toussez SVP",es:"Por favor tosa",ar:"من فضلك اسعل",ro:"Kher khanclimos",ru:"Покашляйте"}},
+  {id:4,ic:"⏸️",cat:"dychani",sub:"Jen pár sekund",t:{cs:"Zadržte dech",en:"Hold your breath",de:"Atem anhalten",uk:"Затримайте подих",vi:"Nín thở",mn:"Амьсгалаа барь",fr:"Retenez votre souffle",es:"Aguante la respiración",ar:"احبس نفسك",ro:"Rakhen sasimos",ru:"Задержите дыхание"}},
+  {id:5,ic:"🛑",cat:"pohyb",sub:"Zůstaňte v klidu",t:{cs:"Nehýbejte se",en:"Do not move",de:"Nicht bewegen",uk:"Не рухайтесь",vi:"Đừng cử động",mn:"Хөдлөхгүй байгаарай",fr:"Ne bougez pas",es:"No se mueva",ar:"لا تتحرك",ro:"Na mov tut",ru:"Не двигайтесь"}},
+  {id:6,ic:"↩️",cat:"pohyb",sub:"Pomůžeme vám",t:{cs:"Otočte se na bok",en:"Turn on your side",de:"Auf die Seite drehen",uk:"Повернітьсь на бік",vi:"Lăn sang một bên",mn:"Хажуу тийш эргэ",fr:"Tournez-vous sur le côté",es:"Gírese de lado",ar:"انقلب على جانبك",ro:"Mur pal rig",ru:"Повернитесь на бок"}},
+  {id:7,ic:"😌",cat:"pohyb",sub:"",t:{cs:"Zavřete oči",en:"Close your eyes",de:"Augen schließen",uk:"Заплющте очі",vi:"Nhắm mắt",mn:"Нүдэ ан",fr:"Fermez les yeux",es:"Cierre los ojos",ar:"أغمض عينيك",ro:"Phand yakha",ru:"Закройте глаза"}},
+  {id:8,ic:"👁️",cat:"pohyb",sub:"",t:{cs:"Otevřete oči",en:"Open your eyes",de:"Augen öffnen",uk:"Розплющте очі",vi:"Mở mắt",mn:"Нүдэ нee",fr:"Ouvrez les yeux",es:"Abra los ojos",ar:"افتح عينيك",ro:"Phuk yakha",ru:"Откройте глаза"}},
+  {id:9,ic:"❓",cat:"bolest",sub:"Ukažte nám kde",t:{cs:"Bolí vás něco?",en:"Are you in pain?",de:"Haben Sie Schmerzen?",uk:"Вам боляче?",vi:"Bạn có đau không?",mn:"Та өвдөж байна уу?",fr:"Avez-vous mal?",es:"¿Tiene dolor?",ar:"هل تشعر بألم؟",ro:"Dukhavel tut?",ru:"Вам больно?"}},
+  {id:10,ic:"😣",cat:"bolest",sub:"Číslem 1–10",t:{cs:"Jak silná je bolest?",en:"How strong is the pain?",de:"Wie stark sind die Schmerzen?",uk:"Наскільки сильний біль?",vi:"Cơn đau mạnh thế nào?",mn:"Өвдөлт хэр их вэ?",fr:"Quelle est l'intensité?",es:"¿Qué tan fuerte es el dolor?",ar:"كم شدة الألم؟",ro:"Sar zoro si i dukh?",ru:"Насколько сильная боль?"}},
+  {id:11,ic:"💊",cat:"bolest",sub:"Na bolest i úzkost",t:{cs:"Brzy dostanete léky",en:"You will get medication soon",de:"Sie bekommen bald Medikamente",uk:"Незабаром вам дадуть ліки",vi:"Bạn sẽ được dùng thuốc sớm",mn:"Тантай удахгүй эм өгнө",fr:"Vous aurez des médicaments bientôt",es:"Pronto recibirá medicación",ar:"ستحصل على دواء قريباً",ro:"Mekhas tu love pharuvnas",ru:"Скоро вам дадут лекарство"}},
+  {id:12,ic:"🏥",cat:"komunikace",sub:"Jsme tu s vámi",t:{cs:"Jste v bezpečí",en:"You are safe",de:"Sie sind in Sicherheit",uk:"Ви в безпеці",vi:"Bạn đang an toàn",mn:"Та аюулгүй байна",fr:"Vous êtes en sécurité",es:"Está en un lugar seguro",ar:"أنت بأمان",ro:"San siguro",ru:"Вы в безопасности"}},
+  {id:13,ic:"🙂",cat:"komunikace",sub:"Stiskněte ruku = ano",t:{cs:"Rozumíte mi?",en:"Do you understand me?",de:"Verstehen Sie mich?",uk:"Ви мене розумієте?",vi:"Bạn có hiểu tôi không?",mn:"Намайг ойлгож байна уу?",fr:"Vous me comprenez?",es:"¿Me entiende?",ar:"هل تفهمني؟",ro:"Samajenas ma?",ru:"Вы меня понимаете?"}},
+  {id:14,ic:"🤝",cat:"komunikace",sub:"Jednou=ano, dvakrát=ne",t:{cs:"Stiskněte mi ruku",en:"Squeeze my hand",de:"Drücken Sie meine Hand",uk:"Стисніть мою руку",vi:"Bóp tay tôi",mn:"Гараа зуу",fr:"Serrez ma main",es:"Apriete mi mano",ar:"اضغط على يدي",ro:"Zas ma vast",ru:"Сожмите мою руку"}},
+  {id:15,ic:"🩺",cat:"procedury",sub:"Pocítíte tlak",t:{cs:"Vytáhneme vám trubičku",en:"We will remove the tube",de:"Wir entfernen den Schlauch",uk:"Ми виймемо трубку",vi:"Chúng tôi sẽ rút ống",mn:"Бид хоолойг гаргана",fr:"Nous allons retirer le tube",es:"Vamos a retirar el tubo",ar:"سنزيل الأنبوب",ro:"Mukhas tiri truba",ru:"Мы извлечём трубку"}},
+  {id:16,ic:"💉",cat:"procedury",sub:"Malé štípnutí",t:{cs:"Budete píchnuti jehlou",en:"You will feel a needle",de:"Sie bekommen eine Spritze",uk:"Ви відчуєте укол",vi:"Bạn sẽ cảm thấy kim tiêm",mn:"Та зүү мэдрэнэ",fr:"Vous allez ressentir une piqûre",es:"Sentirá un pinchazo",ar:"ستشعر بوخز إبرة",ro:"Sasa tuke phuv",ru:"Вы почувствуете укол"}},
+  {id:17,ic:"👀",cat:"vysetreni",sub:"Pohybujte pouze očima",t:{cs:"Sledujte mě očima",en:"Follow me with your eyes",de:"Folgen Sie mir mit den Augen",uk:"Стежте за мною очима",vi:"Theo dõi tôi bằng mắt",mn:"Намайг нүдээрээ дагаарай",fr:"Suivez-moi des yeux",es:"Sígame con los ojos",ar:"تابعني بعينيك",ro:"Dikh ma tele yakha",ru:"Следите за мной глазами"}},
+  {id:18,ic:"✋",cat:"vysetreni",sub:"Co nejsilněji",t:{cs:"Zmáčkněte moji ruku",en:"Squeeze my hand hard",de:"Drücken Sie meine Hand fest",uk:"Міцно стисніть мою руку",vi:"Bóp tay tôi thật mạnh",mn:"Гараа хүчтэй зуу",fr:"Serrez fort ma main",es:"Apriete mi mano fuerte",ar:"اضغط على يدي بقوة",ro:"Zas zorales vast",ru:"Крепко сожмите мою руку"}},
+];
+
+let COMM=[
+  {id:"c1",ic:"😣",bg:"#FCEBEB",tc:"#A32D2D",par:null,t:{cs:"Bolest",en:"Pain",de:"Schmerz",uk:"Біль",vi:"Đau",mn:"Өвдөлт",fr:"Douleur",es:"Dolor",ar:"ألم",ro:"Dukh",ru:"Боль"}},
+  {id:"c2",ic:"💧",bg:"#E6F1FB",tc:"#185FA5",par:null,t:{cs:"Žízeň",en:"Thirst",de:"Durst",uk:"Спрага",vi:"Khát",mn:"Цангалт",fr:"Soif",es:"Sed",ar:"عطش",ro:"Trishag",ru:"Жажда"}},
+  {id:"c3",ic:"🍽️",bg:"#EAF3DE",tc:"#3B6D11",par:null,t:{cs:"Hlad",en:"Hunger",de:"Hunger",uk:"Голод",vi:"Đói",mn:"Өлсөлт",fr:"Faim",es:"Hambre",ar:"جوع",ro:"Bokh",ru:"Голод"}},
+  {id:"c4",ic:"😰",bg:"#FAEEDA",tc:"#854F0B",par:null,t:{cs:"Strach / úzkost",en:"Fear / anxiety",de:"Angst",uk:"Страх",vi:"Sợ hãi",mn:"Айдас",fr:"Peur",es:"Miedo",ar:"خوف",ro:"Dar",ru:"Страх"}},
+  {id:"c5",ic:"🚽",bg:"#EEEDFE",tc:"#534AB7",par:null,t:{cs:"Toaleta",en:"Toilet",de:"Toilette",uk:"Туалет",vi:"Nhà vệ sinh",mn:"Жорлон",fr:"Toilettes",es:"Baño",ar:"حمام",ro:"Pani",ru:"Туалет"}},
+  {id:"c6",ic:"🌡️",bg:"#FCEBEB",tc:"#A32D2D",par:null,t:{cs:"Horko / zima",en:"Hot / Cold",de:"Heiß / Kalt",uk:"Жарко / Холодно",vi:"Nóng / Lạnh",mn:"Халуун / Хүйтэн",fr:"Chaud / Froid",es:"Calor / Frío",ar:"حار / بارد",ro:"Tato / Sil",ru:"Жарко / Холодно"}},
+
+  {id:"c8",ic:"✅",bg:"#E1F5EE",tc:"#0F6E56",par:null,t:{cs:"Ano / Dobře",en:"Yes / OK",de:"Ja / OK",uk:"Так / Добре",vi:"Có / Được",mn:"Тийм / Зүгээр",fr:"Oui / OK",es:"Sí / OK",ar:"نعم / حسنا",ro:"Va / Mishtò",ru:"Да / Хорошо"}},
+  {id:"c9",ic:"❌",bg:"#FCEBEB",tc:"#A32D2D",par:null,t:{cs:"Ne / Špatně",en:"No / Not OK",de:"Nein / Schlecht",uk:"Ні / Погано",vi:"Không / Không tốt",mn:"Үгүй / Муу",fr:"Non / Pas bien",es:"No / Mal",ar:"لا / ليس جيداً",ro:"Na / Na mishtò",ru:"Нет / Плохо"}},
+  // ── Bolest → části těla ──
+  {id:"cs1",ic:"🤕",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Hlava",en:"Head",de:"Kopf",uk:"Голова",vi:"Đầu",mn:"Толгой",fr:"Tête",es:"Cabeza",ar:"رأس",ro:"Shero",ru:"Голова"}},
+  {id:"cs2",ic:"😤",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Krk / Hrdlo",en:"Neck / Throat",de:"Hals",uk:"Шия / Горло",vi:"Cổ / Họng",mn:"Хүзүү / Хоолой",fr:"Cou / Gorge",es:"Cuello / Garganta",ar:"رقبة / حلق",ro:"Kork / Kokosh",ru:"Шея / Горло"}},
+  {id:"cs3",ic:"🫀",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Hrudník",en:"Chest",de:"Brust",uk:"Груди",vi:"Ngực",mn:"Цээж",fr:"Poitrine",es:"Pecho",ar:"صدر",ro:"Brek",ru:"Грудь"}},
+  {id:"cs4",ic:"🫁",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Dýchání",en:"Breathing",de:"Atmung",uk:"Дихання",vi:"Hơi thở",mn:"Амьсгал",fr:"Respiration",es:"Respiración",ar:"التنفس",ro:"Sasimos",ru:"Дыхание"}},
+  {id:"cs5",ic:"🫃",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Břicho",en:"Abdomen",de:"Bauch",uk:"Живіт",vi:"Bụng",mn:"Гэдэс",fr:"Ventre",es:"Abdomen",ar:"بطن",ro:"Per",ru:"Живот"}},
+  {id:"cs6",ic:"🔙",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Záda / Zátylek",en:"Back / Neck",de:"Rücken / Nacken",uk:"Спина / Потилиця",vi:"Lưng / Gáy",mn:"Нуруу / Хүзүүний ар",fr:"Dos / Nuque",es:"Espalda / Nuca",ar:"ظهر / رقبة",ro:"Dumo",ru:"Спина / Затылок"}},
+  {id:"cs7",ic:"🦵",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Levá noha",en:"Left leg",de:"Linkes Bein",uk:"Ліва нога",vi:"Chân trái",mn:"Зүүн хөл",fr:"Jambe gauche",es:"Pierna izquierda",ar:"الساق اليسرى",ro:"Bango punro",ru:"Левая нога"}},
+  {id:"cs8",ic:"🦵",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Pravá noha",en:"Right leg",de:"Rechtes Bein",uk:"Права нога",vi:"Chân phải",mn:"Баруун хөл",fr:"Jambe droite",es:"Pierna derecha",ar:"الساق اليمنى",ro:"Chachho punro",ru:"Правая нога"}},
+  {id:"cs9",ic:"💪",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Levá ruka",en:"Left arm",de:"Linker Arm",uk:"Ліва рука",vi:"Tay trái",mn:"Зүүн гар",fr:"Bras gauche",es:"Brazo izquierdo",ar:"الذراع اليسرى",ro:"Bango vast",ru:"Левая рука"}},
+  {id:"cs10",ic:"💪",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Pravá ruka",en:"Right arm",de:"Rechter Arm",uk:"Права рука",vi:"Tay phải",mn:"Баруун гар",fr:"Bras droit",es:"Brazo derecho",ar:"الذراع اليمنى",ro:"Chachho vast",ru:"Правая рука"}},
+  {id:"cs11",ic:"🦶",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Chodidlo",en:"Foot",de:"Fuß",uk:"Стопа",vi:"Bàn chân",mn:"Ул",fr:"Pied",es:"Pie",ar:"قدم",ro:"Pindro",ru:"Стопа"}},
+  {id:"cs12",ic:"🖐",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Ruka / Dlaň",en:"Hand / Palm",de:"Hand",uk:"Долоня / Кисть",vi:"Bàn tay",mn:"Алга",fr:"Main / Paume",es:"Mano",ar:"يد / كف",ro:"Vast",ru:"Кисть / Ладонь"}},
+  {id:"cs13",ic:"🦷",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Zuby / Ústa",en:"Teeth / Mouth",de:"Zähne / Mund",uk:"Зуби / Рот",vi:"Răng / Miệng",mn:"Шүд / Ам",fr:"Dents / Bouche",es:"Dientes / Boca",ar:"أسنان / فم",ro:"Dand / Muj",ru:"Зубы / Рот"}},
+  {id:"cs14",ic:"👂",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Levé ucho",en:"Left ear",de:"Linkes Ohr",uk:"Ліве вухо",vi:"Tai trái",mn:"Зүүн чих",fr:"Oreille gauche",es:"Oído izquierdo",ar:"الأذن اليسرى",ro:"Bango khan",ru:"Левое ухо"}},
+  {id:"cs15",ic:"👂",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Pravé ucho",en:"Right ear",de:"Rechtes Ohr",uk:"Праве вухо",vi:"Tai phải",mn:"Баруун чих",fr:"Oreille droite",es:"Oído derecho",ar:"الأذن اليمنى",ro:"Chachho khan",ru:"Правое ухо"}},
+  {id:"cs16",ic:"👁",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Levé oko",en:"Left eye",de:"Linkes Auge",uk:"Ліве око",vi:"Mắt trái",mn:"Зүүн нүд",fr:"Oeil gauche",es:"Ojo izquierdo",ar:"العين اليسرى",ro:"Bango yakh",ru:"Левый глаз"}},
+  {id:"cs17",ic:"👁",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Pravé oko",en:"Right eye",de:"Rechtes Auge",uk:"Праве око",vi:"Mắt phải",mn:"Баруун нүд",fr:"Oeil droit",es:"Ojo derecho",ar:"العين اليمنى",ro:"Chachho yakh",ru:"Правый глаз"}},
+  {id:"cs18",ic:"🦴",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Kyčel / Bok",en:"Hip / Side",de:"Hüfte / Seite",uk:"Стегно / Бік",vi:"Hông / Sườn",mn:"Нуруу / Тал",fr:"Hanche / Côté",es:"Cadera / Costado",ar:"ورك / جانب",ro:"Koko / Rig",ru:"Бедро / Бок"}},
+  // ── Části těla (informační) ──
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+];
+
+let nii=19,nci=100,queue=[],selCat="dychani",curLang="cs",staffLang="cs",adminLang="cs",presIdx=0,dark=false;
+let commPath=[],editIid=null,editCid=null,editCmid=null,selCatColor=COLORS[0],selCmColor=COLORS[2];
+
+const $=id=>document.getElementById(id);
+const gl=id=>LANGS.find(l=>l.id===id);
+const gc=id=>CATS.find(c=>c.id===id)||{name:"?",color:"#999"};
+const gi=id=>INST.find(i=>i.id===id);
+const tx=item=>(item.t&&item.t[curLang])||item.t["cs"]||"";
+const ts=item=>(item.t&&item.t[staffLang])||item.t["cs"]||"";  // staff label
+function toast(m){const e=$("toast");e.textContent=m;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),2200);}
+function closeM(id){$(id).classList.remove("open");}
+
+function toggleDark(){dark=!dark;document.body.classList.toggle("dark",dark);$("dktog").textContent=dark?"☀️":"🌙";saveData();}
+
+function initLang(){
+  const opts=LANGS.map(l=>`<option value="${l.id}">${l.fl} ${l.lb}</option>`).join("");
+  $("langsel").innerHTML=opts;$("langsel").value=curLang;
+  $("stafflangsel").innerHTML=opts;$("stafflangsel").value=staffLang;
+}
+function changeLang(id){curLang=id;renderCats();renderCards();renderQ();refreshActiveView();saveData();}
+function changeStaffLang(id){staffLang=id;refreshActiveView();saveData();}
+
+function openEmojiPicker(inputId, previewId){
+  // On mobile/iPad, focusing the input triggers the native emoji keyboard
+  // We temporarily switch to a special input approach
+  const inp = $(inputId);
+  const prev = $(previewId);
+  inp.focus();
+  // Also try to select all so typing replaces
+  inp.select();
+  // Listen for input change to update preview
+  inp.oninput = function(){
+    const val = this.value.trim();
+    if(prev) prev.textContent = val || "➕";
+  };
+}
+function swapLangs(){
+  const tmp=curLang; curLang=staffLang; staffLang=tmp;
+  $("langsel").value=curLang;
+  $("stafflangsel").value=staffLang;
+  renderCats(); renderCards(); renderQ(); refreshActiveView(); saveData();
+  toast("Jazyky prohozeny");
+}
+function refreshActiveView(){
+  // Re-render whichever view is currently visible
+  if($("view-comm").style.display!=="none"){
+    // comm card or body model
+    if($("body-model").style.display!=="none"){
+      // body model: re-render with current state
+      renderBodyModel();
+      requestAnimationFrame(()=>{ sizeBodyStage(); setTimeout(positionBodyLabels,50); });
+    } else {
+      renderComm();
+    }
+  } else if($("view-present").style.display!=="none"){
+    renderPresent();
+  }
+  // builder always re-rendered above via renderCats/renderCards/renderQ
+}
+
+function showView(v){
+  ["builder","present","comm","admin"].forEach(s=>{
+    const e=$("view-"+s);if(e)e.style.display=s===v?"flex":"none";
+  });
+  ["builder","comm","admin"].forEach(t=>{
+    $("tab-"+t)?.classList.toggle("active",t===v||(t==="builder"&&v==="present"));
+  });
+  if(v==="admin")renderAdmin();
+  if(v==="comm"){commPath=[];renderComm();}
+}
+
+function renderCats(){
+  $("catlist").innerHTML=CATS.map(c=>{
+    const cnt=INST.filter(i=>i.cat===c.id).length;
+    return `<button class="catbtn ${c.id===selCat?"active":""}" onclick="selCatFn('${c.id}')">
+      <span class="catdot" style="background:${c.color}"></span>
+      <span style="flex:1">${c.name}</span>
+      <span class="catcnt">${cnt}</span>
+    </button>`;
+  }).join("");
+}
+function selCatFn(id){selCat=id;renderCats();renderCards();}
+function renderCards(){
+  $("cathd").textContent=gc(selCat).name;
+  $("cgrid").innerHTML=INST.filter(i=>i.cat===selCat).map(d=>`
+    <div class="icard ${queue.includes(d.id)?"sel":""}" onclick="toggleQ(${d.id})">
+      <div class="icard-ic">${d.ic}</div>
+      <div class="icard-tx">${tx(d)}</div>
+      ${curLang!==staffLang?`<div class="icard-staff">${ts(d)}</div>`:""}
+      <div class="icard-ck">✓</div>
+    </div>`).join("");
+}
+function toggleQ(id){
+  if(queue.includes(id)){queue=queue.filter(x=>x!==id);}
+  else{queue.push(id);toast("Přidáno do sekvence");}
+  renderCards();renderQ();
+}
+function clearQ(){queue=[];renderCards();renderQ();}
+function renderQ(){
+  $("qbadge").textContent=queue.length;
+  $("strbtn").disabled=!queue.length;
+  const e=$("qscroll");
+  if(!queue.length){e.innerHTML='<span class="qempty">Přidejte pokyny kliknutím na karty výše</span>';return;}
+  // Build tiles + separators: sep[0] tile[0] sep[1] tile[1] ... sep[n]
+  let html = `<div class="qi-sep" data-sep="0"></div>`;
+  queue.forEach((id,i)=>{
+    const d=gi(id);
+    html += `<div class="qi" draggable="true" data-id="${id}" data-idx="${i}"
+      ondragstart="dndStart(event,${i})" ondragend="dndEnd()"
+      ontouchstart="tdStart(event,${i})" ontouchmove="tdMove(event)" ontouchend="tdEnd(event)">
+      <div class="qi-pos">${i+1}</div>
+      <div class="qi-ic">${d.ic}</div>
+      <div class="qi-tx">${tx(d)}</div>
+      ${curLang!==staffLang?`<div class="qi-staff">${ts(d)}</div>`:""}
+      <div class="qi-drag-handle">••••</div>
+      <button class="qi-rm" onclick="event.stopPropagation();rmQ(${id})">✕</button>
+    </div>`;
+    html += `<div class="qi-sep" data-sep="${i+1}"></div>`;
+  });
+  e.innerHTML = html;
+  // attach dragover/drop to the SCROLL CONTAINER for separator highlighting
+  e.ondragover = dndContainerOver;
+  e.ondrop = dndContainerDrop;
+}
+function rmQ(id){queue=queue.filter(x=>x!==id);renderCards();renderQ();}
+// ── Drag & Drop: separator insert ──
+let dndSrc=-1, dndInsertBefore=-1;
+
+function dndStart(e,i){
+  dndSrc=i;
+  setTimeout(()=>e.currentTarget.classList.add("dragging"),0);
+  e.dataTransfer.effectAllowed="move";
+  e.dataTransfer.setData("text/plain",String(i));
+}
+function dndContainerOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect="move";
+  const seps=[...$("qscroll").querySelectorAll(".qi-sep")];
+  let best=null,bestDist=Infinity;
+  seps.forEach(sep=>{
+    const r=sep.getBoundingClientRect();
+    const dist=Math.abs(e.clientX-(r.left+r.width/2));
+    if(dist<bestDist){bestDist=dist;best=sep;}
+  });
+  if(best){
+    seps.forEach(s=>s.classList.remove("active"));
+    best.classList.add("active");
+    dndInsertBefore=parseInt(best.dataset.sep);
+  }
+}
+function dndContainerDrop(e){
+  e.preventDefault();
+  if(dndSrc<0)return;
+  let ins=dndInsertBefore;
+  if(ins>dndSrc)ins--;
+  dndEnd();
+  if(ins===dndSrc||ins<0)return;
+  const item=queue.splice(dndSrc,1)[0];
+  queue.splice(ins,0,item);
+  renderCards();renderQ();
+}
+function dndLeave(e,i){/* handled by container */}
+function dndEnd(){
+  dndSrc=-1;dndInsertBefore=-1;
+  document.querySelectorAll(".qi").forEach(el=>el.classList.remove("dragging"));
+  document.querySelectorAll(".qi-sep").forEach(s=>s.classList.remove("active"));
+}
+// ── Touch drag ──
+let tdSrc=-1,tdClone=null;
+function tdStart(e,i){
+  if(e.target.classList.contains("qi-rm"))return;
+  tdSrc=i;
+  const el=e.currentTarget;
+  setTimeout(()=>el.classList.add("dragging"),0);
+  tdClone=el.cloneNode(true);
+  const r=el.getBoundingClientRect();
+  tdClone.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;opacity:.8;pointer-events:none;z-index:999;transition:none;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.22)`;
+  document.body.appendChild(tdClone);
+}
+function tdMove(e){
+  if(!tdClone)return;
+  e.preventDefault();
+  const t=e.touches[0];
+  tdClone.style.left=(t.clientX-44)+"px";
+  tdClone.style.top=(t.clientY-44)+"px";
+  const seps=[...$("qscroll").querySelectorAll(".qi-sep")];
+  let best=null,bestDist=Infinity;
+  seps.forEach(sep=>{
+    const r=sep.getBoundingClientRect();
+    const dist=Math.abs(t.clientX-(r.left+r.width/2));
+    if(dist<bestDist){bestDist=dist;best=sep;}
+  });
+  seps.forEach(s=>s.classList.remove("active"));
+  if(best){best.classList.add("active");dndInsertBefore=parseInt(best.dataset.sep);}
+}
+function tdEnd(e){
+  if(tdClone){tdClone.remove();tdClone=null;}
+  document.querySelectorAll(".qi").forEach(el=>el.classList.remove("dragging"));
+  document.querySelectorAll(".qi-sep").forEach(s=>s.classList.remove("active"));
+  if(tdSrc>=0&&dndInsertBefore>=0){
+    let ins=dndInsertBefore;
+    if(ins>tdSrc)ins--;
+    if(ins!==tdSrc){
+      const item=queue.splice(tdSrc,1)[0];
+      queue.splice(ins,0,item);
+      renderCards();renderQ();
+    }
+  }
+  tdSrc=-1;dndInsertBefore=-1;
+}
+
+function startPresent(){presIdx=0;showView("present");renderPresent();setupSwipe();}
+function renderPresent(){
+  const tot=queue.length,d=gi(queue[presIdx]),cat=gc(d.cat);
+  $("pctr").textContent=`${presIdx+1} / ${tot}`;
+  const cl=$("pcatl");cl.textContent=cat.name;cl.style.background=cat.color+"22";cl.style.color=cat.color;
+  ["picon","ptxt","psub"].forEach(id=>$(id).classList.remove("an"));
+  setTimeout(()=>{
+    $("picon").textContent=d.ic;$("picon").classList.add("an");
+    $("ptxt").textContent=tx(d);$("ptxt").classList.add("an");
+    $("psub").textContent=d.sub||"";$("psub").classList.add("an");
+    const sf=$("pstaff");
+    if(curLang!==staffLang){sf.textContent=ts(d);sf.style.display="block";}
+    else{sf.style.display="none";}
+  },10);
+  const sz=Math.max(6,Math.min(12,Math.floor(480/tot)));
+  $("pdots").innerHTML=queue.map((_,i)=>`<div class="pdot ${i===presIdx?"act":i<presIdx?"done":""}" style="width:${i===presIdx?20:sz}px" onclick="goSlide(${i})"></div>`).join("");
+  const last=presIdx===tot-1;
+  $("pnav").innerHTML=`<button class="pprev" onclick="presNav(-1)" ${presIdx===0?"disabled":""}>← Předchozí</button>`+(last?`<button class="pfin" onclick="showView('builder')">✓ Hotovo</button>`:`<button class="pnext" onclick="presNav(1)">Další →</button>`);
+}
+function presNav(d){presIdx+=d;renderPresent();}
+function goSlide(i){presIdx=i;renderPresent();}
+function setupSwipe(){
+  const e=$("pstage");let sx=0,sy=0;
+  e.addEventListener("touchstart",ev=>{sx=ev.touches[0].clientX;sy=ev.touches[0].clientY;},{passive:true});
+  e.addEventListener("touchend",ev=>{
+    const dx=ev.changedTouches[0].clientX-sx,dy=ev.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){
+      if(dx<0&&presIdx<queue.length-1)presNav(1);
+      if(dx>0&&presIdx>0)presNav(-1);
+    }
+  },{passive:true});
+}
+document.addEventListener("keydown",e=>{
+  if($("view-present").style.display!=="none"){
+    if(e.key==="ArrowRight"||e.key==="ArrowDown")presIdx<queue.length-1&&presNav(1);
+    if(e.key==="ArrowLeft"||e.key==="ArrowUp")presIdx>0&&presNav(-1);
+  }
+});
+
+function renderComm(){
+  const par = commPath.length ? commPath[commPath.length-1].id : null;
+  const items = COMM.filter(x=>x.par===par);
+  const isRoot = commPath.length === 0;
+
+  // Title & breadcrumb
+  $("comm-title").textContent = commPath.length ? (commPath[commPath.length-1].label||"Komunikační karta") : "Komunikační karta";
+  $("comm-crumb").innerHTML = commPath.length
+    ? `<span class="crumb" onclick="commReset()">Komunikační karta</span>`
+      + commPath.map((p,i)=>i<commPath.length-1
+        ? `<span style="color:var(--tx3)"> › </span><span class="crumb" onclick="commGoTo(${i})">${p.label}</span>`
+        : "").join("")
+    : "";
+
+  $("vas-panel").style.display = "none";
+  $("body-model").style.display = "none";
+
+  // Show body part context bar if set
+  const bpBar = $("body-part-bar");
+  if(bodyPartCtx && bpBar){
+    bpBar.style.display = "flex";
+    $("body-part-bar-text").textContent = bodyPartCtx.label;
+  } else if(bpBar){
+    bpBar.style.display = "none";
+  }
+  $("comm-res").style.display = "none";
+
+  const grid = $("comm-grid");
+  grid.style.display = "grid";
+
+  if(isRoot){
+    // ROOT: 70% grid + 30% body figure button
+    const cols = Math.max(2, Math.min(3, Math.floor(window.innerWidth * 0.7 / 130)));
+    grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+
+    const backBtn = "";
+    const cellsHTML = items.map(c=>{
+      const pt = c.t[curLang]||c.t["cs"];
+      const st = c.t[staffLang]||c.t["cs"];
+      const dual = curLang!==staffLang && pt!==st;
+      return `<div class="ccell" style="background:${c.bg};border-color:${c.tc}33" onclick="commSel('${c.id}')">
+        <div class="ccell-ic">${c.ic}</div>
+        <div class="ccell-tx" style="color:${c.tc}">${pt}</div>
+        ${dual?`<div class="ccell-staff" style="color:${c.tc}99">${st}</div>`:""}
+      </div>`;
+    }).join("");
+
+    // Body figure tile (30% right)
+    const bodyTile = `<div class="comm-body-tile" onclick="openBodyModel([])">
+      <div style="font-size:32px;margin-bottom:8px"></div>
+      <svg viewBox="20 0 160 340" style="width:130px;height:auto;opacity:.9" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="100" cy="38" rx="26" ry="34" fill="#F2C4B0" stroke="#AAA" stroke-width="1.5"/>
+        <rect x="72" y="72" width="56" height="70" rx="4" fill="#C8D8F0" stroke="#AAA" stroke-width="1.2"/>
+        <rect x="72" y="142" width="56" height="50" rx="4" fill="#D0E8C8" stroke="#AAA" stroke-width="1.2"/>
+        <rect x="42" y="76" width="28" height="110" rx="6" fill="#E8D0B0" stroke="#AAA" stroke-width="1.2"/>
+        <rect x="130" y="76" width="28" height="110" rx="6" fill="#E8D0B0" stroke="#AAA" stroke-width="1.2"/>
+        <rect x="72" y="192" width="24" height="130" rx="6" fill="#B8D8C8" stroke="#AAA" stroke-width="1.2"/>
+        <rect x="104" y="192" width="24" height="130" rx="6" fill="#B8D8C8" stroke="#AAA" stroke-width="1.2"/>
+      </svg>
+      <div style="font-size:13px;font-weight:700;color:var(--tld);margin-top:8px">Části těla</div>
+      <div style="font-size:11px;color:var(--tx2);margin-top:2px">Klepněte na figuru</div>
+    </div>`;
+
+    // Layout: grid left 70%, body tile right 30%
+    const wrapper = $("comm-grid-wrap")||grid;
+    // Use comm-grid as the main container but change its structure
+    grid.style.gridTemplateColumns = "";
+    grid.style.display = "flex";
+    grid.style.gap = "0";
+    grid.style.padding = "0";
+    grid.style.alignItems = "stretch";
+    grid.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,200px);gap:10px;padding:12px;flex:0 0 80%;overflow-y:auto;align-content:start">${cellsHTML}</div>
+      <div style="flex:0 0 20%;border-left:1px solid var(--br);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;min-width:160px">${bodyTile}</div>`;
+  } else {
+    // SUBPAGE: full grid with back button
+    grid.style.display = "grid";
+    grid.style.gridTemplateColumns = "repeat(auto-fill,200px)";
+    grid.style.gap = "10px";
+    grid.style.padding = "12px";
+    grid.style.alignContent = "start";
+
+    const backBtn = `<div onclick="commBack()" style="grid-column:1/-1;background:var(--bg3);border:2px solid var(--br2);border-radius:var(--r);padding:14px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-size:16px;font-weight:600;color:var(--tx2)">← Zpět</div>`;
+    const cellsHTML = items.map(x=>{
+      const pt = x.t[curLang]||x.t["cs"];
+      const st = x.t[staffLang]||x.t["cs"];
+      const dual = curLang!==staffLang && pt!==st;
+      return `<div class="ccell" style="background:${x.bg};border-color:${x.tc}33" onclick="commSel('${x.id}')">
+        <div class="ccell-ic">${x.ic}</div>
+        <div class="ccell-tx" style="color:${x.tc}">${pt}</div>
+        ${dual?`<div class="ccell-staff" style="color:${x.tc}99">${st}</div>`:""}
+      </div>`;
+    }).join("");
+    grid.innerHTML = backBtn + cellsHTML;
+  }
+}
+
+function commBack(){if(commPath.length){commPath.pop();renderComm();}}
+// VAS data
+const VAS_DATA=[
+  {max:0, face:"😊",fc:"#2E9E2E",lbl:{cs:"Žádná bolest",en:"No pain",de:"Kein Schmerz",uk:"Немає болю",vi:"Không đau",mn:"Өвдөхгүй",fr:"Pas de douleur",es:"Sin dolor",ar:"لا ألم",ro:"Khanchi dukh",ru:"Нет боли"}},
+  {max:2, face:"🙂",fc:"#7DC52E",lbl:{cs:"Mírná bolest",en:"Mild pain",de:"Leichter Schmerz",uk:"Легкий біль",vi:"Đau nhẹ",mn:"Бага зэрэг өвдөлт",fr:"Douleur légère",es:"Dolor leve",ar:"ألم خفيف",ro:"Tikni dukh",ru:"Слабая боль"}},
+  {max:4, face:"😐",fc:"#D4C400",lbl:{cs:"Střední bolest",en:"Moderate pain",de:"Mäßiger Schmerz",uk:"Помірний біль",vi:"Đau vừa",mn:"Дунд зэрэг өвдөлт",fr:"Douleur modérée",es:"Dolor moderado",ar:"ألم متوسط",ro:"Meso dukh",ru:"Умеренная боль"}},
+  {max:6, face:"😟",fc:"#E08000",lbl:{cs:"Silná bolest",en:"Strong pain",de:"Starker Schmerz",uk:"Сильний біль",vi:"Đau mạnh",mn:"Хүчтэй өвдөлт",fr:"Douleur forte",es:"Dolor fuerte",ar:"ألم شديد",ro:"Zoro dukh",ru:"Сильная боль"}},
+  {max:8, face:"😢",fc:"#D04010",lbl:{cs:"Velmi silná bolest",en:"Very strong pain",de:"Sehr starker Schmerz",uk:"Дуже сильний біль",vi:"Đau rất mạnh",mn:"Маш хүчтэй өвдөлт",fr:"Douleur très forte",es:"Dolor muy fuerte",ar:"ألم شديد جداً",ro:"But zoro dukh",ru:"Очень сильная боль"}},
+  {max:10,face:"😭",fc:"#C01010",lbl:{cs:"Nesnesitelná bolest",en:"Unbearable pain",de:"Unerträglicher Schmerz",uk:"Нестерпний біль",vi:"Đau không chịu được",mn:"Тэвчишгүй өвдөлт",fr:"Douleur insupportable",es:"Dolor insoportable",ar:"ألم لا يُحتمل",ro:"Nashti boldipe",ru:"Невыносимая боль"}},
+];
+let vasValue=0, vasPrevPath=[];
+function getVasLevel(v){return VAS_DATA.find(d=>v<=d.max)||VAS_DATA[VAS_DATA.length-1];}
+function vasUpdate(v){
+  vasValue=v;
+  $("vas-slider").value=v;
+  $("vas-thumb").style.left=(v/10*100)+"%";
+  const lv=getVasLevel(v);
+  $("vas-big-face").textContent=lv.face;
+  $("vas-big-num").textContent=v;
+  $("vas-big-num").style.color=lv.fc;
+  $("vas-big-lbl").textContent=lv.lbl[curLang]||lv.lbl["cs"];
+  document.querySelectorAll(".vas-face").forEach(el=>{
+    const dv=parseInt(el.dataset.v);el.classList.toggle("active",dv===Math.round(v/2)*2);
+  });
+  for(let i=0;i<=10;i++){const el=$("vn"+i);if(el)el.classList.toggle("active",i===v);}
+}
+function vasConfirm(){
+  const lv=getVasLevel(vasValue);
+  const pathLabel=vasPrevPath.map(p=>p.label).join(" › ");
+  const label=(pathLabel?pathLabel+" › ":"")+(lv.lbl[curLang]||lv.lbl["cs"])+" (VAS "+vasValue+"/10)";
+  const pathLabelS=curLang===staffLang?"":vasPrevPath.map(p=>p.staffLabel||(p.t&&p.t[staffLang]?p.t[staffLang]:p.label)).join(" › ");
+  const labelS=curLang!==staffLang?(pathLabelS?pathLabelS+" › ":"")+(lv.lbl[staffLang]||lv.lbl["cs"])+" (VAS "+vasValue+"/10)":"";
+  $("vas-panel").style.display="none";
+  // Reset to root layout
+  commPath=[];
+  renderComm();
+  const bpPrefix = bodyPartCtx ? bodyPartCtx.label+" › " : "";
+  const bpPrefixS = bodyPartCtx && staffLang!==curLang ? (bodyPartCtx.staffLabel||bodyPartCtx.label)+" › " : "";
+  clearBodyPartCtx();
+  $("comm-ric").textContent=lv.face;
+  $("comm-rtx").innerHTML=`<span>${bpPrefix}${label}</span>${labelS&&labelS!==label?`<span class="comm-rtx-staff">${bpPrefixS}${labelS}</span>`:""}`;
+  $("comm-res").style.display="flex"; updateResetBtn();
+}
+function vasClose(){
+  $("vas-panel").style.display="none";$("comm-grid").style.display="grid";
+  commPath=vasPrevPath.slice();renderComm();
+}
+function openVas(pathCtx){
+  vasPrevPath=pathCtx.slice();vasValue=0;
+  $("vas-slider").value=0;
+  $("vas-big-lbl").textContent=VAS_DATA[0].lbl[curLang]||VAS_DATA[0].lbl["cs"];
+  vasUpdate(0);
+  $("comm-grid").style.display="none";
+  $("comm-res").style.display="none";
+  $("vas-panel").style.display="flex";
+}
+function commSel(id){
+  const item=COMM.find(c=>c.id===id);
+  if(!item) return;
+  const lbl=item.t[curLang]||item.t["cs"];
+
+  // Bolest (c1):
+  // - pokud máme kontext části těla → rovnou VAS (část těla + bolest)
+  // - jinak → figura
+  if(id==="c1"){
+    if(bodyPartCtx){
+      // Část těla již vybrána, jdeme rovnou na VAS
+      const path=[{id:"c1",label:lbl,staffLabel:item.t[staffLang]||lbl,t:item.t}];
+      openVas(path);
+    } else {
+      commPath.push({id,label:lbl,staffLabel:item.t[staffLang]||lbl,t:item.t});
+      openBodyModel(commPath);
+    }
+    return;
+  }
+
+  // VAS škála
+  if(id==="c10"){ openVas(commPath); return; }
+
+  const hasSubs=COMM.some(c=>c.par===id);
+  if(hasSubs){ commPath.push({id,label:lbl,staffLabel:item.t[staffLang]||lbl,t:item.t}); renderComm(); return; }
+
+  // Leaf — show result
+  const full=[...commPath.map(p=>p.label),lbl].join(" › ");
+  const fullStaff=curLang!==staffLang?[...commPath.map(p=>p.staffLabel||(p.t&&p.t[staffLang]?p.t[staffLang]:p.label)),item.t[staffLang]||lbl].join(" › "):"";
+  const bpPre = bodyPartCtx ? bodyPartCtx.label+" › " : "";
+  const bpPreS = bodyPartCtx && staffLang!==curLang ? (bodyPartCtx.staffLabel||bodyPartCtx.label)+" › " : "";
+  commPath=[];
+  renderComm();
+  $("comm-ric").textContent=item.ic;
+  $("comm-rtx").innerHTML=`<span>${bpPre}${full}</span>${fullStaff&&fullStaff!==full?`<span class="comm-rtx-staff">${bpPreS}${fullStaff}</span>`:""}`;
+  $("comm-res").style.display="flex"; updateResetBtn();
+}
+
+const RESET_LBL={cs:"↩ Znovu",en:"↩ Again",de:"↩ Nochmal",uk:"↩ Знову",vi:"↩ Lại",mn:"↩ Дахин",fr:"↩ Encore",es:"↩ De nuevo",ar:"↩ مجدداً",ro:"↩ Buter",ru:"↩ Снова"};
+function updateResetBtn(){
+  const btn=$("comm-reset-btn");
+  if(btn) btn.textContent=RESET_LBL[curLang]||RESET_LBL["cs"];
+}
+function clearBodyPartCtx(){
+  bodyPartCtx = null;
+  const bpBar = $("body-part-bar");
+  if(bpBar) bpBar.style.display = "none";
+}
+function commReset(){
+  commPath=[];
+  bodyPartCtx=null;
+  $("comm-res").style.display="none";
+  $("vas-panel").style.display="none";
+  $("comm-grid").style.display="grid";
+  renderComm();
+}
+function commGoTo(i){commPath=commPath.slice(0,i+1);renderComm();}
+function adminNav(s){
+  ["inst","cats","comm"].forEach(k=>{
+    const btn=$("anav-"+k), panel=$("ap-"+k);
+    if(btn) btn.classList.toggle("active", k===s);
+    if(panel){ panel.classList.toggle("active", k===s); }
+  });
+}
+function renderAdmin(){renderAInst();renderACats();renderAComm();renderALangTabs();}
+function renderALangTabs(){
+  $("altabs").innerHTML=LANGS.map(l=>`<div class="ltab ${l.id===adminLang?"active":""}" onclick="setALang('${l.id}')">${l.fl} ${l.lb}</div>`).join("");
+}
+function setALang(id){adminLang=id;renderALangTabs();renderAInst();}
+function renderAInst(){
+  const q=($("asearch").value||"").toLowerCase();
+  const rows=INST.filter(i=>!q||(i.t["cs"]||"").toLowerCase().includes(q)||(i.t[adminLang]||"").toLowerCase().includes(q));
+  $("aitbody").innerHTML=rows.map(d=>{
+    const cat=gc(d.cat),txt=d.t[adminLang]||`<em style="color:var(--tx3)">— bez překladu —</em>`;
+    return`<tr>
+      <td class="a-ic">${d.ic}</td>
+      <td><div style="font-weight:500">${txt}</div>${adminLang!=="cs"?`<div style="font-size:10px;color:var(--tx3)">${d.t["cs"]||""}</div>`:""}</td>
+      <td><span class="abadge" style="background:${cat.color}22;color:${cat.color}"><span class="adot" style="background:${cat.color}"></span>${cat.name}</span></td>
+      <td><div class="abtns"><button class="aedit" onclick="openInstrM(${d.id})">✏</button><button class="adel" onclick="delInstr(${d.id})">🗑</button></div></td>
+    </tr>`;
+  }).join("");
+}
+function renderACats(){
+  $("actbody").innerHTML=CATS.map(c=>{
+    const cnt=INST.filter(i=>i.cat===c.id).length;
+    return`<tr>
+      <td><span style="display:inline-block;width:20px;height:20px;border-radius:5px;background:${c.color}"></span></td>
+      <td style="font-weight:500">${c.name}</td>
+      <td style="text-align:center;color:var(--tx2)">${cnt}</td>
+      <td><div class="abtns"><button class="aedit" onclick="openCatM('${c.id}')">✏</button><button class="adel" onclick="delCat('${c.id}')">🗑</button></div></td>
+    </tr>`;
+  }).join("");
+}
+function renderAComm(){
+  const roots = COMM.filter(x=>x.par===null);
+  let html = "";
+  roots.forEach(root=>{
+    const subs = COMM.filter(x=>x.par===root.id);
+    html += `<div style="margin-bottom:10px;border:1px solid var(--br);border-radius:var(--r);overflow:hidden">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border-bottom:${subs.length?'1px solid var(--br)':'none'}">
+        <span style="font-size:20px">${root.ic}</span>
+        <span style="font-size:14px;font-weight:600;flex:1;color:var(--tx)">${root.t["cs"]||""}</span>
+        <button class="aedit" onclick="openCommM('${root.id}',null)">✏</button>
+        <button class="aadd" style="font-size:11px;padding:4px 10px" onclick="openCommM(null,'${root.id}')">+ podpoložka</button>
+        <button class="adel" onclick="delComm('${root.id}')">🗑</button>
+      </div>
+      ${subs.map(s=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px 8px 32px;border-bottom:1px solid var(--br)">
+        <span style="color:var(--tx3);font-size:12px">└</span>
+        <span style="font-size:18px">${s.ic}</span>
+        <span style="font-size:13px;flex:1;color:var(--tx)">${s.t["cs"]||""}</span>
+        <button class="aedit" onclick="openCommM('${s.id}',null)">✏</button>
+        <button class="adel" onclick="delComm('${s.id}')">🗑</button>
+      </div>`).join("")}
+      ${!subs.length?`<div style="padding:8px 32px;font-size:12px;color:var(--tx3);font-style:italic">Žádné podpoložky</div>`:""}
+    </div>`;
+  });
+  $("acm-tree").innerHTML = html || '<div style="padding:20px;text-align:center;color:var(--tx3);font-size:13px">Žádné položky</div>';
+}
+
+function buildLangInputs(containerId,prefix,existing){
+  $(containerId).innerHTML=LANGS.map(l=>`
+    <div class="lrow">
+      <span class="lflag">${l.fl}</span>
+      <span class="llbl">${l.lb}</span>
+      <input class="lfield" id="${prefix}-${l.id}" value="${existing&&existing[l.id]||""}" placeholder="${l.lb}…"${l.rtl?' dir="rtl"':""}>
+    </div>`).join("");
+}
+function collectLangs(prefix){
+  const t={};LANGS.forEach(l=>{const v=$(prefix+"-"+l.id).value.trim();if(v)t[l.id]=v;});return t;
+}
+function buildColorSwatches(containerId,sel,cb){
+  $(containerId).innerHTML=COLORS.map(col=>`<div class="cswatch ${col===sel?"active":""}" style="background:${col}" onclick="${cb}('${col}')"></div>`).join("");
+}
+
+function openInstrM(id){
+  editIid=id;
+  const d=id?gi(id):{ic:"💬",cat:CATS[0].id,sub:"",t:{}};
+  $("mi-h").textContent=id?"Upravit pokyn":"Nový pokyn";
+  const miIc=d.ic||""; $("mi-ic").value=miIc; const mip=$("mi-ic-preview"); if(mip) mip.textContent=miIc||"➕"; $("mi-sub").value=d.sub||"";
+  $("mi-cat").innerHTML=CATS.map(c=>`<option value="${c.id}"${c.id===d.cat?" selected":""}>${c.name}</option>`).join("");
+  buildLangInputs("mi-langs","mi-t",d.t);
+  $("mi").classList.add("open");
+  setTimeout(()=>$("mi-t-cs").focus(),60);
+}
+function saveInstrM(){
+  const t=collectLangs("mi-t");
+  if(!t["cs"]){$("mi-t-cs").focus();toast("Vyplňte alespoň český text");return;}
+  const o={ic:$("mi-ic").value.trim()||"",cat:$("mi-cat").value,sub:$("mi-sub").value.trim(),t};
+  if(editIid){Object.assign(gi(editIid),o);}else{INST.push({id:nii++,...o});}
+  closeM("mi");renderCats();renderCards();renderQ();renderAInst();saveData();toast(editIid?"Pokyn upraven":"Pokyn přidán");
+}
+function delInstr(id){if(!confirm("Smazat pokyn?"))return;INST=INST.filter(i=>i.id!==id);queue=queue.filter(x=>x!==id);renderCats();renderCards();renderQ();renderAInst();saveData();toast("Smazáno");}
+
+function openCatM(id){
+  editCid=id;
+  const c=id?gc(id):{name:"",color:COLORS[0]};
+  if(c.name==="?")c.name="";
+  selCatColor=c.color||COLORS[0];
+  $("mc-h").textContent=id?"Upravit kategorii":"Nová kategorie";
+  $("mc-n").value=c.name;
+  buildColorSwatches("mc-cols",selCatColor,"pickCC");
+  $("mc").classList.add("open");
+  setTimeout(()=>$("mc-n").focus(),60);
+}
+function pickCC(col){selCatColor=col;buildColorSwatches("mc-cols",col,"pickCC");}
+function saveCatM(){
+  const name=$("mc-n").value.trim();
+  if(!name){$("mc-n").focus();return;}
+  if(editCid){const c=gc(editCid);c.name=name;c.color=selCatColor;}
+  else{const id="cat_"+Date.now();CATS.push({id,name,color:selCatColor});if(!selCat)selCat=id;}
+  closeM("mc");renderCats();renderCards();renderACats();saveData();toast(editCid?"Kategorie upravena":"Kategorie přidána");
+}
+function delCat(id){if(!confirm("Smazat kategorii?"))return;CATS=CATS.filter(c=>c.id!==id);if(selCat===id)selCat=CATS[0]?.id;renderCats();renderCards();renderACats();saveData();toast("Smazáno");}
+
+function openCommM(id, parentPreset){
+  editCmid=id;
+  const c=id?COMM.find(x=>x.id===id):{ic:"💬",bg:COLORS[0],tc:COLORS[0],par:parentPreset||null,t:{}};
+  selCmColor=c.bg||COLORS[0];
+  $("mcm-h").textContent=id?"Upravit položku":"Nová položka";
+  const mcmV=c.ic||""; const mcmReal=$("mcm-ic-real"); if(mcmReal) mcmReal.value=mcmV; const mcmp=$("mcm-ic-preview"); if(mcmp) mcmp.textContent=mcmV||"➕"; 
+  const parVal=c.par||parentPreset||"";
+  $("mcm-par").innerHTML=`<option value="">— hlavní kategorie —</option>`+COMM.filter(x=>x.par===null&&x.id!==id).map(x=>`<option value="${x.id}"${x.id===parVal?" selected":""}>${x.t["cs"]}</option>`).join("");
+  buildColorSwatches("mcm-cols",selCmColor,"pickCmC");
+  buildLangInputs("mcm-langs","mcm-t",c.t);
+  $("mcm").classList.add("open");
+  setTimeout(()=>$("mcm-t-cs").focus(),60);
+}
+function pickCmC(col){selCmColor=col;buildColorSwatches("mcm-cols",col,"pickCmC");}
+function saveCommM(){
+  const t=collectLangs("mcm-t");
+  if(!t["cs"]){$("mcm-t-cs").focus();toast("Vyplňte alespoň český text");return;}
+  const par=$("mcm-par").value||null;
+  const icRaw=$("mcm-ic-real")?.value?.trim()||""; const icVal=icRaw||""; const o={ic:icVal,bg:selCmColor+"33",tc:selCmColor,par,t};
+  if(editCmid){Object.assign(COMM.find(x=>x.id===editCmid),o);}else{COMM.push({id:"ci"+nci++,...o});}
+  closeM("mcm");renderAComm();renderComm();saveData();toast(editCmid?"Upraveno":"Přidáno");
+}
+function delComm(id){if(!confirm("Smazat?"))return;COMM=COMM.filter(c=>c.id!==id&&c.par!==id);renderAComm();renderComm();saveData();toast("Smazáno");}
+
+["mi","mc","mcm"].forEach(id=>{$(id).addEventListener("click",e=>{if(e.target===e.currentTarget)closeM(id);});});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")["mi","mc","mcm"].forEach(closeM);});
+
+loadData();
+fixCommColors();
+initLang();renderCats();renderCards();renderQ();
+
+
+// ════════════════════════════════════════════════════════════
+// BODY MODEL — SVG with animated zoom
+// ════════════════════════════════════════════════════════════
+
+// Region definitions: id, label key, viewBox to zoom into, fill color, sub-zones
+const BODY_REGIONS = [
+  // ════════════ FRONT ════════════
+  { id:"f_head", side:"front",
+    label:{cs:"Hlava",en:"Head",de:"Kopf",uk:"Голова",vi:"Đầu",fr:"Tête",es:"Cabeza",ar:"رأس",ru:"Голова"},
+    path:"M 88,4 Q 100,-2 112,4 Q 128,8 132,30 Q 138,58 128,72 Q 116,86 100,87 Q 84,86 72,72 Q 62,58 68,30 Q 72,8 88,4 Z",
+    fill:"#F2C4B0", zoomBox:"55,0,100,100",
+    subs:[
+      {id:"f_forehead",label:{cs:"Čelo",en:"Forehead",de:"Stirn",uk:"Лоб",vi:"Trán",fr:"Front",es:"Frente",ar:"جبهة",ru:"Лоб"},path:"M 76,8 Q 100,2 124,8 L 126,28 Q 100,22 74,28 Z",fill:"#F5D0BA"},
+      {id:"f_eye_l",label:{cs:"Levé oko",en:"Right eye",de:"Rechtes Auge",uk:"Праве око",vi:"Mắt phải",fr:"Œil droit",es:"Ojo derecho",ar:"العين اليمنى",ru:"Правый глаз"},path:"M 74,36 Q 82,30 90,36 Q 82,42 74,36 Z",fill:"#7DB8D8"},
+      {id:"f_eye_r",label:{cs:"Pravé oko",en:"Left eye",de:"Linkes Auge",uk:"Ліве око",vi:"Mắt trái",fr:"Œil gauche",es:"Ojo izquierdo",ar:"العين اليسرى",ru:"Левый глаз"},path:"M 110,36 Q 118,30 126,36 Q 118,42 110,36 Z",fill:"#7DB8D8"},
+      {id:"f_ear_l",label:{cs:"Levé ucho",en:"Right ear",de:"Rechtes Ohr",uk:"Праве вухо",vi:"Tai phải",fr:"Oreille droite",es:"Oído derecho",ar:"الأذن اليمنى",ru:"Правое ухо"},path:"M 68,40 Q 60,36 58,48 Q 60,58 68,54 Z",fill:"#E8B090"},
+      {id:"f_ear_r",label:{cs:"Pravé ucho",en:"Left ear",de:"Linkes Ohr",uk:"Ліве вухо",vi:"Tai trái",fr:"Oreille gauche",es:"Oído izquierdo",ar:"الأذن اليسرى",ru:"Левое ухо"},path:"M 132,40 Q 140,36 142,48 Q 140,58 132,54 Z",fill:"#E8B090"},
+      {id:"f_nose",label:{cs:"Nos",en:"Nose",de:"Nase",uk:"Ніс",vi:"Mũi",fr:"Nez",es:"Nariz",ar:"أنف",ru:"Нос"},path:"M 96,50 L 104,50 L 108,68 L 100,70 L 92,68 Z",fill:"#E0A088"},
+      {id:"f_mouth",label:{cs:"Ústa / Čelist",en:"Mouth / Jaw",de:"Mund / Kiefer",uk:"Рот / Щелепа",vi:"Miệng / Hàm",fr:"Bouche / Mâchoire",es:"Boca / Mandíbula",ar:"الفم / الفك",ru:"Рот / Челюсть"},path:"M 82,76 Q 100,88 118,76 Q 108,84 100,85 Q 92,84 82,76 Z",fill:"#D47070"},
+    ]
+  },
+  { id:"f_neck", side:"front",
+    label:{cs:"Krk",en:"Neck",de:"Hals",uk:"Шия",vi:"Cổ",fr:"Cou",es:"Cuello",ar:"رقبة",ru:"Шея"},
+    path:"M 86,87 L 114,87 L 116,108 L 84,108 Z", fill:"#F0C8A8", subs:[]
+  },
+  { id:"f_chest", side:"front",
+    label:{cs:"Hrudník",en:"Chest",de:"Brust",uk:"Груди",vi:"Ngực",fr:"Poitrine",es:"Pecho",ar:"صدر",ru:"Грудь"},
+    path:"M 68,108 L 132,108 L 136,190 L 64,190 Z", fill:"#C8D8F0", zoomBox:"55,100,100,100",
+    subs:[
+      {id:"f_chest_l",label:{cs:"Levá část hrudníku",en:"Right chest",de:"Rechte Brust",uk:"Права частина грудей",vi:"Ngực phải",fr:"Poitrine droite",es:"Pecho derecho",ar:"الصدر الأيمن",ru:"Правая сторона груди"},path:"M 68,108 L 89,108 L 89,190 L 68,190 Z",fill:"#B0C8E8"},
+      {id:"f_chest_m",label:{cs:"Střed hrudníku / sternum",en:"Sternum / centre",de:"Brustbein / Mitte",uk:"Груднина / центр",vi:"Xương ức / giữa",fr:"Sternum / centre",es:"Esternón / centro",ar:"عظمة الصدر",ru:"Грудина / центр"},path:"M 89,108 L 111,108 L 111,190 L 89,190 Z",fill:"#C8D8F0"},
+      {id:"f_chest_r",label:{cs:"Pravá část hrudníku",en:"Left chest",de:"Linke Brust",uk:"Ліва частина грудей",vi:"Ngực trái",fr:"Poitrine gauche",es:"Pecho izquierdo",ar:"الصدر الأيسر",ru:"Левая сторона груди"},path:"M 111,108 L 132,108 L 132,190 L 111,190 Z",fill:"#B0C8E8"},
+    ]
+  },
+  { id:"f_belly", side:"front",
+    label:{cs:"Břicho",en:"Abdomen",de:"Bauch",uk:"Живіт",vi:"Bụng",fr:"Ventre",es:"Abdomen",ar:"بطن",ru:"Живот"},
+    path:"M 64,190 L 136,190 L 134,255 L 66,255 Z", fill:"#D0E8C8", zoomBox:"55,182,100,82",
+    subs:[
+      {id:"f_epi_r",  label:{cs:"Pravé podžebří",en:"Left hypochondrium",de:"Linker Oberbauch",uk:"Ліве підребер'я",vi:"Hạ sườn trái",fr:"Hypochondre gauche",es:"Hipocondrio izquierdo",ar:"المراق الأيسر",ru:"Левое подреберье"},   path:"M 64,190 L 88,190 L 88,212 L 64,212 Z",fill:"#B8D8A8"},
+      {id:"f_epi_m",  label:{cs:"Nadbřišek (epigastrium)",en:"Epigastrium",de:"Epigastrium",uk:"Надчерев'я",vi:"Thượng vị",fr:"Épigastre",es:"Epigastrio",ar:"شرسوفي",ru:"Эпигастрий"},                                                path:"M 88,190 L 112,190 L 112,212 L 88,212 Z",fill:"#C0E0B0"},
+      {id:"f_epi_l",  label:{cs:"Levé podžebří",en:"Right hypochondrium",de:"Rechter Oberbauch",uk:"Праве підребер'я",vi:"Hạ sườn phải",fr:"Hypochondre droit",es:"Hipocondrio derecho",ar:"المراق الأيمن",ru:"Правое подреберье"},    path:"M 112,190 L 136,190 L 136,212 L 112,212 Z",fill:"#B8D8A8"},
+      {id:"f_umb_r",  label:{cs:"Pravý bok",en:"Left flank",de:"Linke Flanke",uk:"Лівий бік",vi:"Hông trái",fr:"Flanc gauche",es:"Flanco izquierdo",ar:"الخاصرة اليسرى",ru:"Левый бок"},                               path:"M 64,212 L 88,212 L 88,233 L 64,233 Z",fill:"#C0E0B0"},
+      {id:"f_umb_m",  label:{cs:"Pupek / střed břicha",en:"Umbilical / centre",de:"Nabel",uk:"Пупок / центр",vi:"Rốn / giữa",fr:"Ombilic",es:"Ombligo",ar:"السرة",ru:"Пупок"},                                                        path:"M 88,212 L 112,212 L 112,233 L 88,233 Z",fill:"#C8E8B8"},
+      {id:"f_umb_l",  label:{cs:"Levý bok",en:"Right flank",de:"Rechte Flanke",uk:"Правий бік",vi:"Hông phải",fr:"Flanc droit",es:"Flanco derecho",ar:"الخاصرة اليمنى",ru:"Правый бок"},                                  path:"M 112,212 L 136,212 L 136,233 L 112,233 Z",fill:"#C0E0B0"},
+      {id:"f_hyp_r",  label:{cs:"Pravá jáma kyčelní",en:"Left iliac fossa",de:"Linke Leistengegend",uk:"Ліва клубова ямка",vi:"Hố chậu trái",fr:"Fosse iliaque gauche",es:"Fosa ilíaca izquierda",ar:"الحفرة الحرقفية اليسرى",ru:"Левая подвздошная"},path:"M 64,233 L 88,233 L 88,255 L 66,255 Z",fill:"#B8D8A8"},
+      {id:"f_hyp_m",  label:{cs:"Podbřišek (hypogastrium)",en:"Hypogastrium",de:"Unterbauch",uk:"Підчерев'я",vi:"Hạ vị",fr:"Hypogastre",es:"Hipogastrio",ar:"منطقة ما تحت المعدة",ru:"Гипогастрий"},                               path:"M 88,233 L 112,233 L 112,255 L 88,255 Z",fill:"#C8E8B8"},
+      {id:"f_hyp_l",  label:{cs:"Levá jáma kyčelní",en:"Right iliac fossa",de:"Rechte Leistengegend",uk:"Права клубова ямка",vi:"Hố chậu phải",fr:"Fosse iliaque droite",es:"Fosa ilíaca derecha",ar:"الحفرة الحرقفية اليمنى",ru:"Правая подвздошная"},path:"M 112,233 L 136,233 L 136,255 L 112,255 Z",fill:"#B8D8A8"},
+    ]
+  },
+  { id:"f_larm", side:"front",
+    label:{cs:"Levá horní končetina",en:"Right arm",de:"Rechter Arm",uk:"Права рука",vi:"Tay phải",fr:"Bras droit",es:"Brazo derecho",ar:"الذراع اليمنى",ru:"Правая рука"},
+    path:"M 64,112 L 44,118 L 20,262 L 48,265 L 66,135 Z", fill:"#E8D0B0", zoomBox:"10,105,70,175",
+    subs:[
+      {id:"f_lshoulder",label:{cs:"Levé rameno",en:"Right shoulder",de:"Rechte Schulter",uk:"Праве плече",vi:"Vai phải",fr:"Épaule droite",es:"Hombro derecho",ar:"الكتف الأيمن",ru:"Правое плечо"},    path:"M 64,112 L 44,118 L 40,145 L 62,142 Z",fill:"#E0C4A0"},
+      {id:"f_luarm",    label:{cs:"Levá paže (nadloktí)",en:"Right upper arm",de:"Rechter Oberarm",uk:"Праве надпліччя",vi:"Cánh tay phải",fr:"Bras droit",es:"Brazo superior derecho",ar:"عضد أيمن",ru:"Правое плечо (плечо)"},path:"M 62,142 L 40,145 L 34,188 L 57,186 Z",fill:"#E8D0B0"},
+      {id:"f_lelbow",   label:{cs:"Levý loket",en:"Right elbow",de:"Rechter Ellenbogen",uk:"Правий лікоть",vi:"Khuỷu tay phải",fr:"Coude droit",es:"Codo derecho",ar:"الكوع الأيمن",ru:"Правый локоть"},  path:"M 57,186 L 34,188 L 30,208 L 52,207 Z",fill:"#D4C090"},
+      {id:"f_lforearm", label:{cs:"Levé předloktí",en:"Right forearm",de:"Rechter Unterarm",uk:"Праве передпліччя",vi:"Cẳng tay phải",fr:"Avant-bras droit",es:"Antebrazo derecho",ar:"ساعد أيمن",ru:"Правое предплечье"},path:"M 52,207 L 30,208 L 24,250 L 46,250 Z",fill:"#E8D4B4"},
+      {id:"f_lhand",    label:{cs:"Levá ruka / zápěstí",en:"Right hand / wrist",de:"Rechte Hand / Handgelenk",uk:"Права кисть / зап'ясток",vi:"Bàn tay phải / cổ tay",fr:"Main droite / poignet",es:"Mano / muñeca derecha",ar:"اليد اليمنى / الرسغ",ru:"Правая кисть / запястье"},path:"M 46,250 L 24,250 L 20,262 L 44,265 Z",fill:"#F0DCC0"},
+    ]
+  },
+  { id:"f_rarm", side:"front",
+    label:{cs:"Pravá horní končetina",en:"Left arm",de:"Linker Arm",uk:"Ліва рука",vi:"Tay trái",fr:"Bras gauche",es:"Brazo izquierdo",ar:"الذراع اليسرى",ru:"Левая рука"},
+    path:"M 136,112 L 156,118 L 180,262 L 152,265 L 134,135 Z", fill:"#E8D0B0", zoomBox:"120,105,70,175",
+    subs:[
+      {id:"f_rshoulder",label:{cs:"Pravé rameno",en:"Left shoulder",de:"Linke Schulter",uk:"Ліве плече",vi:"Vai trái",fr:"Épaule gauche",es:"Hombro izquierdo",ar:"الكتف الأيسر",ru:"Левое плечо"},    path:"M 136,112 L 156,118 L 160,145 L 138,142 Z",fill:"#E0C4A0"},
+      {id:"f_ruarm",    label:{cs:"Pravá paže (nadloktí)",en:"Left upper arm",de:"Linker Oberarm",uk:"Ліве надпліччя",vi:"Cánh tay trái",fr:"Bras gauche",es:"Brazo superior izquierdo",ar:"عضد أيسر",ru:"Левое плечо (плечо)"},path:"M 138,142 L 160,145 L 166,188 L 143,186 Z",fill:"#E8D0B0"},
+      {id:"f_relbow",   label:{cs:"Pravý loket",en:"Left elbow",de:"Linker Ellenbogen",uk:"Лівий лікоть",vi:"Khuỷu tay trái",fr:"Coude gauche",es:"Codo izquierdo",ar:"الكوع الأيسر",ru:"Левый локоть"},  path:"M 143,186 L 166,188 L 170,208 L 148,207 Z",fill:"#D4C090"},
+      {id:"f_rforearm", label:{cs:"Pravé předloktí",en:"Left forearm",de:"Linker Unterarm",uk:"Ліве передпліччя",vi:"Cẳng tay trái",fr:"Avant-bras gauche",es:"Antebrazo izquierdo",ar:"ساعد أيسر",ru:"Левое предплечье"},path:"M 148,207 L 170,208 L 176,250 L 154,250 Z",fill:"#E8D4B4"},
+      {id:"f_rhand",    label:{cs:"Pravá ruka / zápěstí",en:"Left hand / wrist",de:"Linke Hand / Handgelenk",uk:"Ліва кисть / зап'ясток",vi:"Bàn tay trái / cổ tay",fr:"Main gauche / poignet",es:"Mano / muñeca izquierda",ar:"اليد اليسرى / الرسغ",ru:"Левая кисть / запястье"},path:"M 154,250 L 176,250 L 180,262 L 156,265 Z",fill:"#F0DCC0"},
+    ]
+  },
+  { id:"f_pelvis", side:"front",
+    label:{cs:"Pánev / tříslo",en:"Pelvis / groin",de:"Becken / Leiste",uk:"Таз / пах",vi:"Xương chậu",fr:"Bassin / aine",es:"Pelvis / ingle",ar:"حوض",ru:"Таз / пах"},
+    path:"M 66,255 L 134,255 L 138,300 L 62,300 Z", fill:"#D8C8E8", subs:[]
+  },
+  { id:"f_lleg", side:"front",
+    label:{cs:"Levá dolní končetina",en:"Right leg",de:"Rechtes Bein",uk:"Права нога",vi:"Chân phải",fr:"Jambe droite",es:"Pierna derecha",ar:"الساق اليمنى",ru:"Правая нога"},
+    path:"M 62,300 L 98,300 L 95,470 L 44,468 Z", fill:"#B8D8C8", zoomBox:"35,290,75,200",
+    subs:[
+      {id:"f_lhip",    label:{cs:"Levá kyčel",en:"Right hip",de:"Rechte Hüfte",uk:"Права кульшова ділянка",vi:"Khớp háng phải",fr:"Hanche droite",es:"Cadera derecha",ar:"الورك الأيمن",ru:"Правый тазобедренный сустав"},path:"M 62,300 L 98,300 L 97,325 L 60,325 Z",fill:"#A8C8B8"},
+      {id:"f_lthigh",  label:{cs:"Levé stehno",en:"Right thigh",de:"Rechter Oberschenkel",uk:"Праве стегно",vi:"Đùi phải",fr:"Cuisse droite",es:"Muslo derecho",ar:"الفخذ الأيمن",ru:"Правое бедро"},    path:"M 60,325 L 97,325 L 96,390 L 50,388 Z",fill:"#B8D0C0"},
+      {id:"f_lknee",   label:{cs:"Levé koleno",en:"Right knee",de:"Rechtes Knie",uk:"Праве коліно",vi:"Đầu gối phải",fr:"Genou droit",es:"Rodilla derecha",ar:"الركبة اليمنى",ru:"Правое колено"},    path:"M 50,388 L 96,390 L 95,415 L 48,413 Z",fill:"#C8E0D0"},
+      {id:"f_lcalf",   label:{cs:"Levý bérec",en:"Right lower leg",de:"Rechter Unterschenkel",uk:"Права гомілка",vi:"Cẳng chân phải",fr:"Jambe inférieure droite",es:"Pierna inferior derecha",ar:"أسفل الساق اليمنى",ru:"Правая голень"},path:"M 48,415 L 95,415 L 93,455 L 45,453 Z",fill:"#B8D8C8"},
+      {id:"f_lankle",  label:{cs:"Levý kotník",en:"Right ankle",de:"Rechtes Sprunggelenk",uk:"Правий гомілковостоп",vi:"Mắt cá chân phải",fr:"Cheville droite",es:"Tobillo derecho",ar:"الكاحل الأيمن",ru:"Правый голеностоп"},path:"M 45,453 L 93,455 L 92,468 L 44,466 Z",fill:"#A8C8B0"},
+      {id:"f_lfoot",   label:{cs:"Levé chodidlo",en:"Right foot",de:"Rechter Fuß",uk:"Права стопа",vi:"Bàn chân phải",fr:"Pied droit",es:"Pie derecho",ar:"القدم اليمنى",ru:"Правая стопа"},       path:"M 44,466 L 92,468 L 90,478 Q 65,484 40,474 Z",fill:"#C8E0D0"},
+    ]
+  },
+  { id:"f_rleg", side:"front",
+    label:{cs:"Pravá dolní končetina",en:"Left leg",de:"Linkes Bein",uk:"Ліва нога",vi:"Chân trái",fr:"Jambe gauche",es:"Pierna izquierda",ar:"الساق اليسرى",ru:"Левая нога"},
+    path:"M 138,300 L 102,300 L 105,470 L 156,468 Z", fill:"#B8D8C8", zoomBox:"90,290,75,200",
+    subs:[
+      {id:"f_rhip",    label:{cs:"Pravá kyčel",en:"Left hip",de:"Linke Hüfte",uk:"Ліва кульшова ділянка",vi:"Khớp háng trái",fr:"Hanche gauche",es:"Cadera izquierda",ar:"الورك الأيسر",ru:"Левый тазобедренный сустав"},path:"M 138,300 L 102,300 L 103,325 L 140,325 Z",fill:"#A8C8B8"},
+      {id:"f_rthigh",  label:{cs:"Pravé stehno",en:"Left thigh",de:"Linker Oberschenkel",uk:"Ліве стегно",vi:"Đùi trái",fr:"Cuisse gauche",es:"Muslo izquierdo",ar:"الفخذ الأيسر",ru:"Левое бедро"},    path:"M 140,325 L 103,325 L 104,390 L 150,388 Z",fill:"#B8D0C0"},
+      {id:"f_rknee",   label:{cs:"Pravé koleno",en:"Left knee",de:"Linkes Knie",uk:"Ліве коліно",vi:"Đầu gối trái",fr:"Genou gauche",es:"Rodilla izquierda",ar:"الركبة اليسرى",ru:"Левое колено"},    path:"M 150,388 L 104,390 L 105,415 L 152,413 Z",fill:"#C8E0D0"},
+      {id:"f_rcalf",   label:{cs:"Pravý bérec",en:"Left lower leg",de:"Linker Unterschenkel",uk:"Ліва гомілка",vi:"Cẳng chân trái",fr:"Jambe inférieure gauche",es:"Pierna inferior izquierda",ar:"أسفل الساق اليسرى",ru:"Левая голень"},path:"M 152,413 L 105,415 L 107,455 L 155,453 Z",fill:"#B8D8C8"},
+      {id:"f_rankle",  label:{cs:"Pravý kotník",en:"Left ankle",de:"Linkes Sprunggelenk",uk:"Лівий гомілковостоп",vi:"Mắt cá chân trái",fr:"Cheville gauche",es:"Tobillo izquierdo",ar:"الكاحل الأيسر",ru:"Левый голеностоп"},path:"M 155,453 L 107,455 L 108,468 L 156,466 Z",fill:"#A8C8B0"},
+      {id:"f_rfoot",   label:{cs:"Pravé chodidlo",en:"Left foot",de:"Linker Fuß",uk:"Ліва стопа",vi:"Bàn chân trái",fr:"Pied gauche",es:"Pie izquierdo",ar:"القدم اليسرى",ru:"Левая стопа"},       path:"M 156,466 L 108,468 L 110,478 Q 135,484 160,474 Z",fill:"#C8E0D0"},
+    ]
+  },
+  // ════════════ BACK ════════════
+  { id:"b_head", side:"back",
+    label:{cs:"Zátylek / hlava",en:"Back of head",de:"Hinterkopf",uk:"Потилиця",vi:"Sau đầu",fr:"Nuque / tête",es:"Nuca / cabeza",ar:"مؤخرة الرأس",ru:"Затылок"},
+    path:"M 88,4 Q 100,-2 112,4 Q 128,8 132,30 Q 138,58 128,72 Q 116,86 100,87 Q 84,86 72,72 Q 62,58 68,30 Q 72,8 88,4 Z",
+    fill:"#F2C4B0", subs:[]
+  },
+  { id:"b_neck", side:"back",
+    label:{cs:"Šíje / zátylek",en:"Back of neck",de:"Nacken",uk:"Шия (зад)",vi:"Gáy",fr:"Nuque",es:"Nuca",ar:"مؤخرة الرقبة",ru:"Шея сзади"},
+    path:"M 86,87 L 114,87 L 116,108 L 84,108 Z", fill:"#F0C8A8", subs:[]
+  },
+  { id:"b_upback", side:"back",
+    label:{cs:"Horní záda",en:"Upper back",de:"Oberer Rücken",uk:"Верхня спина",vi:"Lưng trên",fr:"Haut du dos",es:"Espalda alta",ar:"أعلى الظهر",ru:"Верхняя спина"},
+    path:"M 68,108 L 132,108 L 136,190 L 64,190 Z", fill:"#C0CCE8", zoomBox:"55,100,100,100",
+    subs:[
+      {id:"b_scap_l",  label:{cs:"Levá lopatka",en:"Right scapula",de:"Rechtes Schulterblatt",uk:"Права лопатка",vi:"Xương bả vai phải",fr:"Omoplate droite",es:"Escápula derecha",ar:"لوح الكتف الأيمن",ru:"Правая лопатка"},path:"M 68,115 L 92,115 L 92,175 L 68,175 Z",fill:"#A8BCE0"},
+      {id:"b_spine",   label:{cs:"Páteř (hrudní)",en:"Thoracic spine",de:"Brustwirbelsäule",uk:"Грудний відділ хребта",vi:"Cột sống ngực",fr:"Colonne vertébrale thoracique",es:"Columna torácica",ar:"العمود الفقري الصدري",ru:"Грудной отдел позвоночника"},path:"M 92,108 L 108,108 L 108,190 L 92,190 Z",fill:"#B8C8DC"},
+      {id:"b_scap_r",  label:{cs:"Pravá lopatka",en:"Left scapula",de:"Linkes Schulterblatt",uk:"Ліва лопатка",vi:"Xương bả vai trái",fr:"Omoplate gauche",es:"Escápula izquierda",ar:"لوح الكتف الأيسر",ru:"Левая лопатка"},path:"M 108,115 L 132,115 L 132,175 L 108,175 Z",fill:"#A8BCE0"},
+    ]
+  },
+  { id:"b_loback", side:"back",
+    label:{cs:"Dolní záda / bedra",en:"Lower back / lumbar",de:"Unterer Rücken / Lendenwirbel",uk:"Нижня спина / поперек",vi:"Lưng dưới / thắt lưng",fr:"Bas du dos / lombaires",es:"Espalda baja / lumbar",ar:"أسفل الظهر",ru:"Поясница"},
+    path:"M 64,190 L 136,190 L 134,255 L 66,255 Z", fill:"#B8C4E0", subs:[]
+  },
+  { id:"b_glutes", side:"back",
+    label:{cs:"Hýždě",en:"Buttocks",de:"Gesäß",uk:"Сідниці",vi:"Mông",fr:"Fesses",es:"Glúteos",ar:"الأرداف",ru:"Ягодицы"},
+    path:"M 66,255 L 134,255 L 138,308 L 62,308 Z", fill:"#D8C0E4",
+    zoomBox:"55,248,100,70",
+    subs:[
+      {id:"b_glut_l",label:{cs:"Levé hýždě",en:"Right buttock",de:"Rechtes Gesäß",uk:"Права сідниця",vi:"Mông phải",fr:"Fesse droite",es:"Glúteo derecho",ar:"الأرداف اليمنى",ru:"Правая ягодица"},path:"M 66,255 L 100,255 L 100,308 L 62,308 Z",fill:"#C8B0D8"},
+      {id:"b_glut_r",label:{cs:"Pravé hýždě",en:"Left buttock",de:"Linkes Gesäß",uk:"Ліва сідниця",vi:"Mông trái",fr:"Fesse gauche",es:"Glúteo izquierdo",ar:"الأرداف اليسرى",ru:"Левая ягодица"},path:"M 100,255 L 134,255 L 138,308 L 100,308 Z",fill:"#C8B0D8"},
+    ]
+  },
+  { id:"b_larm", side:"back",
+    label:{cs:"Levá paže (záda)",en:"Right arm (back)",de:"Rechter Arm (hinten)",uk:"Права рука (зад)",vi:"Tay phải (sau)",fr:"Bras droit (dos)",es:"Brazo derecho (dorso)",ar:"الذراع اليمنى (خلف)",ru:"Правая рука (сзади)"},
+    path:"M 64,112 L 44,118 L 20,262 L 48,265 L 66,135 Z", fill:"#E8D0B0", zoomBox:"10,105,70,175",
+    subs:[
+      {id:"b_lshoulder",label:{cs:"Pravé rameno (záda)",en:"Right shoulder (back)",de:"Rechte Schulter (hinten)",uk:"Праве плече (зад)",vi:"Vai phải (sau)",fr:"Épaule droite (dos)",es:"Hombro derecho (dorso)",ar:"الكتف الأيمن (خلف)",ru:"Правое плечо (сзади)"},path:"M 64,112 L 44,118 L 40,145 L 62,142 Z",fill:"#E0C4A0"},
+      {id:"b_luarm",    label:{cs:"Pravá paže / triceps",en:"Right upper arm / triceps",de:"Rechter Oberarm / Trizeps",uk:"Праве плече / трицепс",vi:"Cánh tay phải (sau)",fr:"Bras droit / triceps",es:"Brazo derecho / tríceps",ar:"الجزء العلوي من الذراع الأيمن",ru:"Правое плечо / трицепс"},path:"M 62,142 L 40,145 L 34,188 L 57,186 Z",fill:"#E8D0B0"},
+      {id:"b_lelbow",   label:{cs:"Pravý loket (záda)",en:"Right elbow (back)",de:"Rechter Ellenbogen (hinten)",uk:"Правий лікоть (зад)",vi:"Khuỷu tay phải (sau)",fr:"Coude droit (dos)",es:"Codo derecho (dorso)",ar:"الكوع الأيمن (خلف)",ru:"Правый локоть (сзади)"},path:"M 57,186 L 34,188 L 30,208 L 52,207 Z",fill:"#D4C090"},
+      {id:"b_lforearm", label:{cs:"Pravé předloktí (záda)",en:"Right forearm (back)",de:"Rechter Unterarm (hinten)",uk:"Праве передпліччя (зад)",vi:"Cẳng tay phải (sau)",fr:"Avant-bras droit (dos)",es:"Antebrazo derecho (dorso)",ar:"ساعد أيمن (خلف)",ru:"Правое предплечье (сзади)"},path:"M 52,207 L 30,208 L 24,250 L 46,250 Z",fill:"#E8D4B4"},
+      {id:"b_lhand",    label:{cs:"Pravá ruka / hřbet",en:"Right hand (back)",de:"Rechte Hand / Handrücken",uk:"Права кисть / тил",vi:"Mu bàn tay phải",fr:"Dos de la main droite",es:"Dorso mano derecha",ar:"ظهر اليد اليمنى",ru:"Тыл правой кисти"},path:"M 46,250 L 24,250 L 20,262 L 44,265 Z",fill:"#F0DCC0"},
+    ]
+  },
+  { id:"b_rarm", side:"back",
+    label:{cs:"Pravá paže (záda)",en:"Left arm (back)",de:"Linker Arm (hinten)",uk:"Ліва рука (зад)",vi:"Tay trái (sau)",fr:"Bras gauche (dos)",es:"Brazo izquierdo (dorso)",ar:"الذراع اليسرى (خلف)",ru:"Левая рука (сзади)"},
+    path:"M 136,112 L 156,118 L 180,262 L 152,265 L 134,135 Z", fill:"#E8D0B0", zoomBox:"120,105,70,175",
+    subs:[
+      {id:"b_rshoulder",label:{cs:"Levé rameno (záda)",en:"Left shoulder (back)",de:"Linke Schulter (hinten)",uk:"Ліве плече (зад)",vi:"Vai trái (sau)",fr:"Épaule gauche (dos)",es:"Hombro izquierdo (dorso)",ar:"الكتف الأيسر (خلف)",ru:"Левое плечо (сзади)"},path:"M 136,112 L 156,118 L 160,145 L 138,142 Z",fill:"#E0C4A0"},
+      {id:"b_ruarm",    label:{cs:"Levá paže / triceps",en:"Left upper arm / triceps",de:"Linker Oberarm / Trizeps",uk:"Ліве плече / трицепс",vi:"Cánh tay trái (sau)",fr:"Bras gauche / triceps",es:"Brazo izquierdo / tríceps",ar:"الجزء العلوي من الذراع الأيسر",ru:"Левое плечо / трицепс"},path:"M 138,142 L 160,145 L 166,188 L 143,186 Z",fill:"#E8D0B0"},
+      {id:"b_relbow",   label:{cs:"Levý loket (záda)",en:"Left elbow (back)",de:"Linker Ellenbogen (hinten)",uk:"Лівий лікоть (зад)",vi:"Khuỷu tay trái (sau)",fr:"Coude gauche (dos)",es:"Codo izquierdo (dorso)",ar:"الكوع الأيسر (خلف)",ru:"Левый локоть (сзади)"},path:"M 143,186 L 166,188 L 170,208 L 148,207 Z",fill:"#D4C090"},
+      {id:"b_rforearm", label:{cs:"Levé předloktí (záda)",en:"Left forearm (back)",de:"Linker Unterarm (hinten)",uk:"Ліве передпліччя (зад)",vi:"Cẳng tay trái (sau)",fr:"Avant-bras gauche (dos)",es:"Antebrazo izquierdo (dorso)",ar:"ساعد أيسر (خلف)",ru:"Левое предплечье (сзади)"},path:"M 148,207 L 170,208 L 176,250 L 154,250 Z",fill:"#E8D4B4"},
+      {id:"b_rhand",    label:{cs:"Levá ruka / hřbet",en:"Left hand (back)",de:"Linke Hand / Handrücken",uk:"Ліва кисть / тил",vi:"Mu bàn tay trái",fr:"Dos de la main gauche",es:"Dorso mano izquierda",ar:"ظهر اليد اليسرى",ru:"Тыл левой кисти"},path:"M 154,250 L 176,250 L 180,262 L 156,265 Z",fill:"#F0DCC0"},
+    ]
+  },
+  { id:"b_lleg", side:"back",
+    label:{cs:"Levá dolní končetina (záda)",en:"Right leg (back)",de:"Rechtes Bein (hinten)",uk:"Права нога (зад)",vi:"Chân phải (sau)",fr:"Jambe droite (dos)",es:"Pierna derecha (dorso)",ar:"الساق اليمنى (خلف)",ru:"Правая нога (сзади)"},
+    path:"M 62,308 L 98,308 L 95,470 L 44,468 Z", fill:"#B8D4C8", zoomBox:"35,295,70,200",
+    subs:[
+      {id:"b_lhip",   label:{cs:"Pravá kyčel (záda)",en:"Right hip (back)",de:"Rechte Hüfte (hinten)",uk:"Права кульша (зад)",vi:"Háng phải (sau)",fr:"Hanche droite (dos)",es:"Cadera derecha (dorso)",ar:"الورك الأيمن (خلف)",ru:"Правый тазобедренный (сзади)"},path:"M 62,308 L 98,308 L 97,330 L 60,330 Z",fill:"#A8C0B8"},
+      {id:"b_lthigh", label:{cs:"Pravé stehno (záda)",en:"Right thigh (back)",de:"Rechter Oberschenkel (hinten)",uk:"Праве стегно (зад)",vi:"Đùi phải (sau)",fr:"Cuisse droite (dos)",es:"Muslo derecho (dorso)",ar:"الفخذ الأيمن (خلف)",ru:"Правое бедро (сзади)"},path:"M 60,330 L 97,330 L 95,395 L 48,393 Z",fill:"#B0CCB8"},
+      {id:"b_lknee",  label:{cs:"Pravé koleno (záda)",en:"Right knee (back)",de:"Rechtes Knie (hinten)",uk:"Праве коліно (зад)",vi:"Đầu gối phải (sau)",fr:"Genou droit (dos)",es:"Rodilla derecha (dorso)",ar:"الركبة اليمنى (خلف)",ru:"Правое колено (сзади)"},path:"M 48,393 L 95,395 L 94,415 L 46,413 Z",fill:"#C0D8C8"},
+      {id:"b_lcalf",  label:{cs:"Pravý bérec (záda)",en:"Right calf",de:"Rechte Wade",uk:"Права литка",vi:"Bắp chân phải",fr:"Mollet droit",es:"Pantorrilla derecha",ar:"بطة الساق اليمنى",ru:"Правая икра"},path:"M 46,415 L 94,415 L 92,455 L 44,453 Z",fill:"#B0CCB8"},
+      {id:"b_lankle", label:{cs:"Pravý kotník (záda)",en:"Right ankle (back)",de:"Rechtes Sprunggelenk (hinten)",uk:"Правий гомілковостоп (зад)",vi:"Mắt cá chân phải (sau)",fr:"Cheville droite (dos)",es:"Tobillo derecho (dorso)",ar:"الكاحل الأيمن (خلف)",ru:"Правый голеностоп (сзади)"},path:"M 44,453 L 92,455 L 91,468 L 43,466 Z",fill:"#A0C0B0"},
+      {id:"b_lfoot",  label:{cs:"Pravé chodidlo (záda)",en:"Right foot (back)",de:"Rechter Fuß (hinten)",uk:"Права стопа (зад)",vi:"Bàn chân phải (sau)",fr:"Pied droit (dos)",es:"Pie derecho (dorso)",ar:"القدم اليمنى (خلف)",ru:"Правая стопа (сзади)"},path:"M 43,466 L 91,468 L 89,478 Q 64,484 40,474 Z",fill:"#B8D0C0"},
+    ]
+  },
+  { id:"b_rleg", side:"back",
+    label:{cs:"Pravá dolní končetina (záda)",en:"Left leg (back)",de:"Linkes Bein (hinten)",uk:"Ліва нога (зад)",vi:"Chân trái (sau)",fr:"Jambe gauche (dos)",es:"Pierna izquierda (dorso)",ar:"الساق اليسرى (خلف)",ru:"Левая нога (сзади)"},
+    path:"M 138,308 L 102,308 L 105,470 L 156,468 Z", fill:"#B8D4C8", zoomBox:"95,295,70,200",
+    subs:[
+      {id:"b_rhip",   label:{cs:"Levá kyčel (záda)",en:"Left hip (back)",de:"Linke Hüfte (hinten)",uk:"Ліва кульша (зад)",vi:"Háng trái (sau)",fr:"Hanche gauche (dos)",es:"Cadera izquierda (dorso)",ar:"الورك الأيسر (خلف)",ru:"Левый тазобедренный (сзади)"},path:"M 138,308 L 102,308 L 103,330 L 140,330 Z",fill:"#A8C0B8"},
+      {id:"b_rthigh", label:{cs:"Levé stehno (záda)",en:"Left thigh (back)",de:"Linker Oberschenkel (hinten)",uk:"Ліве стегно (зад)",vi:"Đùi trái (sau)",fr:"Cuisse gauche (dos)",es:"Muslo izquierdo (dorso)",ar:"الفخذ الأيسر (خلف)",ru:"Левое бедро (сзади)"},path:"M 140,330 L 103,330 L 105,395 L 152,393 Z",fill:"#B0CCB8"},
+      {id:"b_rknee",  label:{cs:"Levé koleno (záda)",en:"Left knee (back)",de:"Linkes Knie (hinten)",uk:"Ліве коліно (зад)",vi:"Đầu gối trái (sau)",fr:"Genou gauche (dos)",es:"Rodilla izquierda (dorso)",ar:"الركبة اليسرى (خلف)",ru:"Левое колено (сзади)"},path:"M 152,393 L 105,395 L 106,415 L 154,413 Z",fill:"#C0D8C8"},
+      {id:"b_rcalf",  label:{cs:"Levý bérec (záda)",en:"Left calf",de:"Linke Wade",uk:"Ліва литка",vi:"Bắp chân trái",fr:"Mollet gauche",es:"Pantorrilla izquierda",ar:"بطة الساق اليسرى",ru:"Левая икра"},path:"M 154,413 L 106,415 L 108,455 L 156,453 Z",fill:"#B0CCB8"},
+      {id:"b_rankle", label:{cs:"Levý kotník (záda)",en:"Left ankle (back)",de:"Linkes Sprunggelenk (hinten)",uk:"Лівий гомілковостоп (зад)",vi:"Mắt cá chân trái (sau)",fr:"Cheville gauche (dos)",es:"Tobillo izquierdo (dorso)",ar:"الكاحل الأيسر (خلف)",ru:"Левый голеностоп (сзади)"},path:"M 156,453 L 108,455 L 109,468 L 157,466 Z",fill:"#A0C0B0"},
+      {id:"b_rfoot",  label:{cs:"Levé chodidlo (záda)",en:"Left foot (back)",de:"Linker Fuß (hinten)",uk:"Ліва стопа (зад)",vi:"Bàn chân trái (sau)",fr:"Pied gauche (dos)",es:"Pie izquierdo (dorso)",ar:"القدم اليسرى (خلف)",ru:"Левая стопа (сзади)"},path:"M 157,466 L 109,468 L 111,478 Q 136,484 161,474 Z",fill:"#B8D0C0"},
+    ]
+  },
+]
+// Body outline paths (decorative, non-clickable)
+const BODY_OUTLINE_FRONT = "M 86,87 L 114,87 L 116,108 L 84,108 Z M 68,108 L 132,108 L 136,190 L 64,190 Z M 64,190 L 136,190 L 134,255 L 66,255 Z M 62,255 L 138,255 Q 140,280 138,300 L 62,300 Q 60,280 62,255 Z M 64,112 L 44,118 L 20,262 L 48,265 L 66,135 Z M 136,112 L 156,118 L 180,262 L 152,265 L 134,135 Z M 62,300 L 98,300 L 95,470 L 44,468 Z M 138,300 L 102,300 L 105,470 L 156,468 Z";
+
+let bodyState = { zoomed: null, side: null, prevPath: [] };
+let bodyPartCtx = null; // {label, staffLabel, icon} — pre-selected from figure
+
+function bodyLabel(r){ return (r.label[curLang]||r.label["cs"]); }
+
+function buildBodySVG(side, zoomedRegion){
+  const regions = BODY_REGIONS.filter(r=>r.side===side);
+  const vb = zoomedRegion ? (zoomedRegion.zoomBox||"0 0 200 490") : "0 0 200 490";
+  const vbNorm = vb.replace(/,/g," ");
+  const isZoomed = !!zoomedRegion;
+
+  function pathCentroid(d){
+    const nums=d.match(/[\d.]+[,\s][\d.]+/g)||[];
+    if(!nums.length)return{x:100,y:245};
+    let sx=0,sy=0;
+    nums.forEach(p=>{const[x,y]=p.trim().split(/[,\s]/).map(Number);sx+=x;sy+=y;});
+    return{x:sx/nums.length,y:sy/nums.length};
+  }
+
+  // Build shapes
+  let shapesHTML = "";
+  let labelData = []; // {lbl, cx, cy, onclick, staffLbl}
+
+  if(isZoomed){
+    const r = zoomedRegion;
+    // outline of parent
+    shapesHTML += `<path d="${r.path}" fill="none" stroke="#CCC" stroke-width="0.8" stroke-dasharray="4,3"/>`;
+    r.subs.forEach(s=>{
+      const lbl = s.label[curLang]||s.label["cs"];
+      const staffLbl = s.label[staffLang]||s.label["cs"];
+      const onclick = `bodySubClick('${s.id}','${side}','${bodyLabel(r)}')`;
+      const ctr = pathCentroid(s.path);
+      shapesHTML += `<path d="${s.path}" fill="${s.fill}" fill-opacity="0.82" stroke="#666" stroke-width="1.5"
+        style="cursor:pointer" onclick="${onclick}"
+        onmouseover="this.setAttribute('fill-opacity','1');this.style.filter='brightness(0.88)'"
+        onmouseout="this.setAttribute('fill-opacity','0.82');this.style.filter='none'">
+        <title>${lbl}</title></path>`;
+      labelData.push({lbl, staffLbl, cx:ctr.x, cy:ctr.y, onclick});
+    });
+  } else {
+    regions.forEach(r=>{
+      const hasSubs = r.subs && r.subs.length>0;
+      const onclick = hasSubs ? `bodyZoomIn('${r.id}','${side}')` : `bodySubClick('${r.id}','${side}','')`;
+      const lbl = bodyLabel(r);
+      const staffLbl = r.label[staffLang]||r.label["cs"];
+      const ctr = pathCentroid(r.path);
+      shapesHTML += `<path d="${r.path}" fill="${r.fill}" fill-opacity="0.75" stroke="#888" stroke-width="1.2"
+        style="cursor:pointer;transition:fill-opacity .15s" onclick="${onclick}"
+        onmouseover="this.setAttribute('fill-opacity','0.96');this.style.filter='brightness(0.87)'"
+        onmouseout="this.setAttribute('fill-opacity','0.75');this.style.filter='none'">
+        <title>${lbl}${hasSubs?" — klepněte pro detail":""}</title></path>`;
+      labelData.push({lbl, staffLbl, cx:ctr.x, cy:ctr.y, onclick});
+    });
+  }
+
+  // Parse viewBox to get SVG coordinate space
+  const vbP = vbNorm.trim().split(/\s+/).map(Number);
+  const vbX=vbP[0]||0, vbY=vbP[1]||0, vbW=vbP[2]||200, vbH=vbP[3]||490;
+
+  // Build SVG lines from centroid to SVG edge, then HTML labels outside
+  // Lines drawn as SVG elements to endpoints at left/right edge of viewBox
+  let linesHTML = "";
+  const leftLabels  = labelData.filter(l=>l.cx < vbX+vbW/2).sort((a,b)=>a.cy-b.cy);
+  const rightLabels = labelData.filter(l=>l.cx >= vbX+vbW/2).sort((a,b)=>a.cy-b.cy);
+
+  // Left labels: line goes to x=vbX (left edge)
+  leftLabels.forEach(l=>{
+    linesHTML += `<line x1="${l.cx.toFixed(1)}" y1="${l.cy.toFixed(1)}" x2="${vbX.toFixed(1)}" y2="${l.cy.toFixed(1)}"
+      stroke="#1D9E75" stroke-width="1" stroke-dasharray="4,3" pointer-events="none"/>
+      <circle cx="${l.cx.toFixed(1)}" cy="${l.cy.toFixed(1)}" r="3" fill="#1D9E75" pointer-events="none"/>`;
+  });
+  // Right labels: line goes to x=vbX+vbW (right edge)
+  rightLabels.forEach(l=>{
+    linesHTML += `<line x1="${l.cx.toFixed(1)}" y1="${l.cy.toFixed(1)}" x2="${(vbX+vbW).toFixed(1)}" y2="${l.cy.toFixed(1)}"
+      stroke="#1D9E75" stroke-width="1" stroke-dasharray="4,3" pointer-events="none"/>
+      <circle cx="${l.cx.toFixed(1)}" cy="${l.cy.toFixed(1)}" r="3" fill="#1D9E75" pointer-events="none"/>`;
+  });
+
+  const sideLabel = side==="front" ? "Přední pohled" : "Zadní pohled";
+
+  // HTML label lists (positioned via flex, aligned to SVG height via CSS)
+  const mkLabel = (l, vbY, vbH) => {
+    const dual = curLang!==staffLang && l.lbl!==l.staffLbl;
+    return `<button class="bml" data-cy="${l.cy}" data-vby="${vbY}" data-vbh="${vbH}" style="visibility:hidden" onclick="${l.onclick}">
+      ${l.lbl}${dual?`<span class="bml-staff">${l.staffLbl}</span>`:""}
+    </button>`;
+  };
+
+  const leftHTML  = leftLabels.map(l=>mkLabel(l,vbY,vbH)).join("");
+  const rightHTML = rightLabels.map(l=>mkLabel(l,vbY,vbH)).join("");
+
+  return `<div class="bm-panel" data-side="${side}">
+    <div class="bm-lblcol bm-left">${leftHTML}</div>
+    <div class="bm-svgwrap">
+      <div class="bm-sidelabel">${sideLabel}</div>
+      <svg id="svg-${side}" viewBox="${vbNorm}" preserveAspectRatio="xMidYMid meet"
+        style="display:block;width:100%;height:100%"
+        xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="100" cy="44" rx="33" ry="44" fill="#FAE8DC" stroke="#AAA" stroke-width="1.2"/>
+        <path d="${BODY_OUTLINE_FRONT}" fill="#FAE8DC" stroke="#BBB" stroke-width="1"/>
+        ${shapesHTML}
+        ${linesHTML}
+      </svg>
+    </div>
+    <div class="bm-lblcol bm-right">${rightHTML}</div>
+  </div>`;
+}
+
+function sizeBodyStage(){
+  const appHdr = document.querySelector(".hdr");
+  const bodyHdr = $("body-hdr");
+  const usedH = (appHdr?appHdr.offsetHeight:0) + (bodyHdr?bodyHdr.offsetHeight:0);
+  const h = window.innerHeight - usedH - 8;
+  const stage = $("body-stage");
+  stage.style.height = h + "px";
+  stage.style.flex = "none";
+  document.querySelectorAll(".bm-panel").forEach(p=>{
+    p.style.height = h+"px";
+    p.querySelectorAll(".bm-lblcol").forEach(col=>{ col.style.height = h+"px"; });
+  });
+}
+
+
+function positionBodyLabels(){
+  document.querySelectorAll(".bm-panel").forEach(panel=>{
+    const svg = panel.querySelector("svg");
+    if(!svg) return;
+    const svgR = svg.getBoundingClientRect();
+    const panelR = panel.getBoundingClientRect();
+    if(svgR.height < 10) return;
+
+    // Get viewBox
+    const vbAttr = svg.getAttribute("viewBox")||"0 0 200 490";
+    const vbP = vbAttr.trim().split(/\s+/).map(Number);
+    const vbY = vbP[1]||0, vbH = vbP[3]||490;
+
+    // Helper: SVG cy → screen px relative to panel top
+    function cyToPx(cy){ return svgR.top - panelR.top + ((cy-vbY)/vbH)*svgR.height; }
+
+    ["bm-left","bm-right"].forEach(cls=>{
+      const col = panel.querySelector("."+cls);
+      if(!col) return;
+      const colR = col.getBoundingClientRect();
+      const btns = Array.from(col.querySelectorAll(".bml"));
+      if(!btns.length) return;
+
+      const minGap = 5;
+      const items = btns.map(b=>{
+        const cy = parseFloat(b.dataset.cy)||0;
+        const desired = cyToPx(cy) - (colR.top - panelR.top);
+        const h = Math.max(b.offsetHeight||0, 38);
+        return {el:b, desired, actual:desired, h};
+      }).sort((a,b)=>a.desired-b.desired);
+
+      // Push down
+      for(let i=1;i<items.length;i++){
+        const p=items[i-1], q=items[i];
+        const need = p.actual + p.h/2 + minGap + q.h/2;
+        if(q.actual < need) q.actual = need;
+      }
+      // Pull up if overflowing
+      const colH = colR.height;
+      for(let i=items.length-1;i>=0;i--){
+        const q=items[i];
+        if(q.actual + q.h/2 > colH) q.actual = colH - q.h/2;
+        if(q.actual - q.h/2 < 0) q.actual = q.h/2;
+        if(i>0){
+          const p=items[i-1];
+          const max = q.actual - q.h/2 - minGap - p.h/2;
+          if(p.actual > max) p.actual = max;
+        }
+      }
+      items.forEach(it=>{
+        it.el.style.position = "absolute";
+        it.el.style.top = (it.actual - it.h/2) + "px";
+        it.el.style.visibility = "visible";
+        it.el.style.transform = "none";
+      });
+    });
+  });
+}
+
+function openBodyModel(path){
+  bodyState = { zoomed:null, side:null, prevPath:path.slice() };
+  renderBodyModel();
+  $("comm-grid").style.display="none";
+  $("comm-res").style.display="none";
+  $("vas-panel").style.display="none";
+  $("body-model").style.display="flex";
+  requestAnimationFrame(()=>{ sizeBodyStage(); setTimeout(positionBodyLabels, 50); });
+}
+
+function renderBodyModel(){
+  const zh = bodyState.zoomed;
+  const stage = $("body-stage");
+  if(!zh){
+    // Show both front + back full body
+    $("body-title").textContent = "Kde vás bolí? Klepněte na oblast.";
+    stage.innerHTML = buildBodySVG("front", null) + buildBodySVG("back", null);
+    $("body-back-btn").style.display="none";
+    requestAnimationFrame(()=>{ sizeBodyStage(); setTimeout(positionBodyLabels, 50); });
+  } else {
+    // Zoomed into one region
+    const region = BODY_REGIONS.find(r=>r.id===zh);
+    $("body-title").textContent = bodyLabel(region)+" — vyberte konkrétní místo";
+    $("body-back-btn").style.display="inline-flex";
+    // show only the relevant side, zoomed — full width
+    stage.innerHTML = buildBodySVG(region.side, region);
+    requestAnimationFrame(()=>{ sizeBodyStage(); setTimeout(positionBodyLabels, 50); });
+  }
+}
+
+function bodyZoomIn(regionId, side){
+  const region = BODY_REGIONS.find(r=>r.id===regionId);
+  if(!region || !region.subs || region.subs.length===0){
+    // No subs — treat as direct selection
+    bodySubClick(regionId, side, "");
+    return;
+  }
+  bodyState.zoomed = regionId;
+  bodyState.side = side;
+  $("body-back-btn").style.display="inline-flex";
+  // Animate zoom via SVG viewBox transition
+  const svg = document.getElementById("svg-"+side);
+  if(svg && region.zoomBox){
+    svg.style.transition="none";
+    animateViewBox(svg, "0,0,200,490", region.zoomBox, 320, ()=>{
+      renderBodyModel();
+    });
+  } else {
+    renderBodyModel();
+  }
+}
+
+function animateViewBox(svg, from, to, duration, cb){
+  const fv = from.split(",").map(Number);
+  const tv = to.split(",").map(Number);
+  const start = performance.now();
+  function step(now){
+    const t = Math.min((now-start)/duration, 1);
+    const ease = t<0.5 ? 2*t*t : -1+(4-2*t)*t; // ease in-out
+    const cur = fv.map((f,i)=>f + (tv[i]-f)*ease);
+    svg.setAttribute("viewBox", cur.join(" "));
+    if(t<1){ requestAnimationFrame(step); } else { svg.setAttribute("viewBox", to.replace(/,/g," ")); if(cb)cb(); }
+  }
+  requestAnimationFrame(step);
+}
+
+function bodySubClick(subId, side, parentLabel){
+  let lbl="", staffLbl="";
+  for(const r of BODY_REGIONS){
+    if(r.id===subId){ lbl=r.label[curLang]||r.label["cs"]; staffLbl=r.label[staffLang]||r.label["cs"]; break; }
+    const s=(r.subs||[]).find(s=>s.id===subId);
+    if(s){ lbl=s.label[curLang]||s.label["cs"]; staffLbl=s.label[staffLang]||s.label["cs"]; break; }
+  }
+  // Came from pain path → VAS
+  if(bodyState.prevPath.some(p=>p.id==="c1")){
+    bodyState.prevPath.push({id:subId, label:lbl, t:{}});
+    $("body-model").style.display="none";
+    openVas(bodyState.prevPath);
+    return;
+  }
+  // Otherwise: store body part context, show comm grid so patient can pick what to say
+  bodyPartCtx = {label:lbl, staffLabel:staffLbl, icon:"🫀"};
+  $("body-model").style.display="none";
+  commPath=[];
+  renderComm();
+}
+
+function bodyBack(){
+  if(bodyState.zoomed){
+    bodyState.zoomed=null;
+    renderBodyModel();
+  } else {
+    bodyModelClose();
+  }
+}
+
+function bodyModelClose(){
+  $("body-model").style.display="none";
+  $("comm-grid").style.display="grid";
+  commPath=bodyState.prevPath.slice();
+  renderComm();
+}
+
+// ── PWA Service Worker ───────────────────────────────────────────────────────
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(r=>console.log('SW registered'))
+      .catch(e=>console.warn('SW failed',e));
+  });
+}
+
+// ── Persistence ──────────────────────────────────────────────────────────────
+const STORAGE_KEY="aro_data_v1";
+function saveData(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify({
+      CATS,INST,COMM,
+      nii,nci,
+      curLang,staffLang,adminLang,dark
+    }));
+  }catch(e){console.warn("Save failed",e);}
+}
+function fixCommColors(){
+  COMM.forEach(item=>{
+    // If bg looks like a solid hex color (no alpha) same as tc, lighten bg
+    if(item.bg && item.tc && item.bg===item.tc){
+      item.bg = item.tc+"33";
+    }
+  });
+}
+
+function loadData(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return false;
+    const d=JSON.parse(raw);
+    if(d.CATS)CATS=d.CATS;
+    if(d.INST)INST=d.INST;
+    if(d.COMM)COMM=d.COMM;
+    if(d.nii)nii=d.nii;
+    if(d.nci)nci=d.nci;
+    if(d.curLang){curLang=d.curLang;}
+    if(d.staffLang){staffLang=d.staffLang;}
+    if(d.adminLang){adminLang=d.adminLang;}
+    if(d.dark){dark=true;document.body.classList.add("dark");const dt=$("dktog");if(dt)dt.textContent="☀️";}
+    return true;
+  }catch(e){console.warn("Load failed",e);return false;}
+}
+
+</script>
+</body>
+</html>
