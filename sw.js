@@ -1,6 +1,6 @@
 /* ResqHub – service worker (offline režim)
    Při větší změně hubu zvyš číslo verze, ať se stará cache smaže. */
-const VERSION = 'resqhub-v3';
+const VERSION = 'resqhub-v4';
 const SHELL = [
   './', './index.html', './admin.html', './style.css', './common.js', './lock.js', './apps.js',
   './manifest.json', './icons/icon-192.png', './icons/apple-touch-icon.png'

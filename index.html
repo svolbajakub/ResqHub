@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ResqHub</title>
-<meta name="description" content="ResqApps - utility pro záchranáře">
+<meta name="description" content="Rozcestník mých mini aplikací">
 <meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
@@ -22,6 +22,9 @@
 <header class="topbar" id="topbar">
   <span class="date-line" id="date"></span>
   <span class="mini-title">ResqHub</span>
+  <button type="button" class="round-btn glass info-btn" id="infoBtn" aria-label="Informace a upozornění">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 11v6"/><circle cx="12" cy="7.3" r=".6" fill="currentColor"/></svg>
+  </button>
 </header>
 
 <section class="hero" id="hero">
@@ -63,6 +66,31 @@
       Hub
     </button>
     <div class="viewer-title" id="vtitle"></div>
+  </div>
+</section>
+
+<div class="scrim info-scrim" id="infoScrim"></div>
+<section class="info-sheet" id="info" role="dialog" aria-modal="true" aria-labelledby="infoTitle" aria-hidden="true">
+  <div class="box">
+    <div class="grabber"></div>
+    <div class="info-scroll">
+      <div class="info-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6L12 3z"/><path d="M12 9v4.5"/><circle cx="12" cy="16.4" r=".5" fill="currentColor"/></svg>
+      </div>
+      <h2 id="infoTitle">Než začnete</h2>
+      <p class="info-lead">ResqHub je osobní nekomerční sbírka výukových pomůcek a přehledů z oblasti urgentní medicíny, určená zdravotnickým pracovníkům. Nejedná se o zdravotnický prostředek a jeho použití nenahrazuje odborný úsudek, doporučené postupy ani SPC.</p>
+      <ul class="info-list">
+        <li>Dávkování a výpočty si vždy ověřte z oficiálních zdrojů a SPC jednotlivých léčiv.</li>
+        <li>Obsah může obsahovat chyby nebo mohou být některé jeho části neaktuální.</li>
+        <li>Za rozhodnutí o medicínském postupu odpovídá ošetřující zdravotník.</li>
+      </ul>
+      <p class="info-fine">Autor nenese odpovědnost za škody vzniklé použitím aplikací nebo nesprávným postupem.</p>
+      <a class="dev-card glass" id="devCard" target="_blank" rel="noopener"></a>
+      <p class="info-meta" id="infoMeta"></p>
+    </div>
+    <div class="info-foot">
+      <button type="button" class="cta" id="infoOk">Rozumím</button>
+    </div>
   </div>
 </section>
 
@@ -192,6 +220,41 @@
     else { history.replaceState(null, '', location.pathname + location.search); route(); }
   });
   window.addEventListener('hashchange', route);
+
+  /* ---- Upozornění a vývojář ---- */
+  // Údaje o vývojáři – uprav podle sebe (url může být i "mailto:…")
+  var DEV = { name: 'Jakub Švolba', role: 'Vývoj a obsah', url: '' };
+  // Při změně textu upozornění zvyš číslo – všem se pak jednou znovu zobrazí
+  var DISCLAIMER_V = '2', DISCLAIMER_KEY = 'resqhub:disclaimer';
+  // Datum poslední aktualizace obsahu – při větších změnách uprav
+  var UPDATED = 'říjen 2026';
+  $('infoMeta').textContent = 'Obsah aktualizován: ' + UPDATED;
+  var info = $('info'), infoScrim = $('infoScrim'), infoFirst = false;
+  (function () {
+    var dc = $('devCard'), initials = DEV.name.trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase();
+    if (!DEV.url) dc.removeAttribute('href'); else dc.href = DEV.url;
+    dc.innerHTML = '<span class="dev-avatar" aria-hidden="true">' + RH.esc(initials) + '</span>' +
+      '<span class="grow"><small>' + RH.esc(DEV.role) + '</small><strong>' + RH.esc(DEV.name) + '</strong></span>' +
+      (DEV.url ? '<span class="go" aria-hidden="true">' + arrow + '</span>' : '');
+  })();
+  function openInfo(first) {
+    infoFirst = !!first;
+    info.classList.toggle('first', infoFirst);
+    info.classList.add('open'); infoScrim.classList.add('open');
+    info.setAttribute('aria-hidden', 'false');
+  }
+  function closeInfo() {
+    if (infoFirst) RH.sSet(DISCLAIMER_KEY, DISCLAIMER_V);
+    infoFirst = false;
+    info.classList.remove('open'); infoScrim.classList.remove('open');
+    info.setAttribute('aria-hidden', 'true');
+  }
+  $('infoBtn').addEventListener('click', function () { openInfo(false); });
+  $('infoOk').addEventListener('click', closeInfo);
+  // Při prvním zobrazení jde zavřít jen tlačítkem „Rozumím“
+  infoScrim.addEventListener('click', function () { if (!infoFirst) closeInfo(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && info.classList.contains('open') && !infoFirst) closeInfo(); });
+  if (RH.sGet(DISCLAIMER_KEY) !== DISCLAIMER_V) openInfo(true);
 
   /* ---- Lišta při scrollu ---- */
   var topbar = $('topbar'), hero = $('hero');
