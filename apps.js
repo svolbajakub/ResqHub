@@ -1,6 +1,6 @@
 // ResqHub – seznam aplikací.
 // Generuje admin.html; ruční úpravy jsou možné, jen zachovej formát.
-window.RESQHUB_VERSION = 1791569248061;
+window.RESQHUB_VERSION = 1791569502861;
 window.RESQHUB_APPS = [
   {
     "id": "aro-komunikator",
