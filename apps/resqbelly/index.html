@@ -69,6 +69,7 @@
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); }
+html { touch-action: manipulation; }
 body { position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden; font-family: var(--font); font-size: 17px; line-height: 1.35; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -286,7 +287,7 @@ svg { display: block; }
 
 <script>
 /* ===================== OBLASTI (pohled zepředu, pravá strana pacienta vlevo) ===================== */
-const REGIONS = ["Pravé podžebří", "Epigastrium", "Levé podžebří", "Pravý bok", "Okolí pupku", "Levý bok", "Pravé tříslo", "Podpřišek", "Levé tříslo"];
+const REGIONS = ["Pravé podžebří", "Epigastrium", "Levé podžebří", "Pravý bok", "Okolí pupku", "Levý bok", "Pravé tříslo", "Podbřišek", "Levé tříslo"];
 
 /* ===================== DIAGNÓZY =====================
    p    = klíčový nález (původní text aplikace)
@@ -446,7 +447,7 @@ const state = { regions: new Set(), feats: new Set(), tab: 'map', pushed: false 
 /* ===================== mapa ===================== */
 function buildMap() {
   const x0 = 66, y0 = 58, w = 54, h = 66, gx = 6, gy = 6;
-  const lines = [['Pravé', 'podžebří'], ['Epigastrium', ''], ['Levé', 'podžebří'], ['Pravý', 'bok'], ['Okolí', 'pupku'], ['Levý', 'bok'], ['Pravé', 'tříslo'], ['Podpřišek', ''], ['Levé', 'tříslo']];
+  const lines = [['Pravé', 'podžebří'], ['Epigastrium', ''], ['Levé', 'podžebří'], ['Pravý', 'bok'], ['Okolí', 'pupku'], ['Levý', 'bok'], ['Pravé', 'tříslo'], ['Podbřišek', ''], ['Levé', 'tříslo']];
   let html = '';
   REGIONS.forEach((name, i) => {
     const c = i % 3, r = Math.floor(i / 3);
