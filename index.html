@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ResqHub</title>
-<meta name="description" content="Rozcestník ResqApps - aplikace pro záchranáře">
+<meta name="description" content="Rozcestník mých mini aplikací">
 <meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
@@ -22,9 +22,14 @@
 <header class="topbar" id="topbar">
   <span class="date-line" id="date"></span>
   <span class="mini-title">ResqHub</span>
+  <div class="top-acts">
+  <button type="button" class="round-btn glass info-btn" id="coffeeBtn" aria-label="Podpořit vývoj" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5c-.6.8-.6 1.7 0 2.5M11.5 3.5c-.6.8-.6 1.7 0 2.5"/></svg>
+  </button>
   <button type="button" class="round-btn glass info-btn" id="infoBtn" aria-label="Informace a upozornění">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 11v6"/><circle cx="12" cy="7.3" r=".6" fill="currentColor"/></svg>
   </button>
+  </div>
 </header>
 
 <section class="hero" id="hero">
@@ -74,6 +79,7 @@
   <div class="box">
     <div class="grabber"></div>
     <div class="info-scroll">
+     <div id="infoMain">
       <div class="info-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6L12 3z"/><path d="M12 9v4.5"/><circle cx="12" cy="16.4" r=".5" fill="currentColor"/></svg>
       </div>
@@ -86,7 +92,23 @@
       </ul>
       <p class="info-fine">Autor nenese odpovědnost za škody vzniklé použitím aplikací nebo nesprávným postupem.</p>
       <a class="dev-card glass" id="devCard" target="_blank" rel="noopener"></a>
+      <button type="button" class="support-btn" id="supportBtn" hidden>☕ Podpořit vývoj</button>
       <p class="info-meta" id="infoMeta"></p>
+     </div>
+     <div id="infoSupport" hidden>
+      <button type="button" class="sup-back" id="supBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>Zpět</button>
+      <div class="info-icon sup-icon" aria-hidden="true">☕</div>
+      <h2>Podpořit vývoj</h2>
+      <p class="info-lead">ResqHub je zdarma a bez reklam. Jestli ti pomáhá, můžeš přispět na kafe a další vývoj. Díky!</p>
+      <div id="supQrWrap">
+        <div class="sup-amounts" id="supAmounts"></div>
+        <div class="sup-qr" id="supQr"></div>
+        <p class="info-fine sup-acc" id="supAcc"></p>
+        <div class="sup-acts"><button type="button" class="sup-sec" id="supSave">Uložit QR obrázek</button><button type="button" class="sup-sec" id="supCopy">Kopírovat číslo účtu</button></div>
+        <p class="info-fine">Na jiném zařízení QR kód naskenuj v aplikaci své banky. Na tomhle telefonu si obrázek ulož a v bance zvol <b>QR platba → nahrát z galerie</b>.</p>
+      </div>
+      <a class="cta sup-link" id="supLink" target="_blank" rel="noopener" hidden></a>
+     </div>
     </div>
     <div class="info-foot">
       <button type="button" class="cta" id="infoOk">Rozumím</button>
@@ -94,6 +116,7 @@
   </div>
 </section>
 
+<script src="qrcode.js"></script>
 <script src="apps.js"></script>
 <script src="common.js"></script>
 <script>
@@ -237,7 +260,73 @@
       '<span class="grow"><small>' + RH.esc(DEV.role) + '</small><strong>' + RH.esc(DEV.name) + '</strong></span>' +
       (DEV.url ? '<span class="go" aria-hidden="true">' + arrow + '</span>' : '');
   })();
+  /* ---- Podpora vývoje ----
+     account: české číslo účtu (např. "19-2000145399/0800") nebo IBAN; link: Buy Me a Coffee / Ko-fi.
+     Prázdné = tlačítko se nezobrazí. */
+  var SUPPORT = { account: '189357846/0600', name: 'Jakub Švolba', msg: 'Podpora ResqHub', link: '', linkLabel: 'Buy Me a Coffee' };
+  var supAmount = 100, lastSpd = '';
+  function toIban(acc) {
+    acc = String(acc || '').replace(/\s+/g, '').toUpperCase();
+    if (/^CZ\d{22}$/.test(acc)) return acc;
+    var m = acc.match(/^(?:(\d{1,6})-)?(\d{2,10})\/(\d{4})$/); if (!m) return null;
+    var bban = m[3] + ('000000' + (m[1] || '')).slice(-6) + ('0000000000' + m[2]).slice(-10);
+    var num = bban + '123500', rem = 0; // CZ = 12 35, kontrolní 00
+    for (var i = 0; i < num.length; i++) rem = (rem * 10 + +num[i]) % 97;
+    var ck = ('0' + (98 - rem)).slice(-2);
+    return 'CZ' + ck + bban;
+  }
+  function renderSupport() {
+    var iban = toIban(SUPPORT.account);
+    $('supQrWrap').hidden = !iban || typeof qrcode !== 'function';
+    if (iban && typeof qrcode === 'function') {
+      $('supAmounts').innerHTML = [50, 100, 200, 500, 0].map(function (a) {
+        return '<button type="button" class="chip glass" data-amt="' + a + '" aria-pressed="' + (supAmount === a) + '">' + (a ? a + ' Kč' : 'Vlastní') + '</button>';
+      }).join('');
+      var spd = 'SPD*1.0*ACC:' + iban + (supAmount ? '*AM:' + supAmount.toFixed(2) : '') + '*CC:CZK*MSG:' + SUPPORT.msg.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().slice(0, 60) + (SUPPORT.name ? '*RN:' + SUPPORT.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase() : '');
+      lastSpd = spd;
+      var qr = qrcode(0, 'M'); qr.addData(spd); qr.make();
+      $('supQr').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 3, scalable: true });
+      $('supAcc').textContent = 'Účet: ' + SUPPORT.account + (supAmount ? ' · ' + supAmount + ' Kč' : ' · částku zadáš v bance');
+    }
+    if (SUPPORT.link) { $('supLink').hidden = false; $('supLink').href = SUPPORT.link; $('supLink').textContent = SUPPORT.linkLabel || 'Přispět kartou'; }
+  }
+  if (SUPPORT.account || SUPPORT.link) { $('supportBtn').hidden = false; $('coffeeBtn').hidden = false; }
+  function showSupport() { renderSupport(); $('infoMain').hidden = true; $('infoSupport').hidden = false; $('infoOk').textContent = 'Zavřít'; }
+  $('coffeeBtn').addEventListener('click', function () { openInfo(false); showSupport(); });
+  function qrPng(cb) {
+    var iban = toIban(SUPPORT.account); if (!iban) return;
+    var qr = qrcode(0, 'M'); qr.addData(lastSpd); qr.make();
+    var n = qr.getModuleCount(), cell = 12, pad = 4 * cell, foot = 70, size = n * cell + pad * 2;
+    var c = document.createElement('canvas'); c.width = size; c.height = size + foot;
+    var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.fillStyle = '#000';
+    for (var r = 0; r < n; r++) for (var k = 0; k < n; k++) if (qr.isDark(r, k)) g.fillRect(pad + k * cell, pad + r * cell, cell, cell);
+    g.font = '600 26px -apple-system, Segoe UI, Roboto, sans-serif'; g.textAlign = 'center';
+    g.fillText('QR Platba · ' + SUPPORT.account + (supAmount ? ' · ' + supAmount + ' Kč' : ''), size / 2, size + 26);
+    g.fillStyle = '#555'; g.font = '22px -apple-system, Segoe UI, Roboto, sans-serif'; g.fillText('Podpora ResqHub – díky!', size / 2, size + 58);
+    c.toBlob(cb, 'image/png');
+  }
+  $('supSave').addEventListener('click', function () {
+    qrPng(function (blob) {
+      var name = 'resqhub-qr-platba' + (supAmount ? '-' + supAmount + 'kc' : '') + '.png';
+      try {
+        var file = new File([blob], name, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file] }).catch(function () {}); return; }
+      } catch (e) {}
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      RH.toast('Obrázek uložen');
+    });
+  });
+  $('supCopy').addEventListener('click', function () {
+    var t = SUPPORT.account;
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { RH.toast('Číslo účtu zkopírováno'); }, function () { RH.toast(t); });
+  });
+  $('supportBtn').addEventListener('click', showSupport);
+  $('supBack').addEventListener('click', function () { $('infoSupport').hidden = true; $('infoMain').hidden = false; $('infoOk').textContent = 'Rozumím'; });
+  $('supAmounts').addEventListener('click', function (e) { var b = e.target.closest('[data-amt]'); if (b) { supAmount = +b.dataset.amt; renderSupport(); } });
+
   function openInfo(first) {
+    $('infoSupport').hidden = true; $('infoMain').hidden = false; $('infoOk').textContent = 'Rozumím';
     infoFirst = !!first;
     info.classList.toggle('first', infoFirst);
     info.classList.add('open'); infoScrim.classList.add('open');

@@ -20,6 +20,7 @@
   --fill: rgba(10, 31, 35, .06);
   --switch-off: rgba(10, 31, 35, .14);
   --on-petrol: #FFFFFF;
+  --petrol-soft: rgba(11, 110, 121, .12);
   --danger: #E5383B;
   --warn: #F29A1F;
   --ok: #1FB57A;
@@ -38,7 +39,7 @@
     --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .86);
     --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .16); --glass-shadow: rgba(0, 0, 0, .45);
     --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08); --switch-off: rgba(255, 255, 255, .18);
-    --on-petrol: #03141A;
+    --on-petrol: #03141A; --petrol-soft: rgba(60, 192, 203, .15);
     color-scheme: dark;
   }
 }
@@ -49,7 +50,7 @@
   --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .86);
   --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .16); --glass-shadow: rgba(0, 0, 0, .45);
   --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08); --switch-off: rgba(255, 255, 255, .18);
-  --on-petrol: #03141A;
+  --on-petrol: #03141A; --petrol-soft: rgba(60, 192, 203, .15);
   color-scheme: dark;
 }
 
@@ -381,7 +382,8 @@ button.row:active, .row.tap:active { background: var(--fill); }
 .action-scrim { z-index: 80; }
 
 /* ---------- Upozornění ---------- */
-.info-btn { width: 36px; height: 36px; margin-left: auto; color: var(--petrol); }
+.top-acts { display: flex; gap: 8px; margin-left: auto; }
+.info-btn { width: 36px; height: 36px; color: var(--petrol); }
 .info-btn svg { width: 20px; height: 20px; }
 .info-scrim { z-index: 84; }
 .info-sheet {
@@ -420,6 +422,19 @@ button.row:active, .row.tap:active { background: var(--fill); }
 .dev-card .go { color: var(--ink-3); }
 .dev-card .go svg { width: 16px; height: 16px; }
 .info-meta { margin: 4px 0 6px; text-align: center; font-size: 12.5px; color: var(--ink-3); }
+.support-btn { display: block; margin: 4px auto 6px; padding: 8px 16px; border: 0; border-radius: 18px; background: none; color: var(--petrol); font-size: 15px; font-weight: 650; cursor: pointer; }
+.sup-back { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; color: var(--petrol); font-size: 16px; font-weight: 600; padding: 4px 0; cursor: pointer; }
+.sup-back svg { width: 18px; height: 18px; }
+.sup-icon { font-size: 30px; }
+.sup-amounts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 4px 0 14px; }
+.sup-amounts .chip { height: 38px; padding: 0 14px; border-radius: 19px; font-size: 15px; font-weight: 650; cursor: pointer; color: var(--ink); }
+.sup-amounts .chip[aria-pressed="true"] { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
+.sup-qr { width: 220px; max-width: 70%; margin: 0 auto; padding: 8px; border-radius: 18px; background: #fff; }
+.sup-qr svg { width: 100%; height: auto; }
+.sup-acc { text-align: center; margin-top: 10px !important; font-weight: 600; color: var(--ink) !important; }
+.sup-acts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 10px 0 2px; }
+.sup-sec { height: 40px; padding: 0 14px; border: 0; border-radius: 20px; background: var(--petrol-soft); color: var(--petrol); font-size: 14.5px; font-weight: 650; cursor: pointer; }
+.sup-link { display: flex; width: 100%; height: 50px; margin: 14px 0 6px; background: var(--petrol-soft); color: var(--petrol); box-shadow: none; }
 .info-foot { padding: 8px 16px 16px; }
 .info-foot .cta { width: 100%; height: 52px; }
 
