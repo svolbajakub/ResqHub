@@ -1,3 +1,4 @@
+html { touch-action: manipulation; }
 /* ResqHub – sdílené styly (hub + admin)
    Koncept: skleněné panely nad petrolejovou „hladinou“ – světlo prosvítá shora, obsah plave. */
 :root {
