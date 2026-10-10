@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqNote</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqNote">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+/* ResqNote – rychlý zápis anamnézy a vitálních funkcí. Vzhled sladěný s ResqHubem. */
+:root {
+  --bg: #E4EEEF; --ink: #0A1F23; --ink-2: rgba(10, 31, 35, .6); --ink-3: rgba(10, 31, 35, .36);
+  --petrol: #0B6E79; --petrol-soft: rgba(11, 110, 121, .12); --on-petrol: #FFFFFF;
+  --warn: #B26A00; --warn-soft: rgba(242, 154, 31, .17);
+  --crit: #D0303A; --crit-soft: rgba(229, 56, 59, .14);
+  --glow-a: rgba(11, 110, 121, .5); --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .6); --glass-strong: rgba(250, 253, 253, .96);
+  --glass-edge: rgba(255, 255, 255, .8); --glass-hi: rgba(255, 255, 255, .95); --glass-shadow: rgba(6, 55, 62, .13);
+  --hairline: rgba(10, 31, 35, .1); --fill: rgba(10, 31, 35, .06);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+    --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+  --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden; font-family: var(--font); font-size: 17px; line-height: 1.3; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; padding: 0; }
+svg { display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%); border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -12px var(--glass-shadow); }
+
+.wrap { max-width: 720px; margin: 0 auto; padding: max(12px, var(--st)) 14px calc(110px + var(--sb)); }
+.head { display: flex; align-items: center; gap: 10px; padding: 6px 2px 12px; }
+.head h1 { margin: 0; font-family: var(--font-display); font-size: 34px; font-weight: 800; letter-spacing: -.04em; line-height: 1; flex: 1; }
+.round { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--ink); }
+.round svg { width: 20px; height: 20px; }
+.pt-pill { display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 12px 0 6px; border-radius: 21px; font-size: 15px; font-weight: 650; max-width: 60vw; }
+.pt-pill .av { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--petrol); color: var(--on-petrol); font-family: var(--font-round); font-weight: 800; font-size: 15px; flex: none; }
+.pt-pill .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-pill svg { width: 12px; height: 12px; color: var(--ink-3); flex: none; }
+
+.seg { display: flex; gap: 2px; padding: 3px; border-radius: 15px; background: var(--fill); margin-bottom: 14px; }
+.seg button { flex: 1; height: 38px; border-radius: 12px; font-size: 15.5px; font-weight: 650; color: var(--ink-2); }
+.seg button[aria-selected="true"] { background: var(--glass-strong); color: var(--ink); box-shadow: 0 2px 8px -2px var(--glass-shadow); }
+
+.card { border-radius: 24px; padding: 14px; margin-bottom: 12px; }
+.card-h { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.card-h h2 { margin: 0; font-size: 19px; font-weight: 800; letter-spacing: -.01em; flex: 1; }
+.card-h h2 small { font-size: 13.5px; font-weight: 600; color: var(--ink-2); margin-left: 6px; }
+.card-h .cnt { min-width: 26px; height: 26px; padding: 0 8px; border-radius: 13px; display: grid; place-items: center; background: var(--petrol); color: var(--on-petrol); font-family: var(--font-round); font-weight: 800; font-size: 14px; }
+.collapse { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 650; color: var(--petrol); }
+.collapse svg { width: 14px; height: 14px; transition: transform .2s; }
+.card.closed .collapse svg { transform: rotate(-90deg); }
+.card.closed .card-b { display: none; }
+.card.closed .card-h { margin-bottom: 0; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.inp { display: flex; flex-direction: column; gap: 3px; padding: 8px 12px; border-radius: 16px; background: var(--fill); }
+.inp label { font-size: 12.5px; font-weight: 650; color: var(--ink-2); }
+.inp input, .inp textarea { border: 0; background: none; outline: none; font-size: 19px; font-weight: 650; padding: 2px 0; width: 100%; min-width: 0; }
+.inp textarea { font-size: 16.5px; font-weight: 500; resize: vertical; min-height: 80px; }
+.inp .u { font-size: 14px; color: var(--ink-3); font-weight: 600; }
+.inp .row { display: flex; align-items: baseline; gap: 6px; }
+.inp:focus-within { box-shadow: 0 0 0 2px var(--petrol); }
+.bmi { font-size: 14px; color: var(--ink-2); margin: 8px 4px 0; }
+.sexes { display: flex; gap: 8px; }
+
+.flags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.flag { height: 36px; padding: 0 14px; border-radius: 18px; border: 1.5px dashed var(--ink-3); font-size: 14.5px; font-weight: 650; color: var(--ink-2); }
+.flag[aria-pressed="true"] { border-style: solid; border-color: var(--petrol); background: var(--petrol); color: var(--on-petrol); }
+.grp { margin-top: 10px; }
+.grp-t { font-size: 13px; font-weight: 700; color: var(--ink-2); margin: 0 2px 6px; text-transform: uppercase; letter-spacing: .04em; }
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 7px 13px; border-radius: 20px; background: var(--glass-strong); border: 1px solid var(--glass-edge); font-size: 15px; font-weight: 600; text-align: left; line-height: 1.2; }
+.chip small { font-weight: 500; color: var(--ink-2); font-size: 13px; }
+.chip.on { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
+.chip.on small { color: inherit; opacity: .85; }
+.chip.on.hot { background: var(--crit); border-color: var(--crit); }
+.chip .w { font-size: 12.5px; padding: 2px 7px; border-radius: 9px; background: rgba(255, 255, 255, .22); font-weight: 700; }
+.chip.add { border: 1.5px dashed var(--ink-3); background: none; color: var(--petrol); }
+.chip.custom::after { content: "✎"; font-size: 12px; opacity: .6; }
+.addrow { display: flex; gap: 8px; margin-top: 10px; }
+.addrow input { flex: 1; min-width: 0; height: 44px; border: 0; border-radius: 14px; padding: 0 14px; background: var(--fill); font-size: 16px; outline: none; }
+.addrow input:focus { box-shadow: 0 0 0 2px var(--petrol); }
+.addrow button { height: 44px; padding: 0 16px; border-radius: 14px; background: var(--petrol); color: var(--on-petrol); font-weight: 700; }
+.ak-note { margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: var(--crit-soft); color: var(--crit); font-weight: 750; font-size: 15px; }
+.hint { font-size: 13.5px; color: var(--ink-3); margin: 8px 2px 0; }
+
+/* vitální funkce */
+.vf-add { width: 100%; height: 52px; border-radius: 18px; background: var(--petrol); color: var(--on-petrol); font-size: 17px; font-weight: 750; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.vf-add svg { width: 18px; height: 18px; }
+.meas { margin-top: 10px; border-radius: 18px; overflow: hidden; background: var(--fill); }
+.meas button { display: block; width: 100%; text-align: left; padding: 10px 12px; }
+.meas button + button { border-top: 1px solid var(--hairline); }
+.meas .tm { font-family: var(--font-round); font-weight: 800; font-size: 15px; color: var(--petrol); margin-bottom: 5px; }
+.vals { display: flex; flex-wrap: wrap; gap: 5px; }
+.v { display: inline-flex; align-items: baseline; gap: 4px; padding: 4px 9px; border-radius: 10px; background: var(--glass-strong); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.v i { font-style: normal; font-size: 12px; font-weight: 650; color: var(--ink-2); }
+.v.warn { background: var(--warn-soft); color: var(--warn); }
+.v.crit { background: var(--crit-soft); color: var(--crit); }
+.v.warn i, .v.crit i { color: inherit; opacity: .8; }
+
+/* souhrn */
+.sum { border-radius: 24px; padding: 18px; font-size: 16px; line-height: 1.5; }
+.sum h3 { margin: 0 0 2px; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); }
+.sum .blk { margin-bottom: 14px; }
+.sum .blk:last-child { margin-bottom: 0; }
+.sum .big { font-family: var(--font-display); font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+.sum .hot { color: var(--crit); font-weight: 750; }
+.sum .empty { color: var(--ink-3); }
+.sum table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+.sum td { padding: 4px 6px 4px 0; vertical-align: top; }
+.sum td:first-child { font-family: var(--font-round); font-weight: 800; color: var(--petrol); white-space: nowrap; }
+.copy-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 10px 14px calc(var(--sb) + 12px); display: flex; justify-content: center; pointer-events: none; }
+.copy-bar button { pointer-events: auto; width: min(692px, 100%); height: 58px; border-radius: 29px; background: var(--petrol); color: var(--on-petrol); font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 14px 30px -12px var(--petrol); }
+.copy-bar button svg { width: 20px; height: 20px; }
+.copy-bar button.done { background: #12895A; }
+.foot { margin: 16px 8px 0; font-size: 13px; color: var(--ink-3); text-align: center; line-height: 1.45; }
+
+/* panely */
+.scrim { position: fixed; inset: 0; z-index: 60; background: rgba(2, 20, 24, .4); opacity: 0; pointer-events: none; transition: opacity .3s; }
+.scrim.open { opacity: 1; pointer-events: auto; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 61; max-width: 640px; margin: 0 auto; max-height: calc(100% - var(--st) - 16px); flex-direction: column; border-radius: 28px 28px 0 0; background: var(--bg); box-shadow: 0 -10px 40px rgba(0, 0, 0, .2); transform: translateY(105%); visibility: hidden; transition: transform .38s cubic-bezier(.32, .72, 0, 1), visibility 0s .38s; }
+.sheet.open { transform: none; visibility: visible; transition: transform .38s cubic-bezier(.32, .72, 0, 1); }
+.sheet::before { content: ""; position: absolute; inset: 0 0 auto; height: 180px; border-radius: inherit; pointer-events: none; background: radial-gradient(120% 100% at 50% 0%, var(--glow-b), transparent 70%); opacity: .4; }
+.sheet > * { position: relative; }
+.sh-h { display: flex; align-items: center; gap: 8px; padding: 14px 14px 6px; }
+.sh-h h3 { flex: 1; margin: 0; text-align: center; font-size: 17px; font-weight: 750; }
+.tbtn { min-width: 64px; height: 36px; padding: 0 12px; border-radius: 18px; font-size: 16px; font-weight: 650; color: var(--petrol); }
+.tbtn.pri { background: var(--petrol); color: var(--on-petrol); }
+.sh-b { flex: 1; min-height: 0; overflow-y: auto; padding: 6px 16px calc(var(--sb) + 22px); }
+.sh-b .lbl { font-size: 13px; font-weight: 700; color: var(--ink-2); margin: 14px 2px 6px; text-transform: uppercase; letter-spacing: .04em; }
+.sh-b .lbl:first-child { margin-top: 4px; }
+.opts { display: flex; flex-wrap: wrap; gap: 7px; }
+.opt { min-height: 42px; padding: 0 15px; border-radius: 21px; background: var(--glass-strong); border: 1px solid var(--glass-edge); font-size: 15.5px; font-weight: 650; }
+.opt[aria-pressed="true"] { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
+.danger-btn { width: 100%; height: 50px; margin-top: 18px; border-radius: 16px; background: var(--crit-soft); color: var(--crit); font-weight: 750; font-size: 16px; }
+.vf-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.vf-form .full { grid-column: 1 / -1; }
+.tk { display: flex; align-items: baseline; gap: 4px; }
+.tk input { width: 3.2em; }
+.tk span { font-size: 22px; color: var(--ink-3); }
+.inp.warn { box-shadow: inset 0 0 0 2px var(--warn); }
+.inp.crit { box-shadow: inset 0 0 0 2px var(--crit); }
+.gcs { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; }
+.gcs b { font-family: var(--font-round); font-size: 17px; width: 22px; }
+.gcs .opts { gap: 5px; }
+.gcs .opt { min-width: 40px; min-height: 40px; padding: 0; font-family: var(--font-round); font-size: 17px; }
+.gcs-sum { font-size: 15px; font-weight: 700; color: var(--ink-2); margin-top: 6px; }
+.vas .opt { min-width: 40px; padding: 0; font-family: var(--font-round); font-size: 17px; }
+.o2 { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.o2 .opt { min-height: 34px; font-size: 14px; }
+.o2 input { width: 4em; height: 34px; border: 0; border-radius: 10px; background: var(--glass-strong); text-align: center; font-size: 16px; font-weight: 700; outline: none; }
+.plist button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; padding: 8px 12px; border-radius: 16px; text-align: left; margin-bottom: 6px; background: var(--glass-strong); }
+.plist button.cur { box-shadow: inset 0 0 0 2px var(--petrol); }
+.plist .av { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--petrol); color: var(--on-petrol); font-family: var(--font-round); font-weight: 800; flex: none; }
+.plist small { display: block; color: var(--ink-2); font-size: 13.5px; }
+.toast { position: fixed; left: 50%; top: calc(var(--st) + 12px); z-index: 100; transform: translate(-50%, -20px); opacity: 0; pointer-events: none; max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 22px; background: var(--glass-strong); font-size: 15px; font-weight: 600; text-align: center; box-shadow: 0 12px 30px -10px var(--glass-shadow); transition: opacity .25s, transform .3s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.sheet { display: flex; }
+.nf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: stretch; }
+.nf-grid .full { grid-column: 1 / -1; }
+.nf-grid .full:empty { display: none; }
+.nf-tk { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; }
+.nf-tk .nf { flex: 1; }
+.nf-tk .sl { font-size: 26px; color: var(--ink-3); }
+.nf { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 12px; border-radius: 16px; background: var(--fill); text-align: left; min-height: 62px; }
+.nf .l { font-size: 12.5px; font-weight: 650; color: var(--ink-2); }
+.nf .val { display: flex; align-items: baseline; gap: 5px; }
+.nf .val b { font-family: var(--font-round); font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.nf .val i { font-style: normal; font-size: 13px; color: var(--ink-3); font-weight: 600; }
+.nf.warn { box-shadow: inset 0 0 0 2px var(--warn); }
+.nf.crit { box-shadow: inset 0 0 0 2px var(--crit); }
+.nf.act { box-shadow: inset 0 0 0 3px var(--petrol); background: var(--petrol-soft); }
+.mini { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+.mini .opt { min-height: 28px; font-size: 13.5px; padding: 0 10px; }
+.gcs2 { display: grid; grid-template-columns: 24px 1fr; gap: 8px 8px; align-items: start; }
+.g-k { font-family: var(--font-round); font-weight: 800; font-size: 18px; padding-top: 10px; }
+.g-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.g-opt { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 4px; border-radius: 14px; background: var(--glass-strong); border: 1px solid var(--glass-edge); }
+.g-opt b { font-family: var(--font-round); font-size: 18px; }
+.g-opt small { font-size: 11.5px; color: var(--ink-2); line-height: 1.15; text-align: center; }
+.g-opt[aria-pressed="true"] { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
+.g-opt[aria-pressed="true"] small { color: inherit; opacity: .85; }
+.opt.q { min-height: 32px; font-size: 14px; padding: 0 12px; text-transform: none; letter-spacing: 0; }
+.pad { flex: none; padding: 8px 12px calc(var(--sb) + 10px); border-top: 1px solid var(--hairline); background: var(--glass-strong); }
+.pad-h { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 700; color: var(--petrol); margin: 0 4px 6px; }
+.pad-h button { color: var(--ink-2); font-weight: 600; font-size: 14px; }
+.pad-k { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.pad-k button { height: 50px; border-radius: 14px; background: var(--fill); font-family: var(--font-round); font-size: 24px; font-weight: 700; }
+.pad-k button:active { background: var(--petrol-soft); }
+.pad-next { width: 100%; height: 48px; margin-top: 6px; border-radius: 14px; background: var(--petrol); color: var(--on-petrol); font-size: 17px; font-weight: 750; }
+.sum-fab { position: fixed; right: 16px; bottom: calc(var(--sb) + 16px); z-index: 20; display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 20px; border-radius: 26px; background: var(--petrol); color: var(--on-petrol); font-size: 16.5px; font-weight: 750; box-shadow: 0 14px 30px -10px var(--petrol); }
+.sum-fab svg { width: 18px; height: 18px; }
+.fold { border-top: 1px solid var(--hairline); }
+.fold:first-of-type { border-top: 0; }
+.fold-h { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 48px; padding: 6px 2px; text-align: left; }
+.fold-t { font-size: 16px; font-weight: 700; flex: none; }
+.fold-n { min-width: 22px; height: 22px; padding: 0 7px; border-radius: 11px; display: grid; place-items: center; background: var(--petrol); color: var(--on-petrol); font-size: 12.5px; font-weight: 800; flex: none; }
+.fold-s { flex: 1; min-width: 0; font-size: 13.5px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fold-h svg { width: 14px; height: 14px; color: var(--ink-3); flex: none; transition: transform .2s; }
+.fold.open .fold-h svg { transform: rotate(90deg); }
+.fold.open .fold-s { visibility: hidden; }
+.fold .chips { display: none; padding: 2px 0 12px; }
+.fold.open .chips { display: flex; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="head">
+    <h1>ResqNote</h1>
+    <button type="button" class="pt-pill glass" id="pt-pill" aria-label="Pacienti"></button>
+    <button type="button" class="round glass" id="theme" aria-label="Přepnout světlý nebo tmavý režim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+  </header>
+  <div class="seg" role="tablist">
+    <button type="button" role="tab" data-tab="form" aria-selected="true">Zápis</button>
+    <button type="button" role="tab" data-tab="sum" aria-selected="false">Souhrn</button>
+  </div>
+  <div id="form"></div>
+  <div id="sum" hidden></div>
+</div>
+<button type="button" class="sum-fab" id="sum-fab">Souhrn<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+<div class="copy-bar" id="copy-bar" hidden><button type="button" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>Kopírovat vše</span></button></div>
+<div class="scrim" id="scrim"></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true"></section>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* ================= číselníky ================= */
+// w: true = po zaškrtnutí se ptá „kdy“; hot: zvýraznit v souhrnu
+const OA = [
+  ['Kardiovaskulární', [['Hypertenze'], ['ICHS / angina pectoris'], ['St. p. IM', 1, 1], ['St. p. PCI / stent', 1], ['St. p. CABG', 1], ['Fibrilace síní', 0, 1], ['Srdeční selhání'], ['Kardiostimulátor / ICD', 0, 1], ['Chlopenní vada / náhrada chlopně'], ['ICHDK'], ['St. p. TEN / plicní embolie', 1, 1], ['Aneurysma aorty', 0, 1]]],
+  ['Neurologie', [['St. p. CMP / TIA', 1, 1], ['Epilepsie', 0, 1], ['Demence'], ['Parkinsonova nemoc'], ['Roztroušená skleróza']]],
+  ['Plíce', [['Astma'], ['CHOPN'], ['Domácí kyslík', 0, 1], ['Spánková apnoe / CPAP']]],
+  ['Metabolické a endokrinní', [['DM 1. typu', 0, 1], ['DM 2. typu – dieta'], ['DM 2. typu – PAD'], ['DM 2. typu – inzulin', 0, 1], ['Hypotyreóza'], ['Hypertyreóza'], ['Obezita']]],
+  ['Ledviny, játra, GIT', [['Chronické onemocnění ledvin'], ['Dialýza', 0, 1], ['Cirhóza jater'], ['Krvácení do GIT / vředová choroba', 1, 1], ['Crohn / ulcerózní kolitida']]],
+  ['Onkologie a krev', [['Onkologické onemocnění'], ['Chemoterapie / imunosuprese', 0, 1], ['Porucha srážlivosti', 0, 1], ['Anémie']]],
+  ['Psychiatrie', [['Deprese'], ['Úzkostná porucha'], ['Schizofrenie / psychóza'], ['Bipolární porucha'], ['Suicidální pokus v anamnéze', 1, 1]]],
+  ['Ostatní', [['Těhotenství', 0, 1], ['St. p. operace', 1], ['Transplantace', 1, 1], ['Imobilní / ležící'], ['Glaukom']]]
+];
+const ABUS = [['Alkohol'], ['Kouření'], ['Drogy'], ['Benzodiazepiny / opioidy mimo předpis']];
+// FA: [název, podnázev, hot, antikoagulace]
+const FA = [
+  ['Antikoagulancia', [['Warfarin', '', 1, 1], ['Eliquis', 'apixaban', 1, 1], ['Xarelto', 'rivaroxaban', 1, 1], ['Pradaxa', 'dabigatran', 1, 1], ['Lixiana', 'edoxaban', 1, 1], ['LMWH', 'Clexane, Fraxiparine', 1, 1]]],
+  ['Antiagregancia', [['ASA', 'Anopyrin, Godasal', 1], ['Klopidogrel', 'Trombex, Zyllt', 1], ['Brilique', 'tikagrelor', 1], ['Efient', 'prasugrel', 1]]],
+  ['Antidiabetika', [['Inzulin', '', 1], ['Metformin', 'Siofor, Glucophage'], ['Gliflozin', 'Jardiance, Forxiga'], ['Gliptin', 'Januvia'], ['GLP-1', 'Ozempic, Rybelsus'], ['Gliklazid', 'Diaprel', 1]]],
+  ['Kardio a tlak', [['Betablokátor', 'Concor, Betaloc, Nebilet'], ['ACE inhibitor', 'Prestarium, Tritace'], ['Sartan', 'Lozap, Micardis'], ['Amlodipin', 'Agen, Amlozek'], ['Diuretikum', 'Furon, Verospiron'], ['Nitrát', 'Isoket, Monosan'], ['Digoxin', '', 1], ['Amiodaron', 'Cordarone', 1], ['Statin', 'Atoris, Sorvasta']]],
+  ['Neuro a psychiatrie', [['Antiepileptikum', 'Keppra, Depakine, Lamictal'], ['Benzodiazepiny', 'Neurol, Lexaurin, Rivotril'], ['Antidepresiva', 'SSRI, mirtazapin, trazodon'], ['Antipsychotika', 'Tiapridal, quetiapin'], ['Hypnotika', 'Stilnox'], ['Lithium', '', 1], ['Antiparkinsonika', 'Isicom, Madopar'], ['Donepezil', '']]],
+  ['Bolest', [['Opioidy', 'Tramal, Targin, fentanyl. náplast', 1], ['Metamizol', 'Novalgin, Algifen'], ['NSAID', 'ibuprofen, diklofenak'], ['Paracetamol', 'Paralen']]],
+  ['Plíce', [['Inhalační léky', 'Ventolin, Berodual, Symbicort'], ['Domácí kyslík', '', 1]]],
+  ['Ostatní', [['Kortikoidy', 'Prednison, Medrol', 1], ['Levothyroxin', 'Euthyrox, Letrox'], ['PPI', 'omeprazol, pantoprazol'], ['Imunosupresiva / biologika', '', 1], ['Chemoterapie', '', 1], ['Methotrexát', '', 1], ['Hormonální antikoncepce', '']]]
+];
+const AA = [['Penicilin / PNC', 1], ['Cefalosporiny'], ['Sulfonamidy'], ['Makrolidy'], ['NSAID / ASA'], ['Metamizol'], ['Opioidy'], ['Jodová kontrastní látka'], ['Lokální anestetika'], ['Latex'], ['Náplasti'], ['Hmyz – včela / vosa'], ['Potraviny'], ['Pyly / roztoče']];
+const WHEN = ['< 24 h', '< 1 týden', '< 1 měsíc', '< 1 rok', '> 1 rok', 'Neví'];
+const REACT = ['Vyrážka', 'Otok', 'Anafylaxe', 'Neví'];
+// Rozmezí pro dospělé (obecná učebnicová): [crit pod, warn pod, warn nad, crit nad]
+const LIM = { sys: [90, 100, 140, 180], dia: [null, null, 90, 110], tf: [40, 60, 100, 130], spo2: [90, 95, null, null], df: [8, 12, 20, 30], tt: [35, 36, 37.5, 39.5], glyk: [3, 3.9, 11.1, 20], gcs: [9, 15, null, null], vas: [null, null, 4, 7], etco2: [30, 35, 45, 50] };
+const VF = [['tk', 'TK', 'mmHg'], ['tf', 'TF', '/min'], ['spo2', 'SpO₂', '%'], ['df', 'DF', '/min'], ['tt', 'TT', '°C'], ['glyk', 'Glyk', 'mmol/l'], ['gcs', 'GCS', ''], ['vas', 'VAS', ''], ['etco2', 'EtCO₂', 'mmHg']];
+
+/* ================= stav ================= */
+const KEY = 'resqnote:v1', TTL = 12 * 3600 * 1000;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const blank = (letter) => ({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), letter, label: '', sex: '', age: '', kg: '', cm: '', oa: {}, ab: {}, fa: {}, aa: {}, flags: {}, custom: { oa: [], ab: [], fa: [], aa: [] }, vf: [], note: '' });
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY));
+    if (d && Array.isArray(d.patients) && d.patients.length && Date.now() - (d.updated || 0) < TTL) return d;
+  } catch (e) {}
+  return { patients: [blank('A')], cur: 0, updated: Date.now() };
+}
+let D = load();
+const P = () => D.patients[D.cur] || D.patients[0];
+function save() { D.updated = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) {} }
+const UI = { tab: 'form', closed: {}, open: {} };
+try { const t = localStorage.getItem('resqnote:theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+$('theme').onclick = () => {
+  const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const n = cur === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; try { localStorage.setItem('resqnote:theme', n); } catch (e) {}
+};
+function toast(m) { const e = $('toast'); e.textContent = m; e.classList.add('show'); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove('show'), 2200); }
+
+/* ================= pomocné ================= */
+const num = (v) => { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : null; };
+const fmt = (n) => String(n).replace('.', ',');
+const isChild = () => { const a = num(P().age); return a != null && a < 15; };
+function lvl(key, v) {
+  const n = num(v); if (n == null || isChild()) return '';
+  const [cl, wl, wh, ch] = LIM[key] || [];
+  if (cl != null && n < cl) return 'crit'; if (ch != null && n >= ch) return 'crit';
+  if (wl != null && n < wl) return 'warn'; if (wh != null && n >= wh) return 'warn';
+  return '';
+}
+function tkLvl(m) { const a = lvl('sys', m.sys), b = lvl('dia', m.dia); return a === 'crit' || b === 'crit' ? 'crit' : a || b; }
+function gcsTotal(m) { return m.e && m.v && m.m ? m.e + m.v + m.m : null; }
+const timeStr = (t) => new Date(t).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
+function bmi(p) { const kg = num(p.kg), cm = num(p.cm); return kg && cm ? Math.round(kg / Math.pow(cm / 100, 2) * 10) / 10 : null; }
+function ptLabel(p) {
+  const bits = [p.sex === 'M' ? 'muž' : p.sex === 'Z' ? 'žena' : '', p.age ? (/^\d{4}$/.test(p.age) ? 'nar. ' + p.age : '~' + p.age + ' let') : '', p.label].filter(Boolean);
+  return bits.join(', ') || 'Bez údajů';
+}
+
+/* ================= zápis ================= */
+function chipsHtml(sec, list) {
+  const p = P(), sel = p[sec];
+  return list.map(([name, a, b, c]) => {
+    const on = !!sel[name];
+    let extra = '', hot = false, sub = '';
+    if (sec === 'oa' || sec === 'ab') { hot = !!b; if (on && sel[name].when) extra = `<span class="w">${esc(sel[name].when)}</span>`; }
+    if (sec === 'fa') { sub = a; hot = !!b; }
+    if (sec === 'aa') { hot = !!a; if (on && sel[name].react) { extra = `<span class="w">${esc(sel[name].react)}</span>`; if (sel[name].react === 'Anafylaxe') hot = true; } }
+    return `<button type="button" class="chip${on ? ' on' : ''}${on && hot ? ' hot' : ''}" data-sec="${sec}" data-name="${esc(name)}">${esc(name)}${sub ? ` <small>${esc(sub)}</small>` : ''}${extra}</button>`;
+  }).join('');
+}
+function customHtml(sec) {
+  const p = P();
+  return p.custom[sec].map((name) => {
+    const it = p[sec][name] || {};
+    const extra = it.when ? `<span class="w">${esc(it.when)}</span>` : it.react ? `<span class="w">${esc(it.react)}</span>` : '';
+    return `<button type="button" class="chip on custom" data-sec="${sec}" data-name="${esc(name)}" data-custom="1">${esc(name)}${extra}</button>`;
+  }).join('');
+}
+function foldGrp(sec, g, list) {
+  const key = sec + ':' + g, open = !!UI.open[key];
+  const sel = list.map((x) => x[0]).filter((n) => P()[sec][n]);
+  return `<div class="fold${open ? ' open' : ''}"><button type="button" class="fold-h" data-fold="${esc(key)}"><span class="fold-t">${esc(g)}</span>${sel.length ? `<span class="fold-n">${sel.length}</span>` : ''}<span class="fold-s">${esc(sel.join(', '))}</span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 3 3 3-3 3"/></svg></button><div class="chips">${chipsHtml(sec, list)}</div></div>`;
+}
+function count(sec) { return Object.keys(P()[sec]).length; }
+function card(id, title, body, cnt) {
+  const closed = UI.closed[id];
+  return `<section class="card glass${closed ? ' closed' : ''}" data-card="${id}">
+    <div class="card-h"><h2>${title}</h2>${cnt ? `<span class="cnt">${cnt}</span>` : ''}<button type="button" class="collapse" data-toggle="${id}"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 4.5 3 3 3-3"/></svg></button></div>
+    <div class="card-b">${body}</div></section>`;
+}
+function flagsHtml(sec, opts) { const f = P().flags; return `<div class="flags">${opts.map(([k, l]) => `<button type="button" class="flag" data-flag="${sec}:${k}" aria-pressed="${!!f[sec + ':' + k]}">${l}</button>`).join('')}</div>`; }
+function addRow(sec, ph) { return `<div class="addrow"><input type="text" data-addin="${sec}" placeholder="${ph}" enterkeyhint="done" autocomplete="off"><button type="button" data-add="${sec}">Přidat</button></div>`; }
+function renderForm() {
+  const p = P(), b = bmi(p);
+  const base = `<div class="sexes" style="margin-bottom:8px">${[['M', 'Muž'], ['Z', 'Žena']].map(([k, l]) => `<button type="button" class="opt" style="flex:1" data-sex="${k}" aria-pressed="${p.sex === k}">${l}</button>`).join('')}</div>
+    <div class="grid2">
+      <div class="inp"><label for="f-age">Věk nebo rok narození</label><input id="f-age" data-f="age" inputmode="numeric" value="${esc(p.age)}" placeholder="např. 72"></div>
+      <div class="inp"><label for="f-label">Označení (ne jméno)</label><input id="f-label" data-f="label" value="${esc(p.label)}" placeholder="iniciály, řidič…" autocomplete="off"></div>
+      <div class="inp"><label for="f-kg">Váha</label><div class="row"><input id="f-kg" data-f="kg" inputmode="decimal" value="${esc(p.kg)}"><span class="u">kg</span></div></div>
+      <div class="inp"><label for="f-cm">Výška</label><div class="row"><input id="f-cm" data-f="cm" inputmode="numeric" value="${esc(p.cm)}"><span class="u">cm</span></div></div>
+    </div><p class="bmi" id="bmi">${b ? 'BMI ' + fmt(b) : ''}</p>`;
+  const oa = flagsHtml('oa', [['none', 'Bez OA'], ['unk', 'Neví / nelze zjistit']]) +
+    OA.map(([g, list]) => foldGrp('oa', g, list)).join('') +
+    (p.custom.oa.length ? `<div class="grp"><div class="grp-t">Vlastní</div><div class="chips">${customHtml('oa')}</div></div>` : '') + addRow('oa', 'Dopsat diagnózu…');
+  const ab = `<div class="chips">${chipsHtml('ab', ABUS)}${customHtml('ab')}</div>` + addRow('ab', 'Dopsat…');
+  const ak = Object.keys(p.fa).filter((n) => FA[0][1].some((x) => x[0] === n));
+  const fa = flagsHtml('fa', [['none', 'Bez léků'], ['unk', 'Neví'], ['list', 'Má seznam léků'], ['with', 'Léky s sebou']]) +
+    FA.map(([g, list]) => foldGrp('fa', g, list)).join('') +
+    (p.custom.fa.length ? `<div class="grp"><div class="grp-t">Vlastní</div><div class="chips">${customHtml('fa')}</div></div>` : '') + addRow('fa', 'Dopsat lék…') +
+    (ak.length ? `<div class="ak-note">⚠️ Antikoagulace: ${esc(ak.join(', '))}</div>` : '');
+  const aa = flagsHtml('aa', [['none', 'Bez alergií'], ['unk', 'Neví']]) + `<div class="chips">${chipsHtml('aa', AA)}${customHtml('aa')}</div>` + addRow('aa', 'Dopsat alergii…') + '<p class="hint">Klepnutím na vybranou alergii doplníš typ reakce.</p>';
+  const vf = `<button type="button" class="vf-add" id="vf-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nové měření</button>` +
+    (p.vf.length ? `<div class="meas">${p.vf.map((m, i) => `<button type="button" data-meas="${i}"><div class="tm">${timeStr(m.t)}</div><div class="vals">${measVals(m)}</div></button>`).join('')}</div>` : '') +
+    (isChild() ? '<p class="hint">Dítě – barevné zvýraznění hodnot je vypnuté (normy se liší podle věku).</p>' : '');
+  const note = `<div class="inp"><label for="f-note">Poznámka</label><textarea id="f-note" data-f="note" rows="3" placeholder="Okolnosti, nynější onemocnění, kontakt na blízké…">${esc(p.note)}</textarea></div>`;
+  const noteFlags = (sec) => { const f = p.flags; return ['none', 'unk', 'list', 'with'].filter((k) => f[sec + ':' + k]).length; };
+  $('form').innerHTML = card('base', 'Pacient', base) + card('oa', 'OA', oa, count('oa') || (noteFlags('oa') ? '✓' : '')) + card('ab', 'Abúzus', ab, count('ab')) +
+    card('fa', 'FA', fa, count('fa') || (noteFlags('fa') ? '✓' : '')) + card('aa', 'AA', aa, count('aa') || (noteFlags('aa') ? '✓' : '')) +
+    card('vf', 'Vitální funkce', vf, p.vf.length) + card('note', 'Poznámka', note) +
+    `<p class="foot">Data jsou jen v tomto zařízení a po 12 hodinách nečinnosti se sama smažou.<br>Nezapisuj jméno ani rodné číslo.</p>`;
+}
+function measVals(m) {
+  const out = [];
+  if (m.sys || m.dia) out.push(`<span class="v ${tkLvl(m)}"><i>TK</i>${esc(m.sys || '?')}/${esc(m.dia || '?')}</span>`);
+  if (m.tf) out.push(`<span class="v ${lvl('tf', m.tf)}"><i>TF</i>${esc(m.tf)}${m.reg === 0 ? ' <i>nepravid.</i>' : m.reg === 1 ? ' <i>pravid.</i>' : ''}</span>`);
+  if (m.spo2) out.push(`<span class="v ${lvl('spo2', m.spo2)}"><i>SpO₂</i>${esc(m.spo2)} %${m.o2 ? ` <i>O₂ ${esc(m.o2l || '?')} l</i>` : ''}</span>`);
+  if (m.df) out.push(`<span class="v ${lvl('df', m.df)}"><i>DF</i>${esc(m.df)}</span>`);
+  if (m.tt) out.push(`<span class="v ${lvl('tt', m.tt)}"><i>TT</i>${esc(fmt(m.tt))}</span>`);
+  if (m.glyk) out.push(`<span class="v ${lvl('glyk', m.glyk)}"><i>Glyk</i>${esc(fmt(m.glyk))}</span>`);
+  const g = gcsTotal(m); if (g) out.push(`<span class="v ${lvl('gcs', g)}"><i>GCS</i>${g} <i>E${m.e}V${m.v}M${m.m}</i></span>`);
+  if (m.vas != null && m.vas !== '') out.push(`<span class="v ${lvl('vas', m.vas)}"><i>VAS</i>${esc(m.vas)}</span>`);
+  if (m.etco2) out.push(`<span class="v ${lvl('etco2', m.etco2)}"><i>EtCO₂</i>${esc(m.etco2)}</span>`);
+  return out.join('') || '<span class="hint">prázdné</span>';
+}
+
+/* události zápisu */
+$('form').addEventListener('input', (e) => {
+  const f = e.target.dataset.f; if (!f) return;
+  P()[f] = e.target.value; save();
+  if (f === 'kg' || f === 'cm') { const b = bmi(P()); $('bmi').textContent = b ? 'BMI ' + fmt(b) : ''; }
+  if (f === 'label' || f === 'age') renderPill();
+});
+$('form').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.dataset.addin) { e.preventDefault(); addCustom(e.target.dataset.addin); } });
+$('form').addEventListener('click', (e) => {
+  const fo = e.target.closest('[data-fold]'); if (fo) { const k = fo.dataset.fold; UI.open[k] = !UI.open[k]; fo.parentElement.classList.toggle('open', UI.open[k]); return; }
+  const t = e.target.closest('[data-toggle]'); if (t) { UI.closed[t.dataset.toggle] = !UI.closed[t.dataset.toggle]; t.closest('.card').classList.toggle('closed'); return; }
+  const sx = e.target.closest('[data-sex]'); if (sx) { const p = P(); p.sex = p.sex === sx.dataset.sex ? '' : sx.dataset.sex; save(); renderForm(); renderPill(); return; }
+  const fl = e.target.closest('[data-flag]'); if (fl) {
+    const p = P(), k = fl.dataset.flag, [sec, kind] = k.split(':'), excl = kind === 'none' || kind === 'unk';
+    if (!p.flags[k] && excl) {
+      const n = Object.keys(p[sec]).length;
+      if (n && !confirm(`Zrušit ${n} vybraných položek?`)) return;
+      p[sec] = {}; p.custom[sec] = []; delete p.flags[sec + ':none']; delete p.flags[sec + ':unk'];
+      if (sec === 'fa') { delete p.flags['fa:list']; delete p.flags['fa:with']; }
+    }
+    if (!excl) { delete p.flags[sec + ':none']; }
+    p.flags[k] = !p.flags[k]; if (!p.flags[k]) delete p.flags[k]; save(); renderForm(); return; }
+  const ad = e.target.closest('[data-add]'); if (ad) { addCustom(ad.dataset.add); return; }
+  if (e.target.closest('#vf-add')) { vfSheet(null); return; }
+  const ms = e.target.closest('[data-meas]'); if (ms) { vfSheet(+ms.dataset.meas); return; }
+  const c = e.target.closest('.chip[data-sec]'); if (c) chipTap(c.dataset.sec, c.dataset.name, !!c.dataset.custom);
+});
+function defOf(sec, name) {
+  if (sec === 'oa') for (const [, l] of OA) { const x = l.find((i) => i[0] === name); if (x) return { when: !!x[1] }; }
+  if (sec === 'ab') return { when: false };
+  return {};
+}
+function chipTap(sec, name, custom) {
+  const p = P(), sel = p[sec], on = !!sel[name];
+  // výběr konkrétní položky ruší „Bez…“ i „Neví“
+  delete p.flags[sec + ':none']; delete p.flags[sec + ':unk'];
+  if (!on) {
+    sel[name] = {}; save(); renderForm();
+    if (defOf(sec, name).when) whenSheet(sec, name);
+    return;
+  }
+  const askWhen = sec === 'oa' && (custom || defOf(sec, name).when);
+  if (sec === 'aa') { reactSheet(name, custom); return; }
+  if (askWhen || custom) { whenSheet(sec, name, custom); return; }
+  delete sel[name]; save(); renderForm();
+}
+function addCustom(sec) {
+  const inp = document.querySelector(`[data-addin="${sec}"]`), v = inp.value.trim(); if (!v) return;
+  const p = P(); if (!p.custom[sec].includes(v)) p.custom[sec].push(v);
+  p[sec][v] = p[sec][v] || {}; delete p.flags[sec + ':none']; delete p.flags[sec + ':unk']; save(); renderForm();
+  const again = document.querySelector(`[data-addin="${sec}"]`); if (again) again.focus();
+}
+function removeItem(sec, name) { const p = P(); delete p[sec][name]; p.custom[sec] = p.custom[sec].filter((x) => x !== name); save(); renderForm(); }
+
+/* ================= panely ================= */
+function openSheet(html, bind) { const sh = $('sheet'); sh.onclick = null; sh.innerHTML = html; sh.classList.add('open'); $('scrim').classList.add('open'); bind && bind(sh); }
+function closeSheet() { $('sheet').classList.remove('open'); $('scrim').classList.remove('open'); }
+$('scrim').onclick = closeSheet;
+const sh_h = (title, left, right) => `<div class="sh-h">${left || '<span style="min-width:64px"></span>'}<h3>${esc(title)}</h3>${right || '<button type="button" class="tbtn" data-x>Hotovo</button>'}</div>`;
+$('sheet').addEventListener('click', (e) => { if (e.target.closest('[data-x]')) closeSheet(); });
+
+function whenSheet(sec, name, custom) {
+  const it = P()[sec][name] || {};
+  const isW = sec === 'oa';
+  openSheet(sh_h(name) + `<div class="sh-b">
+    ${isW ? `<div class="lbl">Kdy</div><div class="opts">${WHEN.map((w) => `<button type="button" class="opt" data-w="${w}" aria-pressed="${it.when === w}">${w}</button>`).join('')}</div>
+    <div class="addrow"><input type="text" id="when-in" inputmode="numeric" placeholder="nebo rok, např. 2019" value="${it.when && !WHEN.includes(it.when) ? esc(it.when) : ''}"><button type="button" id="when-ok">OK</button></div>` : ''}
+    <button type="button" class="danger-btn" id="rm">Odebrat</button></div>`, (sh) => {
+    sh.querySelectorAll('[data-w]').forEach((b) => b.onclick = () => { P()[sec][name] = Object.assign(P()[sec][name] || {}, { when: b.dataset.w }); save(); renderForm(); closeSheet(); });
+    const ok = () => { const v = $('when-in').value.trim(); if (!v) return; P()[sec][name] = Object.assign(P()[sec][name] || {}, { when: v }); save(); renderForm(); closeSheet(); };
+    if ($('when-ok')) { $('when-ok').onclick = ok; $('when-in').onkeydown = (e) => { if (e.key === 'Enter') ok(); }; }
+    $('rm').onclick = () => { removeItem(sec, name); closeSheet(); };
+  });
+}
+function reactSheet(name) {
+  const it = P().aa[name] || {};
+  openSheet(sh_h(name) + `<div class="sh-b"><div class="lbl">Typ reakce</div><div class="opts">${REACT.map((r) => `<button type="button" class="opt" data-r="${r}" aria-pressed="${it.react === r}">${r}</button>`).join('')}</div>
+    <button type="button" class="danger-btn" id="rm">Odebrat</button></div>`, (sh) => {
+    sh.querySelectorAll('[data-r]').forEach((b) => b.onclick = () => { P().aa[name] = { react: b.dataset.r }; save(); renderForm(); closeSheet(); });
+    $('rm').onclick = () => { removeItem('aa', name); closeSheet(); };
+  });
+}
+
+/* měření – vlastní numerická klávesnice */
+const NF = { sys: ['TK syst', 'mmHg', 3], dia: ['TK diast', 'mmHg', 3], tf: ['TF', '/min', 3], spo2: ['SpO₂', '%', 3], o2l: ['Kyslík', 'l/min', 2, 1], df: ['DF', '/min', 2], tt: ['TT', '°C', 4, 1], glyk: ['Glykémie', 'mmol/l', 4, 1], etco2: ['EtCO₂', 'mmHg', 3] };
+const GCS_T = {
+  e: ['žádné', 'na bolest', 'na oslovení', 'spontánně'],
+  v: ['žádná', 'zvuky', 'nepřiléhavá slova', 'zmatená', 'orientovaný'],
+  m: ['žádná', 'extenze', 'abnormní flexe', 'úhyb', 'lokalizuje', 'vyhoví výzvě']
+};
+function vfSheet(idx) {
+  const p = P(), isNew = idx == null;
+  const m = isNew ? { t: Date.now() } : Object.assign({}, p.vf[idx]);
+  const hhmm = timeStr(m.t);
+  let act = isNew ? 'sys' : null;
+  const order = () => ['sys', 'dia', 'tf', 'spo2'].concat(m.o2 ? ['o2l'] : [], ['df', 'tt', 'glyk', 'etco2']);
+  const lv = (k) => k === 'sys' || k === 'dia' ? tkLvl(m) : k === 'o2l' ? '' : lvl(k, m[k]);
+  const nf = (k, cls) => `<button type="button" class="nf ${cls || ''}" data-nf="${k}"><span class="l">${NF[k][0]}</span><span class="val"><b>${m[k] ? esc(m[k]) : '–'}</b><i>${NF[k][1]}</i></span></button>`;
+  const gRow = (k, n) => `<div class="g-k">${k.toUpperCase()}</div><div class="g-opts">${Array.from({ length: n }, (_, i) => i + 1).map((v) => `<button type="button" class="g-opt" data-g="${k}" data-v="${v}"><b>${v}</b><small>${GCS_T[k][v - 1]}</small></button>`).join('')}</div>`;
+  openSheet(sh_h(isNew ? 'Nové měření' : 'Měření ' + hhmm, '<button type="button" class="tbtn" data-x>Zrušit</button>', '<button type="button" class="tbtn pri" id="vf-save">Uložit</button>') + `<div class="sh-b" id="vf-body">
+    <div class="inp" style="margin-bottom:8px"><label for="vf-time">Čas</label><input id="vf-time" type="time" value="${hhmm}"></div>
+    <div class="nf-grid">
+      <div class="nf-tk">${nf('sys')}<span class="sl">/</span>${nf('dia')}</div>
+      ${nf('tf')}
+      <div class="mini"><button type="button" class="opt" data-reg="1">Pravidelný</button><button type="button" class="opt" data-reg="0">Nepravidelný</button></div>
+      ${nf('spo2')}
+      <div class="mini"><button type="button" class="opt" id="o2">Na kyslíku</button></div>
+      <div id="o2box" class="full"></div>
+      ${nf('df')}${nf('tt')}${nf('glyk')}${nf('etco2')}
+    </div>
+    <div class="lbl" style="display:flex;align-items:center;gap:8px">GCS <span style="flex:1"></span><button type="button" class="opt q" data-gq="15">15</button><button type="button" class="opt q" data-gq="3">3</button><button type="button" class="opt q" data-gq="0">Vymazat</button></div>
+    <div class="gcs2">${gRow('e', 4)}${gRow('v', 5)}${gRow('m', 6)}</div>
+    <div class="gcs-sum" id="gcs-sum"></div>
+    <div class="lbl">VAS</div>
+    <div class="opts vas">${Array.from({ length: 11 }, (_, i) => `<button type="button" class="opt" data-vas="${i}">${i}</button>`).join('')}</div>
+    ${isNew ? '' : '<button type="button" class="danger-btn" id="vf-del">Smazat měření</button>'}
+  </div>
+  <div class="pad" id="pad" hidden>
+    <div class="pad-h"><span id="pad-l"></span><button type="button" id="pad-hide">Skrýt</button></div>
+    <div class="pad-k">${['1', '2', '3', '4', '5', '6', '7', '8', '9', ',', '0', '⌫'].map((k) => `<button type="button" data-key="${k}">${k}</button>`).join('')}</div>
+    <button type="button" class="pad-next" id="pad-next">Další ›</button>
+  </div>`, (sh) => {
+    const paint = () => {
+      sh.querySelectorAll('[data-nf]').forEach((b) => {
+        const k = b.dataset.nf; b.className = 'nf ' + lv(k) + (act === k ? ' act' : '');
+        b.querySelector('b').textContent = m[k] || '–';
+      });
+      sh.querySelectorAll('[data-reg]').forEach((b) => b.setAttribute('aria-pressed', m.reg != null && String(m.reg) === b.dataset.reg));
+      $('o2').setAttribute('aria-pressed', !!m.o2);
+      $('o2box').innerHTML = m.o2 ? nf('o2l') : '';
+      sh.querySelectorAll('[data-g]').forEach((b) => b.setAttribute('aria-pressed', m[b.dataset.g] === +b.dataset.v));
+      sh.querySelectorAll('[data-vas]').forEach((b) => b.setAttribute('aria-pressed', m.vas != null && m.vas !== '' && +b.dataset.vas === +m.vas));
+      const g = gcsTotal(m); $('gcs-sum').textContent = g ? `GCS ${g} (E${m.e} V${m.v} M${m.m})` : (m.e || m.v || m.m ? 'Doplň E, V i M' : '');
+      $('pad').hidden = !act;
+      if (act) $('pad-l').textContent = NF[act][0] + ' (' + NF[act][1] + ')';
+      if (act) sh.querySelectorAll('[data-nf]').forEach((b) => { if (b.dataset.nf === act) b.className += ' act'; });
+    };
+    const next = () => { const o = order(), i = o.indexOf(act); act = i >= 0 && i < o.length - 1 ? o[i + 1] : null; paint(); const el = act && sh.querySelector(`[data-nf="${act}"]`); if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); };
+    const autoNext = (k, v) => {
+      // dvoumístné hodnoty se přeskočí hned, třímístné (začínající 1, u syst. i 2) po třetí číslici
+      if (k === 'sys') return v.length >= 3 || (v.length === 2 && !/^[12]/.test(v));
+      if (k === 'dia' || k === 'tf') return v.length >= 3 || (v.length === 2 && v[0] !== '1');
+      if (k === 'spo2') return v.length >= 3 || (v.length === 2 && v[0] !== '1');
+      if (k === 'tt' || k === 'glyk') return /,\d$/.test(v);
+      return false;
+    };
+    sh.onclick = (e) => {
+      const f = e.target.closest('[data-nf]'); if (f) { act = f.dataset.nf; paint(); return; }
+      const key = e.target.closest('[data-key]');
+      if (key && act) {
+        let v = m[act] || ''; const k = key.dataset.key, [, , max, dec] = NF[act];
+        if (k === '⌫') v = v.slice(0, -1);
+        else if (k === ',') { if (dec && !v.includes(',')) v = (v || '0') + ','; }
+        else if (v.replace(',', '').length < max) v += k;
+        m[act] = v; if (!v) delete m[act];
+        paint(); if (k !== '⌫' && k !== ',' && autoNext(act, v)) next();
+        return;
+      }
+      if (e.target.closest('#pad-next')) { next(); return; }
+      if (e.target.closest('#pad-hide')) { act = null; paint(); return; }
+      const rg = e.target.closest('[data-reg]'); if (rg) { m.reg = String(m.reg) === rg.dataset.reg ? null : +rg.dataset.reg; paint(); return; }
+      if (e.target.closest('#o2')) { m.o2 = !m.o2; if (m.o2) act = 'o2l'; else { delete m.o2l; if (act === 'o2l') act = null; } paint(); return; }
+      const g = e.target.closest('[data-g]'); if (g) { const k = g.dataset.g, v = +g.dataset.v; m[k] = m[k] === v ? null : v; act = null; paint(); return; }
+      const gq = e.target.closest('[data-gq]'); if (gq) { const q = +gq.dataset.gq; if (q === 15) Object.assign(m, { e: 4, v: 5, m: 6 }); else if (q === 3) Object.assign(m, { e: 1, v: 1, m: 1 }); else Object.assign(m, { e: null, v: null, m: null }); act = null; paint(); return; }
+      const vs = e.target.closest('[data-vas]'); if (vs) { const v = +vs.dataset.vas; m.vas = m.vas === v ? null : v; act = null; paint(); return; }
+    };
+    $('vf-save').onclick = () => {
+      const [h, mi] = ($('vf-time').value || hhmm).split(':').map(Number); const d = new Date(m.t); d.setHours(h, mi, 0, 0); m.t = d.getTime();
+      Object.keys(NF).forEach((k) => { if (m[k]) m[k] = String(m[k]).replace(/,$/, ''); if (!m[k]) delete m[k]; });
+      const has = ['sys', 'dia', 'tf', 'spo2', 'df', 'tt', 'glyk', 'etco2'].some((k) => m[k]) || gcsTotal(m) || (m.vas != null && m.vas !== '');
+      if (!has) { toast('Měření je prázdné.'); return; }
+      if (isNew) p.vf.push(m); else p.vf[idx] = m;
+      p.vf.sort((a, b) => a.t - b.t); save(); renderForm(); closeSheet();
+    };
+    if (!isNew) $('vf-del').onclick = () => { if (!confirm('Smazat toto měření?')) return; p.vf.splice(idx, 1); save(); renderForm(); closeSheet(); };
+    paint();
+  });
+}
+
+/* pacienti */
+function renderPill() {
+  const p = P();
+  $('pt-pill').innerHTML = `<span class="av">${esc(p.letter)}</span><span class="t">${esc(ptLabel(p))}</span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 4.5 3 3 3-3"/></svg>`;
+}
+$('pt-pill').onclick = () => {
+  openSheet(sh_h('Pacienti') + `<div class="sh-b"><div class="plist">${D.patients.map((p, i) => `<button type="button" data-pi="${i}" class="${i === D.cur ? 'cur' : ''}"><span class="av">${esc(p.letter)}</span><span><b>Pacient ${esc(p.letter)}</b><small>${esc(ptLabel(p))} · ${Object.keys(p.oa).length + Object.keys(p.fa).length + Object.keys(p.aa).length} položek, ${p.vf.length} měření</small></span></button>`).join('')}</div>
+    <button type="button" class="vf-add" id="p-add" style="margin-top:6px">＋ Další pacient</button>
+    ${D.patients.length > 1 ? `<button type="button" class="danger-btn" id="p-rm">Smazat pacienta ${esc(P().letter)}</button>` : ''}
+    <button type="button" class="danger-btn" id="p-end">Ukončit zásah – smazat vše</button></div>`, (sh) => {
+    sh.querySelectorAll('[data-pi]').forEach((b) => b.onclick = () => { D.cur = +b.dataset.pi; save(); refresh(); closeSheet(); });
+    $('p-add').onclick = () => { const used = D.patients.map((p) => p.letter); const L = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').find((c) => !used.includes(c)) || '?'; D.patients.push(blank(L)); D.cur = D.patients.length - 1; save(); refresh(); closeSheet(); toast('Pacient ' + L + ' přidán'); };
+    if ($('p-rm')) $('p-rm').onclick = () => { if (!confirm('Smazat zápis pacienta ' + P().letter + '?')) return; D.patients.splice(D.cur, 1); D.cur = 0; save(); refresh(); closeSheet(); };
+    $('p-end').onclick = () => { if (!confirm('Ukončit zásah a smazat všechny zápisy?')) return; D = { patients: [blank('A')], cur: 0, updated: Date.now() }; save(); UI.tab = 'form'; refresh(); closeSheet(); toast('Zápis smazán'); };
+  });
+};
+
+/* ================= souhrn ================= */
+function itemsText(sec) {
+  const p = P();
+  return Object.entries(p[sec]).map(([n, v]) => {
+    let s = n;
+    if (sec === 'fa') { for (const [, l] of FA) { const x = l.find((i) => i[0] === n); if (x && x[1] && !x[3]) s += ' (' + x[1].split(',')[0].trim() + ')'; if (x && x[3] && x[1] && !/,/.test(x[1])) s += ' (' + x[1] + ')'; } }
+    if (v.when) s += ' – ' + v.when;
+    if (v.react) s += ' (' + v.react.toLowerCase() + ')';
+    return s;
+  });
+}
+function isHot(sec, name) {
+  const p = P();
+  if (sec === 'oa') for (const [, l] of OA) { const x = l.find((i) => i[0] === name); if (x) return !!x[2]; }
+  if (sec === 'fa') for (const [, l] of FA) { const x = l.find((i) => i[0] === name); if (x) return !!x[2]; }
+  if (sec === 'aa') { const x = AA.find((i) => i[0] === name); return !!(x && x[1]) || (p.aa[name] && p.aa[name].react === 'Anafylaxe'); }
+  return false;
+}
+function flagText(sec) {
+  const f = P().flags, map = { none: { oa: 'bez OA', fa: 'bez léků', aa: 'bez alergií' }, unk: { oa: 'neví / nelze zjistit', fa: 'neví', aa: 'neví' }, list: { fa: 'má seznam léků' }, with: { fa: 'léky s sebou' } };
+  return Object.keys(map).filter((k) => f[sec + ':' + k]).map((k) => map[k][sec]);
+}
+function antikoag() { return Object.keys(P().fa).filter((n) => FA[0][1].some((x) => x[0] === n)); }
+function vfText(m) {
+  const o = [];
+  if (m.sys || m.dia) o.push(`TK ${m.sys || '?'}/${m.dia || '?'}`);
+  if (m.tf) o.push(`TF ${m.tf}${m.reg === 0 ? ' nepravid.' : m.reg === 1 ? ' pravid.' : ''}`);
+  if (m.spo2) o.push(`SpO₂ ${m.spo2} %${m.o2 ? ` (O₂ ${m.o2l || '?'} l/min)` : ''}`);
+  if (m.df) o.push(`DF ${m.df}`);
+  if (m.tt) o.push(`TT ${fmt(m.tt)}`);
+  if (m.glyk) o.push(`Glyk ${fmt(m.glyk)}`);
+  const g = gcsTotal(m); if (g) o.push(`GCS ${g} (E${m.e}V${m.v}M${m.m})`);
+  if (m.vas != null && m.vas !== '') o.push(`VAS ${m.vas}`);
+  if (m.etco2) o.push(`EtCO₂ ${m.etco2}`);
+  return o.join(' · ');
+}
+function summaryText() {
+  const p = P(), b = bmi(p), L = [];
+  const date = new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' });
+  L.push(`ResqNote · ${date}${D.patients.length > 1 ? ' · pacient ' + p.letter : ''}`);
+  const head = [p.sex === 'M' ? 'Muž' : p.sex === 'Z' ? 'Žena' : '', p.age ? (/^\d{4}$/.test(p.age) ? 'nar. ' + p.age : '~' + p.age + ' let') : '',
+    p.kg || p.cm ? `${p.kg ? p.kg + ' kg' : '? kg'} / ${p.cm ? p.cm + ' cm' : '? cm'}${b ? ' (BMI ' + fmt(b) + ')' : ''}` : '', p.label].filter(Boolean).join(', ');
+  if (head) L.push(head);
+  L.push('');
+  const line = (lbl, sec) => {
+    const it = itemsText(sec).map((s, i) => isHot(sec, Object.keys(p[sec])[i]) ? s + ' ⚠️' : s);
+    const all = flagText(sec).concat(it);
+    L.push(`${lbl}: ${all.length ? all.join(', ') : '–'}`);
+  };
+  line('OA', 'oa');
+  if (count('ab')) line('Abúzus', 'ab');
+  line('FA', 'fa');
+  const ak = antikoag(); if (ak.length) L.push(`   ⚠️ ANTIKOAGULACE: ${ak.join(', ')}`);
+  line('AA', 'aa');
+  if (p.vf.length) { L.push(''); L.push('Vitální funkce:'); p.vf.forEach((m) => L.push(`${timeStr(m.t)}  ${vfText(m)}`)); }
+  if (p.note.trim()) { L.push(''); L.push('Poznámka: ' + p.note.trim()); }
+  return L.join('\n');
+}
+function renderSum() {
+  const p = P(), b = bmi(p);
+  const list = (sec) => {
+    const names = Object.keys(p[sec]), txt = itemsText(sec);
+    const parts = flagText(sec).map((s) => esc(s)).concat(txt.map((s, i) => isHot(sec, names[i]) ? `<span class="hot">${esc(s)} ⚠️</span>` : esc(s)));
+    return parts.length ? parts.join(', ') : '<span class="empty">nevyplněno</span>';
+  };
+  const head = [p.sex === 'M' ? 'Muž' : p.sex === 'Z' ? 'Žena' : '', p.age ? (/^\d{4}$/.test(p.age) ? 'nar. ' + p.age : '~' + p.age + ' let') : ''].filter(Boolean).join(', ');
+  const ak = antikoag();
+  $('sum').innerHTML = `<div class="sum glass">
+    <div class="blk"><div class="big">${esc(head || 'Pacient ' + p.letter)}</div>${p.kg || p.cm || p.label ? `<div>${esc([p.kg ? p.kg + ' kg' : '', p.cm ? p.cm + ' cm' : '', b ? 'BMI ' + fmt(b) : '', p.label].filter(Boolean).join(' · '))}</div>` : ''}</div>
+    <div class="blk"><h3>OA</h3>${list('oa')}</div>
+    ${count('ab') ? `<div class="blk"><h3>Abúzus</h3>${list('ab')}</div>` : ''}
+    <div class="blk"><h3>FA</h3>${list('fa')}${ak.length ? `<div class="ak-note" style="margin-top:8px">⚠️ Antikoagulace: ${esc(ak.join(', '))}</div>` : ''}</div>
+    <div class="blk"><h3>AA</h3>${list('aa')}</div>
+    <div class="blk"><h3>Vitální funkce</h3>${p.vf.length ? `<table>${p.vf.map((m) => `<tr><td>${timeStr(m.t)}</td><td><div class="vals">${measVals(m)}</div></td></tr>`).join('')}</table>` : '<span class="empty">žádné měření</span>'}</div>
+    ${p.note.trim() ? `<div class="blk"><h3>Poznámka</h3>${esc(p.note.trim()).replace(/\n/g, '<br>')}</div>` : ''}
+  </div><p class="foot">„Kopírovat vše“ vloží souhrn jako prostý text – můžeš ho vložit kamkoliv.</p>`;
+}
+async function copyAll() {
+  const text = summaryText(); let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
+    const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+    try { ok = document.execCommand('copy'); } catch (er) {} ta.remove();
+  }
+  const b = $('copy');
+  if (ok) { b.classList.add('done'); b.querySelector('span').textContent = 'Zkopírováno'; setTimeout(() => { b.classList.remove('done'); b.querySelector('span').textContent = 'Kopírovat vše'; }, 1800); }
+  else toast('Kopírování se nepodařilo – označ text ručně.');
+}
+$('copy').onclick = copyAll;
+$('sum-fab').onclick = () => { UI.tab = 'sum'; refresh(); window.scrollTo(0, 0); };
+
+/* ================= záložky ================= */
+document.querySelector('.seg').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) { UI.tab = b.dataset.tab; refresh(); window.scrollTo(0, 0); } });
+function refresh() {
+  document.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.tab === UI.tab));
+  $('form').hidden = UI.tab !== 'form'; $('sum').hidden = UI.tab !== 'sum'; $('copy-bar').hidden = UI.tab !== 'sum'; $('sum-fab').hidden = UI.tab !== 'form';
+  renderPill(); if (UI.tab === 'form') renderForm(); else renderSum();
+}
+// smazání po 12 h i při dlouho otevřené appce
+setInterval(() => { if (Date.now() - D.updated > TTL) { D = { patients: [blank('A')], cur: 0, updated: Date.now() }; save(); refresh(); } }, 60000);
+save(); refresh();
+</script>
+</body>
+</html>
