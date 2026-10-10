@@ -247,6 +247,94 @@ input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offs
 
 /* kalkulačka ředění */
 .search-box { position: relative; margin-bottom: 14px; }
+.calc-pt { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.calc-pt-l { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.calc-pt-kg { display: flex; align-items: center; gap: 6px; }
+.calc-pt-kg .calc-in { width: 92px; flex: none; font-size: 20px; font-weight: 750; text-align: center; }
+.calc-pt-kg span { font-size: 15px; color: var(--ink-2); font-weight: 600; }
+.calc-pt-b { margin-left: auto; height: 30px; padding: 0 12px; border-radius: 15px; display: inline-flex; align-items: center; font-size: 13px; font-weight: 750; border: 1px solid var(--hairline); white-space: nowrap; }
+.res-info { font-size: 17px; line-height: 1.45; margin-bottom: 8px; }
+.res-info b { font-size: 24px; }
+
+/* kalkulačka léků (mechanika ResqCalc) */
+.drug-pick.alert-high { border: 2px solid var(--alarm); box-shadow: 0 0 0 4px rgba(229, 56, 59, .15); }
+.drug-pick.alert-low { border: 2px solid #2A7BC4; }
+.pc-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.pc-b { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 11px; font-size: 12px; font-weight: 750; background: var(--fill); color: var(--ink-2); white-space: nowrap; }
+.pc-b.high { background: var(--alarm); color: #fff; }
+.pc-b.low { background: #2A7BC4; color: #fff; }
+.pc-b.solv.only { background: rgba(242, 154, 31, .18); color: #A65C00; }
+.pc-h { font-size: 13px; font-weight: 650; color: var(--ink-2); margin: 16px 4px 8px; }
+.pc-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.pc-chip { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 8px 12px; border-radius: 16px; border: 1px solid var(--glass-edge); background: var(--glass-strong); font-size: 15px; font-weight: 650; color: var(--ink); text-align: left; }
+.pc-chip small { font-size: 12px; font-weight: 550; color: var(--ink-2); }
+.pc-chip[aria-pressed="true"] { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
+.pc-chip[aria-pressed="true"] small { color: inherit; opacity: .85; }
+.pc-card { border-radius: 20px; padding: 10px; background: var(--glass-strong); border: 1px solid var(--glass-edge); }
+.pc-opt { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 6px; border: 0; background: none; text-align: left; color: var(--ink); }
+.pc-opt + .pc-opt { border-top: 1px solid var(--hairline); }
+.pc-opt .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink-3); flex: none; }
+.pc-opt[aria-pressed="true"] .dot { border: 6px solid var(--petrol); }
+.pc-opt .grow { flex: 1; min-width: 0; }
+.pc-opt b { display: block; font-size: 15px; font-weight: 650; }
+.pc-opt .sub { display: block; font-size: 12.5px; color: var(--ink-2); }
+.pc-custom { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0; }
+.pc-custom label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--ink-2); font-weight: 600; }
+.pc-prep { margin-top: 8px; padding: 10px 12px; border-radius: 14px; background: var(--petrol-soft); font-size: 15.5px; line-height: 1.4; }
+.pc-prep b { font-size: 17px; }
+.pc-conc { font-size: 13px; color: var(--ink-2); margin: 6px 4px 0; }
+.pc-mode { display: flex; gap: 2px; padding: 3px; border-radius: 13px; background: var(--fill); margin-bottom: 8px; }
+.pc-mode button { flex: 1; height: 34px; border: 0; border-radius: 10px; background: none; font-weight: 650; color: var(--ink-2); }
+.pc-mode button[aria-pressed="true"] { background: var(--glass-strong); color: var(--ink); box-shadow: 0 1px 4px rgba(0, 0, 0, .12); }
+.pc-dose { display: flex; gap: 8px; align-items: center; }
+.pc-dose .calc-in { flex: 1; min-width: 0; font-size: 22px; font-weight: 750; }
+.pc-unit { display: flex; gap: 2px; padding: 3px; border-radius: 13px; background: var(--fill); flex: none; }
+.pc-unit button { height: 38px; padding: 0 12px; border: 0; border-radius: 10px; background: none; font-weight: 650; color: var(--ink-2); font-size: 14px; }
+.pc-unit button[aria-pressed="true"] { background: var(--petrol); color: var(--on-petrol); }
+.pc-hint { font-size: 13px; color: var(--ink-2); margin: 6px 4px 0; min-height: 16px; }
+.pc-res { margin-top: 14px; border-radius: 24px; padding: 16px 18px; text-align: center; color: #fff; background: linear-gradient(150deg, #16A3AE 0%, #0B6E79 55%, #074B53 100%); box-shadow: 0 14px 30px -14px rgba(11, 110, 121, .8); }
+.pc-res.orange { background: linear-gradient(150deg, #F2A33A 0%, #C9730C 100%); }
+.pc-res.red { background: linear-gradient(150deg, #F25C5F 0%, #D7262A 100%); }
+.pc-res .lbl { font-size: 13px; font-weight: 650; opacity: .85; }
+.pc-res .big { font-family: var(--font-display); font-size: 52px; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; }
+.pc-res .big small { font-size: 22px; margin-left: 4px; }
+.pc-res .sub { font-size: 14.5px; opacity: .92; margin-top: 2px; }
+.pc-res .tag { display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 12px; background: rgba(255, 255, 255, .18); font-size: 12.5px; font-weight: 650; }
+.pc-res .empty { font-size: 17px; font-weight: 650; opacity: .9; }
+.pc-w { margin: 10px 0 0; padding: 10px 12px; border-radius: 14px; font-size: 14.5px; font-weight: 650; line-height: 1.35; }
+.pc-w.red { background: rgba(229, 56, 59, .14); color: #C2262A; }
+.pc-w.orange { background: rgba(242, 154, 31, .17); color: #A65C00; }
+.pc-info { margin-top: 10px; border-radius: 16px; padding: 10px 12px; background: var(--glass-strong); border: 1px solid var(--glass-edge); font-size: 14px; }
+.pc-info summary { font-weight: 700; cursor: pointer; }
+.pc-info p { margin: 6px 0 0; }
+.pc-fixed { margin-top: 10px; font-size: 14.5px; line-height: 1.45; }
+.pc-fixed p { margin: 4px 0 0; }
+.pc-note { font-size: 12.5px; color: var(--ink-3); text-align: center; margin: 14px 8px 4px; line-height: 1.4; }
+.dp-item.off b { color: var(--ink-3); }
+.dp-item .pc-b { flex: none; }
+.drug-pick { display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 14px; padding: 14px 16px; border-radius: 20px; border: 1px solid var(--glass-edge); background: var(--glass-strong); box-shadow: 0 6px 18px -10px var(--glass-shadow); text-align: left; color: var(--ink); cursor: pointer; }
+.drug-pick .grow { flex: 1; min-width: 0; }
+.dp-name { display: block; font-family: var(--font-display, inherit); font-size: 22px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+.dp-sub { display: block; margin-top: 3px; font-size: 14px; color: var(--ink-2); }
+.dp-chg { flex: none; height: 34px; padding: 0 14px; border-radius: 17px; background: var(--petrol); color: var(--on-petrol); font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; }
+.dp-ov { z-index: 340; }
+.dp-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 350; max-width: 560px; margin: 0 auto; height: calc(100% - max(16px, env(safe-area-inset-top))); display: flex; flex-direction: column; border-radius: 30px 30px 0 0; background: var(--sheet, var(--bg)); box-shadow: 0 -10px 40px rgba(0, 0, 0, .25); transform: translateY(105%); visibility: hidden; transition: transform .4s cubic-bezier(.32, .72, 0, 1), visibility 0s linear .4s; }
+.dp-sheet.open { transform: none; visibility: visible; transition: transform .4s cubic-bezier(.32, .72, 0, 1); }
+.dp-grab { width: 38px; height: 5px; border-radius: 3px; background: var(--ink-3, rgba(0,0,0,.25)); margin: 8px auto 0; flex: none; }
+.dp-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px; flex: none; }
+.dp-close { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--glass-edge); background: var(--glass-strong); display: grid; place-items: center; color: var(--ink); flex: none; }
+.dp-close svg { width: 18px; height: 18px; }
+.dp-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 16px calc(24px + env(safe-area-inset-bottom)); }
+.dp-list { border-radius: 20px; overflow: hidden; background: var(--glass-strong); border: 1px solid var(--glass-edge); }
+.dp-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 14px; border: 0; background: none; text-align: left; color: var(--ink); }
+.dp-item + .dp-item { border-top: 1px solid var(--hairline); }
+.dp-item:active { background: var(--fill); }
+.dp-item .grow { flex: 1; min-width: 0; }
+.dp-item b { display: block; font-size: 16px; font-weight: 650; }
+.dp-item .sub { display: block; font-size: 13px; color: var(--ink-2); }
+.dp-item[aria-current="true"] { background: var(--petrol-soft); }
+.dp-warn { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: rgba(229, 56, 59, .14); color: var(--alarm, #D0303A); font-weight: 800; }
+.dp-empty { padding: 18px; text-align: center; color: var(--ink-2); }
 .search-field { display: flex; align-items: center; gap: 8px; height: 50px; padding: 0 12px 0 14px; border-radius: 16px; background: var(--glass-strong); border: 1px solid var(--glass-edge); box-shadow: 0 6px 18px -10px var(--glass-shadow); }
 .search-field svg { width: 19px; height: 19px; color: var(--ink-2); flex: none; }
 .search-field input { flex: 1; min-width: 0; height: 100%; border: 0; background: none; outline: none; font-size: 17px; }
@@ -296,7 +384,7 @@ input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offs
 .warning-text { display: block; padding: 9px 12px; margin-bottom: 12px; border-radius: 14px; background: rgba(0, 0, 0, .18); font-size: 14px; font-weight: 700; text-align: center; }
 .res-cap { display: block; text-align: center; font-size: 13px; font-weight: 600; opacity: .85; }
 
-/* triage a skóre */
+/* triáž a skóre */
 .triage-step-title { margin: 6px 0 18px; font-size: 22px; font-weight: 750; letter-spacing: -.02em; text-align: center; text-wrap: balance; }
 .triage-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .btn-triage {
@@ -356,12 +444,12 @@ input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offs
     <div class="group glass">
       <button class="drawer-item" type="button" onclick="openCalc()">
         <span class="ic" style="background:linear-gradient(150deg,#22C1C9,#0B6E79)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4M17 7l3-3M19 9 8.7 19.3a2.4 2.4 0 0 1-3.4 0l-.6-.6a2.4 2.4 0 0 1 0-3.4L15 5M9 11l4 4M5 19l-3 3M14 4l6 6"/></svg></span>
-        <span class="grow"><b>Kalkulačka ředění</b><span class="sub">Příprava léku a objem k podání</span></span>
+        <span class="grow"><b>Kalkulačka léků</b><span class="sub">Dávka podle váhy, ředění a kolik ml podat</span></span>
         <svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>
       </button>
       <button class="drawer-item" type="button" onclick="startJumpstart()">
         <span class="ic" style="background:linear-gradient(150deg,#F25C5F,#C9282B)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4M12 14v-4M4 13a8 8 0 0 1 8-7 8 8 0 1 1-5.3 14L4 17.6"/><path d="M9 17H4v5"/></svg></span>
-        <span class="grow"><b>JumpSTART triage</b><span class="sub">Třídění dětí při hromadném neštěstí</span></span>
+        <span class="grow"><b>JumpSTART triáž</b><span class="sub">Třídění dětí při hromadném neštěstí</span></span>
         <svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>
       </button>
       <button class="drawer-item" type="button" onclick="openGCS()">
@@ -524,75 +612,6 @@ input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offs
         }
     ];
 
-    const CALC_DB = [
-        {n: "Acide Acetylsalycique", d: 10, u: "mg/kg", amp: 500, ampV: 1, sol: "p.o. (tbl)", limit: {minY: 15, msg: "Riziko Reyeova syndromu do 15 let!"}},
-        {n: "Adenocor", d: 0.1, u: "mg/kg", amp: 6, ampV: 2, sol: "NaCl (rapidní i.v.)"},
-        {n: "Adrenalin", d: 10, u: "mcg/kg", amp: 1, ampV: 1, sol: "NaCl"},
-        {n: "Analgin", d: 20, u: "mg/kg", amp: 1000, ampV: 2, sol: "NaCl / G5%", limit: {minKg: 5, msg: "SPC: Kontraindikováno pod 5 kg váhy."}},
-        {n: "Anopyrin", d: 10, u: "mg/kg", amp: 100, ampV: 1, sol: "p.o. (tbl)", limit: {minY: 15, msg: "Riziko Reyeova syndromu do 15 let!"}},
-        {n: "Apaurin", d: 0.2, u: "mg/kg", amp: 10, ampV: 2, sol: "Neředit (i.v. pomalu)"},
-        {n: "Aqua pro inj.", d: 0, u: "ml", amp: 10, ampV: 10, sol: "Rozpouštědlo"},
-        {n: "Atropin", d: 20, u: "mcg/kg", amp: 0.5, ampV: 1, sol: "NaCl / Aqua"},
-        {n: "Berodual liq.", d: 0.05, u: "ml/kg", amp: 0.25, ampV: 1, sol: "Inhalačně v NaCl"},
-        {n: "Berodual spr.", d: 1, u: "vdech", amp: 1, ampV: 1, sol: "Inhalačně"},
-        {n: "Betadine desinf.", d: 0, u: "-", amp: 1, ampV: 1, sol: "Lokálně", limit: {minM: 6, msg: "Opatrně u novorozenců (riziko resorpce jodu)."}},
-        {n: "Betaloc", d: 0.1, u: "mg/kg", amp: 5, ampV: 5, sol: "NaCl / G5%"},
-        {n: "Bricanyl", d: 5, u: "mcg/kg", amp: 0.5, ampV: 1, sol: "NaCl"},
-        {n: "Brilique", d: 0, u: "mg", amp: 90, ampV: 1, sol: "p.o. (tbl)", limit: {minY: 18, msg: "SPC: Bezpečnost u dětí nebyla stanovena (Kontraindikováno)."}},
-        {n: "Butylskopolamin", d: 0.3, u: "mg/kg", amp: 20, ampV: 1, sol: "NaCl", limit: {minY: 6, msg: "SPC: Použití od 6 let."}},
-        {n: "Calcium Chloratum 10%", d: 20, u: "mg/kg", amp: 1000, ampV: 10, sol: "i.v. pomalu!"},
-        {n: "Calypsol", d: 1, u: "mg/kg", amp: 500, ampV: 10, sol: "NaCl / G5%"},
-        {n: "Carbosorb plv.", d: 1000, u: "mg/kg", amp: 25000, ampV: 1, sol: "p.o. (suspenze)", limit: {minY: 3, msg: "SPC: Od 3 let věku."}},
-        {n: "Cefotaxime", d: 50, u: "mg/kg", amp: 1000, ampV: 1, sol: "NaCl / Aqua"},
-        {n: "Cordarone", d: 5, u: "mg/kg", amp: 150, ampV: 3, sol: "G5% (VÝHRADNĚ!)", limit: {minKg: 3, msg: "Pozor na benzylalkohol u novorozenců!"}},
-        {n: "Dexamed", d: 0.6, u: "mg/kg", amp: 8, ampV: 2, sol: "NaCl / G5%"},
-        {n: "Dexamethason supp.", d: 1, u: "čípek", amp: 1, ampV: 1, sol: "p.r."},
-        {n: "Diazepam Rectal Tube", d: 0.5, u: "mg/kg", amp: 5, ampV: 2.5, sol: "p.r.", limit: {minKg: 10, msg: "Tuba 5mg je určena pro dětí nad 10kg."}},
-        {n: "Dithiaden", d: 0.05, u: "mg/kg", amp: 1, ampV: 1, sol: "NaCl", limit: {minY: 1, msg: "SPC: Kontraindikováno do 1 roku věku."}},
-        {n: "Dolmina", d: 1, u: "mg/kg", amp: 75, ampV: 3, sol: "NaCl (i.m. / i.v. infuze)", limit: {minY: 15, msg: "SPC: i.m. podání až od 15 let. (Pediatrie: Off-label)"}},
-        {n: "Ebrantil", d: 0.5, u: "mg/kg", amp: 25, ampV: 5, sol: "NaCl"},
-        {n: "Ephedrin", d: 0.1, u: "mg/kg", amp: 50, ampV: 1, sol: "NaCl"},
-        {n: "Exacyl", d: 15, u: "mg/kg", amp: 500, ampV: 5, sol: "NaCl"},
-        {n: "F1/1", d: 20, u: "ml/kg", amp: 1, ampV: 1, sol: "Krystaloid"},
-        {n: "Flumazenil", d: 10, u: "mcg/kg", amp: 0.5, ampV: 5, sol: "NaCl", limit: {minY: 1, msg: "SPC: Omezené zkušenosti u dětí do 1 roku."}},
-        {n: "Furosemid", d: 1, u: "mg/kg", amp: 20, ampV: 2, sol: "NaCl"},
-        {n: "Gelaspon", d: 0, u: "-", amp: 1, ampV: 1, sol: "Lokálně"},
-        {n: "Glukóza 40%", d: 500, u: "mg/kg", amp: 400, ampV: 1, sol: "i.v. pomalu", limit: {minKg: 3, msg: "Silně dráždivé - ředit na max. 10-12.5%!"}},
-        {n: "Glukóza 5%", d: 1, u: "ml", amp: 1, ampV: 1, sol: "Infuze"},
-        {n: "Haloperidol", d: 0.05, u: "mg/kg", amp: 5, ampV: 1, sol: "NaCl", limit: {minY: 3, msg: "SPC: Použití od 3 let."}},
-        {n: "Heparin", d: 50, u: "UI/kg", amp: 25000, ampV: 5, sol: "NaCl"},
-        {n: "Infadolan ung.", d: 0, u: "-", amp: 1, ampV: 1, sol: "Lokálně"},
-        {n: "Isoket", d: 1, u: "mcg/kg/min", amp: 10, ampV: 10, sol: "G5% / NaCl"},
-        {n: "Lexaurin", d: 0, u: "mg", amp: 3, ampV: 1, sol: "p.o. (tbl)", limit: {minY: 18, msg: "SPC: Nedoporučuje se u dětí do 18 let."}},
-        {n: "Mesocain 1%", d: 1, u: "mg/kg", amp: 100, ampV: 10, sol: "Lokální / i.v."},
-        {n: "Mesocain gel", d: 0, u: "-", amp: 1, ampV: 1, sol: "Lokálně"},
-        {n: "Methylergometrin", d: 0.1, u: "mg", amp: 0.2, ampV: 1, sol: "i.m. / i.v. (porod)"},
-        {n: "MgSO4 20%", d: 40, u: "mg/kg", amp: 2000, ampV: 10, sol: "i.v. pomalu"},
-        {n: "Midazolam", d: 0.1, u: "mg/kg", amp: 5, ampV: 1, sol: "NaCl / G5%", limit: {minM: 6, msg: "SPC: Riziko apnoe u kojenců pod 6 měsíců."}},
-        {n: "Morphin BBP 1%", d: 0.1, u: "mg/kg", amp: 10, ampV: 1, sol: "NaCl", limit: {minM: 6, msg: "Vysoké riziko dechové deprese do 6 měsíců věku!"}},
-        {n: "Naloxon", d: 10, u: "mcg/kg", amp: 0.4, ampV: 1, sol: "NaCl"},
-        {n: "Noradrenalin", d: 0.1, u: "mcg/kg/min", amp: 1, ampV: 1, sol: "G5% (infuze)"},
-        {n: "Novalgin", d: 20, u: "mg/kg", amp: 2500, ampV: 5, sol: "NaCl / G5%", limit: {minKg: 5, msg: "SPC: Kontraindikováno pod 3 měsíce nebo 5 kg."}},
-        {n: "Ondansetron", d: 0.15, u: "mg/kg", amp: 4, ampV: 2, sol: "NaCl", limit: {minY: 1, msg: "SPC: Podání až od 1 roku věku."}},
-        {n: "Ophtal aqa.", d: 0, u: "-", amp: 1, ampV: 1, sol: "Oční výplach"},
-        {n: "Paracetamol Kabi", d: 15, u: "mg/kg", amp: 1000, ampV: 100, sol: "i.v. infuze (neředí se)", limit: {minKg: 10, msg: "POZOR: U dětí pod 10kg je dávka pouze 7.5mg/kg!"}},
-        {n: "Paralen", d: 15, u: "mg/kg", amp: 100, ampV: 1, sol: "p.r. / p.o."},
-        {n: "Perlinganit", d: 0.5, u: "mcg/kg/min", amp: 10, ampV: 10, sol: "NaCl / G5%"},
-        {n: "Propofol 1%", d: 3, u: "mg/kg", amp: 200, ampV: 20, sol: "Neředit", limit: {minM: 1, msg: "SPC: Kontraindikováno do 1 měsíce věku."}},
-        {n: "Ringerfundin", d: 20, u: "ml/kg", amp: 1, ampV: 1, sol: "Krystaloid"},
-        {n: "Rocuronium", d: 1, u: "mg/kg", amp: 50, ampV: 5, sol: "NaCl"},
-        {n: "Sefotak", d: 50, u: "mg/kg", amp: 1000, ampV: 1, sol: "NaCl / Aqua"},
-        {n: "Solu-Medrol", d: 2, u: "mg/kg", amp: 40, ampV: 1, sol: "Aqua / NaCl"},
-        {n: "Sufentanil", d: 0.2, u: "mcg/kg", amp: 0.01, ampV: 2, sol: "NaCl"},
-        {n: "Suxamethonium", d: 2, u: "mg/kg", amp: 100, ampV: 2, sol: "NaCl", limit: {minKg: 3, msg: "Pozor na bradykardii a hyperkalémii u dětí!"}},
-        {n: "Syntophyllin", d: 5, u: "mg/kg", amp: 240, ampV: 10, sol: "G5% (infuze)", limit: {minM: 6, msg: "SPC: Nepoužívat u dětí do 6 měsíců věku."}},
-        {n: "Tensiomin", d: 0, u: "mg", amp: 25, ampV: 1, sol: "p.o. (tbl)"},
-        {n: "Torecan", d: 0.1, u: "mg/kg", amp: 6.5, ampV: 1, sol: "i.m. / i.v. pomalu", limit: {minY: 15, msg: "SPC: Kontraindikováno pod 15 let (Extrapyramidové příznaky)!"}},
-        {n: "Ventolin liq.", d: 0.1, u: "ml/kg", amp: 5, ampV: 1, sol: "Inhalačně v NaCl"},
-        {n: "Ventolin spr.", d: 1, u: "vdech", amp: 100, ampV: 1, sol: "Inhalačně"},
-        {n: "Xylocain spr. 10%", d: 0, u: "-", amp: 1, ampV: 1, sol: "Lokálně (sliznice)"}
-    ].sort((a,b) => a.n.localeCompare(b.n, 'cs'));
-
     const CHEV_DOWN = '<svg class="expand-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l4 4 4-4"/></svg>';
     const BROSELOW_COLORS = { GREY: "#808080", PINK: "#ffc0cb", RED: "#ff3b30", PURPLE: "#af52de", YELLOW: "#ffcc00", WHITE: "#ffffff", BLUE: "#007aff", ORANGE: "#ff9500", GREEN: "#4cd964" };
     const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -702,6 +721,7 @@ input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offs
     };
 
     function render() {
+        if (document.getElementById('ca-kg')) syncCalcPt();
         const view = document.getElementById('data-view'), kg = parseFloat(document.getElementById('in-kg').value)||3, yrs = parseInt(document.getElementById('in-yr').value)||0, d = FULL_DB[curB];
         let html = "";
 
@@ -787,122 +807,295 @@ input[type=range]:focus-visible { outline: 2px solid var(--petrol); outline-offs
         view.innerHTML = html;
     }
 
-    /* ---- Kalkulačka ředění ---- */
+    /* ---- Kalkulačka léků (mechanika ResqCalc, dětské dávky) ---- */
+    const PEDI = [{"id":"adenocor","n":"Adenocor","s":"6 mg / 2 ml","peds":"yes","base":"mg","conc":3,"amp":2,"solv":"proplach FR","dil":[{"l":"Neředit (3 mg/ml)","ml":null,"total":null,"sub":"větší děti; rychlý bolus + ihned proplach FR 5–10 ml"},{"l":"2 ml + 4 ml FR = 1 mg/ml","ml":2,"total":6,"sub":"malé děti / kojenci – přesnější odměření; podat přes 2 stříkačky / trojcestný kohout a ihned proplachnout"}],"reg":[{"l":"SVT 1. dávka","d":0.1,"kg":true,"max":6,"route":"i.v.","dil":1,"note":"rychlý bolus co nejblíže srdci (HK), ihned proplach FR; ERC/RCUK připouští 0,1–0,2 mg/kg"},{"l":"SVT 2. dávka","d":0.2,"kg":true,"max":12,"route":"i.v.","dil":1,"note":"po 1–2 min, pokud SVT trvá (SPC: navyšovat po 0,1 mg/kg)"},{"l":"SVT 3. dávka","d":0.3,"kg":true,"max":12,"route":"i.v.","dil":1,"note":"SPC max 12 mg jednotlivě; RCUK uvádí 0,3 mg/kg max 12–18 mg"}],"cave":"Kontinuální EKG záznam a připravená KPR; přechodná asystolie/bradykardie, bronchospasmus (opatrně u astmatu). Účinnost i.o. podání podle SPC neprokázána.","conf":"high","src":["https://mediately.co/cz/drugs/SdTlIzwPwMle080jYZI9DJgbkUl/adenocor-3mg-ml-injekcni-roztok","https://www.rxreasoner.com/monographs/adenocor/usage","https://www.resus.org.uk/sites/default/files/2026-01/RCUK%20Paediatric%20emergency%20algorithms%20and%20resources%20Jan%2026%20V5.pdf"],"kind":"calc"},{"id":"adrenalin","n":"Adrenalin","s":"1 mg / 1 ml","peds":"yes","base":"mg","conc":1,"amp":1,"solv":"FR","dil":[{"l":"1 ml + 9 ml FR = 0,1 mg/ml (100 µg/ml)","ml":1,"total":10,"sub":"KPR: 0,1 ml/kg"},{"l":"Neředit (1 mg/ml)","ml":null,"total":null,"sub":"i.m. anafylaxe; inhalace"},{"l":"Perfuzor 1 mg do 50 ml FR = 20 µg/ml","ml":1,"total":50,"sub":"kontinuálně, ideálně samostatný vstup"}],"reg":[{"l":"KPR","d":0.01,"kg":true,"max":1,"route":"i.v./i.o.","dil":0,"note":"10 µg/kg; nedefibrilovatelné co nejdříve, defibrilovatelné po 3. výboji; opakovat á 3–5 min"},{"l":"Anafylaxe","d":0.01,"kg":true,"max":0.5,"route":"i.m.","dil":1,"note":"anterolaterálně stehno; opakovat po 5 min; viz pevné dávky dle věku"},{"l":"Laryngitida / stridor – inhalace","d":0.5,"kg":true,"max":5,"route":"inh","dil":1,"note":"0,5 ml/kg roztoku 1 mg/ml (max 5 ml) neředěného nebo doplnit FR, nebulizace s O2; efekt přechodný (1–2 h)"}],"perf":{"unit":"µg/kg/min","range":[0.05,1],"def":0.1,"dil":2},"fixed":"Anafylaxe i.m. (RCUK/ERC): < 6 měs. 0,1–0,15 mg; 6 měs.–6 let 0,15 mg; 6–12 let 0,3 mg; > 12 let 0,5 mg (0,3 mg u malých/prepubertálních).","cave":"Neplést koncentrace: KPR ředěný 0,1 mg/ml i.v./i.o., anafylaxe neředěný i.m. Bolusové i.v. podání u anafylaxe bez zástavy jen titračně (1 µg/kg) a zkušeným lékařem.","conf":"high","src":["https://www.resus.org.uk/sites/default/files/2026-01/RCUK%20Paediatric%20emergency%20algorithms%20and%20resources%20Jan%2026%20V5.pdf","https://www.resus.org.uk/sites/default/files/2025-12/Paediatric%20advanced%20life%20support%20algorithm%20Nov%202025%20V2.pdf","https://www.childrens.health.qld.gov.au/__data/assets/pdf_file/0022/174163/croup-flowchart-and-medications.pdf"],"kind":"calc"},{"id":"analgin","n":"Analgin","s":"2,5 g / 5 ml (metamizol)","peds":"limited","base":"mg","conc":500,"amp":5,"solv":"FR / G5 %","dil":[{"l":"1 ml + 9 ml FR = 50 mg/ml","ml":1,"total":10,"sub":"i.v. velmi pomalu (max 1 ml neředěného/min), vleže"},{"l":"Neředit (500 mg/ml)","ml":null,"total":null,"sub":"i.m. (kojenci 3–11 měs. pouze i.m.)"},{"l":"Infuze 5 ml do 100 ml FR","ml":5,"total":100,"sub":"u větších dětí; z vaku podat vypočtený objem"}],"reg":[{"l":"Analgezie / antipyréza","d":15,"kg":true,"max":1000,"route":"i.v./i.m.","dil":0,"note":"SPC pásma ≈ 10–15 mg/kg (horečka ~10 mg/kg); max 4× denně; i.v. pomalu – riziko hypotenze"}],"age":{"minMonths":3,"minKg":5,"msg":"SPC: injekce kontraindikována < 3 měsíce nebo < 5 kg; 3–11 měsíců pouze i.m., i.v. až od 1 roku"},"fixed":"SPC (500 mg/ml) jednotlivá dávka: 5–8 kg 0,1–0,2 ml (jen i.m.); 9–15 kg 0,2–0,5 ml; 16–23 kg 0,3–0,8 ml; 24–30 kg 0,4–1 ml; 31–45 kg 0,5–1,5 ml; 46–53 kg 0,8–1,8 ml.","cave":"Hypotenze/šok při rychlém i.v. podání, agranulocytóza, anafylaxe. Ne u kojenců < 3 m / < 5 kg.","conf":"medium","src":["https://sukl.cz/download/spc/SPC14385.pdf"],"kind":"calc"},{"id":"apaurin","n":"Apaurin","s":"10 mg / 2 ml (diazepam)","peds":"yes","base":"mg","conc":5,"amp":2,"solv":"neředit","dil":[{"l":"Neředit (5 mg/ml)","ml":null,"total":null,"sub":"ředěním se sráží; i.v. pomalu ~1 ml/min do velké žíly"}],"reg":[{"l":"Křeče / status epilepticus","d":0.25,"kg":true,"max":10,"route":"i.v./i.o.","dil":0,"note":"SPC 0,2–0,3 mg/kg (nebo 1 mg/rok věku); max 2 dávky benzodiazepinu v PNP, pak 2. linie"},{"l":"Křeče – rektálně z ampule","d":0.5,"kg":true,"max":10,"route":"p.r.","dil":0,"note":"off-label (roztok ampule rektálně stříkačkou bez jehly); RCUK 0,5 mg/kg max 20 mg"}],"age":{"minMonths":6,"minKg":0,"msg":"SPC: novorozenci nedoporučeno (benzylalkohol, propylenglykol); < 6 měsíců jen s krajní opatrností, není-li alternativa – u křečí kojence rozhoduje lékař"},"cave":"Dechová deprese/apnoe (zvl. po kombinaci s jiným BZD či opiátem), hypotenze. Mít připravenou ventilaci.","conf":"medium","src":["https://halmed.hr/upl/lijekovi/SPC/Apaurin-SPC.pdf","https://www.resus.org.uk/sites/default/files/2026-01/RCUK%20Paediatric%20emergency%20algorithms%20and%20resources%20Jan%2026%20V5.pdf"],"kind":"calc"},{"id":"arduan","n":"Arduan","s":"4 mg prášek → 1 mg/ml","peds":"limited","base":"mg","conc":1,"amp":4,"solv":"FR","form":"Rozpustit FR do 4 ml","dil":[{"l":"Po rozpuštění do 4 ml = 1 mg/ml","ml":null,"total":null,"sub":"4 mg + FR do 4 ml"},{"l":"1 ml roztoku + 3 ml FR = 0,25 mg/ml","ml":1,"total":4,"sub":"kojenci/novorozenci"}],"reg":[{"l":"Myorelaxace – děti","d":0.08,"kg":true,"max":8,"route":"i.v.","dil":0,"note":"SPC (EE) 0,08–0,09 mg/kg, účinek 25–35 min; doplňková dávka 1/3 úvodní"},{"l":"Myorelaxace – novorozenci","d":0.05,"kg":true,"route":"i.v.","dil":1,"note":"SPC 0,05–0,06 mg/kg"}],"cave":"Dlouhodobě působící relaxans – nevhodné k RSI (pomalý nástup), jen po zajištění DC a sedaci; bradykardie, hypotenze. U dětské RSI preferovat rokuronium/sukcinylcholin.","conf":"low","src":["https://www.kliinik.ee/static/ravimid/SPC/SPC_1001316.pdf"],"kind":"calc"},{"id":"atropin","n":"Atropin","s":"0,5 mg / 1 ml","peds":"yes","base":"mg","conc":0.5,"amp":1,"solv":"FR","dil":[{"l":"1 ml + 4 ml FR = 0,1 mg/ml","ml":1,"total":5,"sub":"děti – 0,2 ml/kg"},{"l":"Neředit (0,5 mg/ml)","ml":null,"total":null,"sub":"větší děti, intoxikace organofosfáty"}],"reg":[{"l":"Bradykardie (vagová) / premedikace RSI","d":0.02,"kg":true,"max":0.5,"route":"i.v./i.o.","dil":0,"note":"20 µg/kg; lze opakovat; ERC už neuvádí minimální dávku 0,1 mg"},{"l":"Intoxikace organofosfáty","d":0.02,"kg":true,"route":"i.v./i.o.","dil":1,"note":"0,02–0,05 mg/kg, zdvojovat á 5 min do atropinizace (suché sekrety) – bez maxima"}],"cave":"Bradykardie u dítěte je většinou hypoxická – nejdřív oxygenace/ventilace, adrenalin při HR < 60 s hypoperfuzí; atropin jen u vagové příčiny nebo AV blokády.","conf":"high","src":["https://www.resus.org.uk/sites/default/files/2026-01/RCUK%20Paediatric%20emergency%20algorithms%20and%20resources%20Jan%2026%20V5.pdf","https://dontforgetthebubbles.com/resus-council-guidance-2025-paediatric-life-support/"],"kind":"calc"},{"id":"berodual_neb","n":"Berodual roztok k rozprašování","s":"0,25 mg ipratropium + 0,5 mg fenoterol / ml (20 kapek = 1 ml)","peds":"yes","base":"ml","conc":1,"amp":20,"solv":"FR do nebulizátoru","dil":[{"l":"Dávka + FR do 3–4 ml","ml":null,"total":4,"sub":"ředit jen FR, ne destilovanou vodou"}],"reg":[{"l":"Akutní bronchospasmus < 6 let (< 22 kg)","d":0.1,"kg":true,"max":0.5,"route":"inh","dil":0,"note":"SPC: 0,1 ml/kg = 2 kapky/kg, max 0,5 ml (10 kapek)."}],"age":{"minMonths":0,"minKg":0,"msg":"< 6 let (< 22 kg) jen omezená data – pouze pod lékařským dohledem."},"fixed":"< 6 let: 2 kapky/kg (0,1 ml/kg), max 10 kapek (0,5 ml). 6–12 let: 10–40 kapek (0,5–2 ml). > 12 let: 20–50 kapek (1–2,5 ml), výjimečně max 80 kapek (4 ml). Vždy doplnit FR na 3–4 ml. Opakování dle SPC nejdříve za 4 h.","cave":"Tachykardie, třes, hypokalémie. KI: HOKMP, tachyarytmie. Nesmí do očí (ipratropium – mydriáza, glaukom).","conf":"high","src":["https://boehringer-ingelheim.com/sites/default/files/cz/SPC/berodual_sol_spc_10_2020.pdf"],"kind":"calc"},{"id":"betaloc","n":"Betaloc","s":"5 mg / 5 ml (metoprolol)","peds":"no","base":"mg","conc":1,"amp":5,"solv":"neředit","dil":[{"l":"Neředit (1 mg/ml)","ml":null,"total":null,"sub":"jen adolescenti po konzultaci"}],"age":{"minMonths":216,"minKg":0,"msg":"SPC: bezpečnost a účinnost i.v. metoprololu u dětí nebyla stanovena"},"cave":"U dětí v PNP nepoužívat – SVT řešit vagovými manévry/adenosinem/kardioverzí; riziko bradykardie, hypotenze, hypoglykémie, bronchospasmu.","conf":"medium","src":[],"kind":"info"},{"id":"bricanyl","n":"Bricanyl","s":"0,5 mg / 1 ml (terbutalin)","peds":"yes","base":"mg","conc":0.5,"amp":1,"solv":"FR / G5 % pro infuzi","dil":[{"l":"Neředit (0,5 mg/ml)","ml":null,"total":null,"sub":"s.c. (příp. i.m.)"}],"reg":[{"l":"Těžké astma / bronchospasmus","d":0.01,"kg":true,"max":0.3,"route":"s.c.","dil":0,"note":"lze opakovat po 20–30 min; i.v. jen pomalu/infuzí za monitorace"}],"age":{"minMonths":24,"minKg":0,"msg":"SPC: dávkování stanoveno pro 2–15 let"},"fixed":"SPC: < 3 roky (~10 kg) 0,1 mg = 0,2 ml; 3 roky 0,15 mg; 6 let 0,2 mg; 8 let 0,25 mg; ≥ 10 let 0,3 mg = 0,6 ml.","cave":"Tachykardie, hypokalémie, třes, hyperglykémie/laktát. Inhalační β2-mimetika mají přednost.","conf":"medium","src":["https://www.rxreasoner.com/monographs/bricanyl-inj-sol/usage","https://www.medicines.org.uk/emc/product/867/smpc/print"],"kind":"calc"},{"id":"cacl","n":"Calcium chloratum 10 %","s":"10 ml = 4,56 mmol Ca","peds":"yes","base":"mmol","conc":0.456,"amp":10,"solv":"neředit","dil":[{"l":"Neředit (10 %)","ml":null,"total":null,"sub":"i.o./centrální žíla, KPR"},{"l":"5 ml + 5 ml FR (5 %)","ml":5,"total":10,"sub":"periferní žíla – silně dráždivé, riziko nekrózy při paravazátu"}],"reg":[{"l":"Hyperkalémie / hypokalcémie / blokátory Ca kanálu","d":0.0912,"kg":true,"max":4.56,"route":"i.v./i.o.","dil":1,"note":"= 0,2 ml/kg 10 % (20 mg/kg), max 10 ml; pomalu 5–10 min (při zástavě bolus); lze opakovat"},{"l":"Masivní transfuze","d":0.0456,"kg":true,"max":2.28,"route":"i.v./i.o.","dil":1,"note":"= 0,1 ml/kg 10 %, max 5 ml"}],"cave":"Nepodávat rutinně při KPR. Precipitace s bikarbonátem – proplachovat. Paravazát = nekróza; bradykardie při rychlém podání (digoxin).","conf":"medium","src":["https://www.greatnorthairambulance.co.uk/app/uploads/2023/05/Calcium-chloride-SOP.pdf","https://dontforgetthebubbles.com/resus-council-guidance-2025-paediatric-life-support/"],"kind":"calc"},{"id":"calypsol","n":"Calypsol","s":"500 mg / 10 ml (ketamin)","peds":"yes","base":"mg","conc":50,"amp":10,"solv":"FR","dil":[{"l":"2 ml + 8 ml FR = 10 mg/ml","ml":2,"total":10,"sub":"analgezie, sedace i.v."},{"l":"Neředit (50 mg/ml)","ml":null,"total":null,"sub":"i.m. a i.n. (max 1 ml/nosní dírku, MAD)"},{"l":"1 ml + 9 ml FR = 5 mg/ml","ml":1,"total":10,"sub":"analgezie u malých dětí"}],"reg":[{"l":"Analgezie","d":0.3,"kg":true,"max":25,"route":"i.v./i.o.","dil":2,"note":"subdisociační 0,1–0,3(–0,5) mg/kg pomalu, titrovat á 5–10 min"},{"l":"Analgezie","d":1,"kg":true,"max":50,"route":"i.n.","dil":1,"note":"1–1,5 mg/kg neředěný, rozdělit do obou nosních dírek; lze 1× opakovat 0,5 mg/kg po 10–15 min"},{"l":"Analgosedace","d":1,"kg":true,"max":100,"route":"i.v./i.o.","dil":0,"note":"1–1,5 mg/kg za 30–60 s, doplňky 0,5 mg/kg"},{"l":"Analgosedace","d":4,"kg":true,"max":200,"route":"i.m.","dil":1,"note":"4–5 mg/kg (ACEP), nástup 5 min"},{"l":"Úvod do anestezie (RSI)","d":2,"kg":true,"max":200,"route":"i.v./i.o.","dil":0,"note":"1–2 mg/kg (u šoku 1 mg/kg); SPC 1–4,5 mg/kg"}],"age":{"minMonths":3,"minKg":0,"msg":"Do 3 měsíců vyšší riziko laryngospasmu/apnoe (ACEP – relativní KI pro procedurální sedaci); SPC věkový limit neuvádí"},"cave":"Laryngospasmus, hypersalivace (zvážit atropin), zvracení, emergentní reakce u starších dětí, hypertenze. Monitorace SpO2/EtCO2.","conf":"medium","src":["https://www.medicines.org.uk/emc/product/6935/smpc/print","https://www.paramedicpractice.com/content/clinical-practice/intranasal-ketamine-analgesia-for-non-physician-prehospital-clinicians"],"kind":"calc"},{"id":"cefotaxim","n":"Cefotaxim","s":"1 g prášek → 100 mg/ml","peds":"yes","base":"mg","conc":100,"amp":10,"solv":"Aqua / FR","form":"Rozpustit v 10 ml Aqua / FR","dil":[{"l":"1 g v 10 ml Aqua/FR = 100 mg/ml","ml":null,"total":null,"sub":"i.v. během 3–5 min"}],"reg":[{"l":"Sepse / IMO / meningitida","d":50,"kg":true,"max":2000,"route":"i.v./i.o.","dil":0,"note":"co nejdříve (do 30 min od podezření), nečekat na odběry; i.m. možné, pokud nelze získat vstup"},{"l":"Meningitida – vyšší dávka","d":100,"kg":true,"max":2000,"route":"i.v./i.o.","dil":0,"note":"jen dle lokálního protokolu; ČSARIM: 50 mg/kg/dávku, max 200 mg/kg/den"}],"cave":"Anafylaxe (alergie na β-laktamy). Rychlé bolusové podání přes CVK – arytmie.","conf":"medium","src":["https://www.csarim.cz/getmedia/b396df33-bb33-4db2-8bbc-c7d1ec4be321/doporuceny-postup-invazivni-meningokokove-onemocneni-2005.pdf.aspx"],"kind":"calc"},{"id":"cordarone","n":"Cordarone","s":"150 mg / 3 ml (amiodaron)","peds":"yes","base":"mg","conc":50,"amp":3,"solv":"G5 %","solvOnly":true,"dil":[{"l":"3 ml + 12 ml G5 % = 10 mg/ml","ml":3,"total":15,"sub":"KPR: 0,5 ml/kg; ředit výhradně G5 %"},{"l":"3 ml + G5 % do 50 ml = 3 mg/ml","ml":3,"total":50,"sub":"infuze 5 mg/kg za 20–60 min (tachyarytmie)"},{"l":"Neředit (50 mg/ml)","ml":null,"total":null,"sub":"KPR u větších dětí, proplach"}],"reg":[{"l":"KPR VF/bVT po 3. výboji","d":5,"kg":true,"max":300,"route":"i.v./i.o.","dil":0,"note":"bolus, proplach"},{"l":"KPR VF/bVT po 5. výboji","d":5,"kg":true,"max":150,"route":"i.v./i.o.","dil":0,"note":"RCUK 2025: druhá dávka max 150 mg"},{"l":"Tachyarytmie s pulzem","d":5,"kg":true,"max":300,"route":"i.v.","dil":1,"note":"pomalu > 20 min (ideálně po konzultaci dětského kardiologa); rychlé podání → hypotenze"}],"cave":"Obsahuje benzylalkohol – SPC Cordarone: KI u novorozenců/kojenců (UK SPC do 3 let) mimo život ohrožující situace; při KPR podat. Hypotenze, bradykardie.","conf":"high","src":["https://www.resus.org.uk/sites/default/files/2025-12/Paediatric%20advanced%20life%20support%20algorithm%20Nov%202025%20V2.pdf","https://www.resus.org.uk/sites/default/files/2026-01/RCUK%20Paediatric%20emergency%20algorithms%20and%20resources%20Jan%2026%20V5.pdf"],"kind":"calc"},{"id":"dexamed","n":"Dexamed","s":"8 mg / 2 ml (dexamethason)","peds":"yes","base":"mg","conc":4,"amp":2,"solv":"FR / G5 %","dil":[{"l":"2 ml + 6 ml FR = 1 mg/ml","ml":2,"total":8,"sub":"malé děti – přesné odměření"},{"l":"Neředit (4 mg/ml)","ml":null,"total":null,"sub":"i.m. nebo i.v. pomalu"}],"reg":[{"l":"Laryngitida (croup) lehká–střední","d":0.15,"kg":true,"max":12,"route":"i.v./i.m.","dil":0,"note":"0,15–0,3 mg/kg; stejně účinné p.o."},{"l":"Laryngitida těžká","d":0.6,"kg":true,"max":12,"route":"i.v./i.m.","dil":0,"note":"+ inhalace adrenalinu"},{"l":"Bakteriální meningitida","d":0.15,"kg":true,"max":10,"route":"i.v.","dil":0,"note":"před/s 1. dávkou ATB (ČSARIM 0,15 mg/kg á 6 h)"}],"cave":"Jednorázová dávka bezpečná; u akutní laryngitidy zbytečně neagitovat dítě (i.m./i.v. jen pokud nelze p.o./p.r.).","conf":"high","src":["https://www.childrens.health.qld.gov.au/__data/assets/pdf_file/0022/174163/croup-flowchart-and-medications.pdf","https://pubmed.ncbi.nlm.nih.gov/17208307/","https://www.csarim.cz/getmedia/b396df33-bb33-4db2-8bbc-c7d1ec4be321/doporuceny-postup-invazivni-meningokokove-onemocneni-2005.pdf.aspx"],"kind":"calc"},{"id":"dexa_supp","n":"Dexamethason supp. pro infant","s":"10 mg čípek (magistraliter)","peds":"limited","base":"mg","solv":"p.r.","dil":[{"l":"Celý čípek (10 mg)","ml":null,"total":null,"sub":"čípek lze případně dělit podélně (nepřesné)"}],"reg":[{"l":"Laryngitida (croup)","d":0.6,"kg":true,"max":10,"route":"p.r.","dil":0,"note":"rektální biologická dostupnost a dávkování dexamethasonu nejsou standardizovány – použít ekvivalent 0,15–0,6 mg/kg a zaokrouhlit na čípek"}],"fixed":"Obvykle 1 čípek 10 mg (≈ 0,6 mg/kg u ~17 kg; u kojence < 10 kg > 1 mg/kg – zvážit ½ čípku nebo p.o./i.m. Dexamed).","cave":"Nejde o registrovaný léčivý přípravek – individuálně připravovaný lék (lékárna, např. Magistraliter Pharma: dexamethason 0,010 g / supp. pro infant), bez SPC a bez oficiálního dávkování.","conf":"low","src":["https://www.magistraliterpharma.cz/download/818-zde.pdf"],"kind":"info"},{"id":"diazepam_rect","n":"Diazepam Desitin rectal tube","s":"5 mg / 2,5 ml; 10 mg / 2,5 ml","peds":"yes","base":"mg","conc":2,"amp":2.5,"solv":"neředit","dil":[{"l":"Neředit – celá tuba","ml":null,"total":null,"sub":"zavést do konečníku, stlačit, vytahovat stlačenou, stisknout hýždě"}],"reg":[{"l":"Křeče","d":0.5,"kg":true,"max":10,"min":5,"route":"p.r.","dil":0,"note":"SPC 0,25–0,5 mg/kg zaokrouhleno nahoru na tubu; při neúčinnosti lze opakovat za 10 min"}],"age":{"minMonths":12,"minKg":10,"msg":"SPC: < 10 kg (< 1 rok) nedoporučeno"},"fixed":"10–15 kg (1–3 roky): 5 mg tuba (u malých dětí zavádět jen do poloviny ke značce); > 15 kg (> 3 roky): 10 mg tuba.","cave":"Dechová deprese, zvlášť při opakování nebo kombinaci s i.v. BZD; po p.r. diazepamu počítat jako 1. dávku BZD.","conf":"high","src":["https://www.medicines.org.uk/emc/product/2997/smpc/print","https://www.medicines.org.uk/emc/product/3001/smpc/print"],"kind":"info"},{"id":"dithiaden","n":"Dithiaden","s":"1 mg / 2 ml (bisulepin)","peds":"limited","base":"mg","conc":0.5,"amp":2,"solv":"neředit","dil":[{"l":"Neředit (0,5 mg/ml)","ml":null,"total":null,"sub":"i.v. pomalu nebo i.m."}],"reg":[{"l":"Alergická reakce (doplněk)","d":0.05,"kg":true,"max":1,"route":"i.v./i.m.","dil":0,"note":"odvozeno z pevných dávek SPC (≈ 0,05 mg/kg); u anafylaxe není lékem 1. volby"}],"age":{"minMonths":12,"minKg":0,"msg":"SPC injekce uvádí dávkování až od 1 roku"},"fixed":"SPC: 1–6 let 0,5–1 mg; 7–14 let 1–2 mg; 2–3× denně.","cave":"Sedace, paradoxní excitace a nežádoucí účinky častější u dětí; nesmí oddálit adrenalin u anafylaxe. KI: status asthmaticus.","conf":"low","src":["https://nonstop-lekarna.cz/dithiaden-inj-1890/souhrn-udaju"],"kind":"calc"},{"id":"dolmina","n":"Dolmina","s":"75 mg / 3 ml (diklofenak)","peds":"no","base":"mg","conc":25,"amp":3,"solv":"FR / G5 %","dil":[{"l":"Neředit","ml":null,"total":null,"sub":"jen i.m. u dospělých/adolescentů"}],"age":{"minMonths":216,"minKg":0,"msg":"Injekční diklofenak není určen dětem a dospívajícím (starý seznam: i.m. až od 15 let – ověřit v SPC)"},"cave":"U dětí v PNP nepoužívat – alternativy: paracetamol, metamizol, ketamin, opioidy. Riziko nefrotoxicity při dehydrataci, krvácení.","conf":"low","src":[],"kind":"info"},{"id":"ebrantil","n":"Ebrantil","s":"25 mg / 5 ml (urapidil)","peds":"no","base":"mg","conc":5,"amp":5,"solv":"FR / G5 %","dil":[{"l":"Neředit","ml":null,"total":null,"sub":""}],"age":{"minMonths":216,"minKg":0,"msg":"SPC: u dětí nejsou dostatečné údaje o bezpečnosti a účinnosti"},"cave":"Hypertenzní krize u dítěte je vzácná (renální, feochromocytom, intoxikace) – řešit po konzultaci, v PNP zpravidla nesnižovat TK farmakologicky; riziko hypoperfuze CNS.","conf":"medium","src":[],"kind":"info"},{"id":"exacyl","n":"Exacyl","s":"500 mg / 5 ml (k. tranexamová)","peds":"limited","base":"mg","conc":100,"amp":5,"solv":"FR","dil":[{"l":"Neředit (100 mg/ml)","ml":null,"total":null,"sub":"i.v. pomalu za 10 min (max 1 ml/min)"},{"l":"5 ml + 45 ml FR = 10 mg/ml","ml":5,"total":50,"sub":"malé děti, pomalá aplikace"}],"reg":[{"l":"Závažné trauma / krvácení","d":15,"kg":true,"max":1000,"route":"i.v./i.o.","dil":0,"note":"do 3 h od úrazu, za 10 min; následně 2 mg/kg/h v nemocnici"}],"cave":"Pouze do 3 h od úrazu; rychlý bolus → hypotenze. Křeče při vysokých dávkách.","conf":"high","src":["https://clinicalguidelines.scot.nhs.uk/nhsggc-guidelines/nhsggc-guidelines/cardiac/tranexamic-acid-in-paediatric-surgery-and-trauma/"],"kind":"calc"},{"id":"flumazenil","n":"Flumazenil","s":"0,5 mg / 5 ml","peds":"limited","base":"mg","conc":0.1,"amp":5,"solv":"neředit","dil":[{"l":"Neředit (0,1 mg/ml)","ml":null,"total":null,"sub":"i.v. za 15 s"}],"reg":[{"l":"Zvrat sedace BZD","d":0.01,"kg":true,"max":0.2,"route":"i.v.","dil":0,"note":"opakovat á 60 s, max 4 další dávky; celkem max 0,05 mg/kg nebo 1 mg (menší z hodnot)"}],"age":{"minMonths":12,"minKg":0,"msg":"SPC: u dětí < 1 rok nedostatek údajů"},"cave":"Ne u neznámé/smíšené intoxikace a u dětí s epilepsií na BZD – riziko křečí. Krátký účinek → resedace.","conf":"high","src":["https://www.medsafe.govt.nz/profs/Datasheet/f/Flumazenilinj.pdf"],"kind":"calc"},{"id":"furosemid","n":"Furosemid","s":"20 mg / 2 ml","peds":"limited","base":"mg","conc":10,"amp":2,"solv":"FR","solvOnly":true,"dil":[{"l":"2 ml + 8 ml FR = 2 mg/ml","ml":2,"total":10,"sub":"malé děti"},{"l":"Neředit (10 mg/ml)","ml":null,"total":null,"sub":"i.v. pomalu (max 4 mg/min)"}],"reg":[{"l":"Plicní edém / převodnění","d":1,"kg":true,"max":20,"route":"i.v.","dil":0,"note":"pomalu 1–2 min"}],"cave":"V PNP u dětí vzácná indikace (kardiální selhání, převodnění); KI při hypovolémii/dehydrataci. Ototoxicita při rychlém podání.","conf":"low","src":[],"kind":"calc"},{"id":"glukoza10","n":"Glukóza 10 % (z G40)","s":"10 ml G40 % + 30 ml Aqua = 40 ml G10 %","peds":"yes","base":"g","conc":0.1,"amp":40,"solv":"připravená G10 %","dil":[{"l":"Připraveno: 10 ml G40 + 30 ml Aqua (1 : 3)","ml":null,"total":null,"sub":"0,1 g/ml; pro > 20 kg připravit 2 sady (20 ml G40 + 60 ml Aqua)"}],"reg":[{"l":"Hypoglykémie","d":0.2,"kg":true,"max":10,"route":"i.v./i.o.","dil":0,"note":"= 2 ml/kg G10 %; lze opakovat dle glykémie po 5–10 min"},{"l":"Hypoglykémie – novorozenec","d":0.25,"kg":true,"route":"i.v./i.o.","dil":0,"note":"= 2,5 ml/kg G10 %"}],"cave":"Ředit Aqua nebo FR (FR → mírně hypertonické, oboje přijatelné); po bolusu zajistit kontinuální přívod glukózy a recheck glykémie.","conf":"high","src":["https://www.resus.org.uk/sites/default/files/2026-01/RCUK%20Paediatric%20emergency%20algorithms%20and%20resources%20Jan%2026%20V5.pdf","https://dontforgetthebubbles.com/resus-council-guidance-2025-paediatric-life-support/"],"kind":"calc"},{"id":"glukoza40","n":"Glukóza 40 %","s":"4 g / 10 ml","peds":"limited","base":"g","conc":0.4,"amp":10,"solv":"Aqua","dil":[{"l":"Na 10 %: 10 ml G40 + 30 ml Aqua","ml":10,"total":40,"sub":"= 0,1 g/ml; standard pro děti (viz glukoza10)"},{"l":"Neředit (40 %)","ml":null,"total":null,"sub":"jen adolescenti / centrální žíla – u dětí periferně nepodávat"}],"reg":[{"l":"Hypoglykémie","d":0.2,"kg":true,"max":10,"route":"i.v./i.o.","dil":0,"note":"0,2 g/kg = 2 ml/kg G10 %; novorozenci 0,25 g/kg (2,5 ml/kg G10); kontrola glykémie po 5–10 min"}],"cave":"G40 % je hyperosmolární – u dětí ředit na 10 % (paravazát = nekróza). Vyhnout se hyperglykémii (u KPR/poranění mozku).","conf":"high","src":["https://www.resus.org.uk/sites/default/files/2026-01/RCUK%20Paediatric%20emergency%20algorithms%20and%20resources%20Jan%2026%20V5.pdf","https://dontforgetthebubbles.com/resus-council-guidance-2025-paediatric-life-support/"],"kind":"calc"},{"id":"haloperidol","n":"Haloperidol","s":"5 mg / 1 ml","peds":"no","base":"mg","conc":5,"amp":1,"solv":"neředit","dil":[{"l":"Neředit","ml":null,"total":null,"sub":"i.m."}],"age":{"minMonths":216,"minKg":0,"msg":"SPC injekce (harmonizované EU): bezpečnost a účinnost u dětí a dospívajících < 18 let nestanovena"},"cave":"Extrapyramidové reakce (dystonie) a prodloužení QT častější u dětí; agitovanost dítěte řešit primárně nefarmakologicky / BZD.","conf":"medium","src":["https://psychiatrie.cz/images/haloperidol_inj_2.pdf"],"kind":"info"},{"id":"heparin","n":"Heparin","s":"50 000 IU / 10 ml","peds":"no","base":"IU","conc":5000,"amp":10,"solv":"FR","dil":[{"l":"1 ml + 9 ml FR = 500 IU/ml","ml":1,"total":10,"sub":"jen pokud indikováno konzultantem"}],"reg":[{"l":"Tromboembolie (jen po konzultaci)","d":75,"kg":true,"max":5000,"route":"i.v.","dil":0,"note":"BNFc 75 IU/kg bolus (novorozenci 75 IU/kg) – nemocniční indikace"}],"cave":"V dětské PNP chybí indikace (AKS/PE prakticky nejsou); riziko krvácení, chyba v koncentraci 5000 IU/ml je kritická.","conf":"low","src":[],"kind":"info"},{"id":"kardegic","n":"Kardégic","s":"0,5 g prášek → 100 mg/ml","peds":"no","base":"mg","conc":100,"amp":5,"solv":"Aqua","form":"Rozpustit přiloženými 5 ml","dil":[{"l":"Po rozpuštění v 5 ml","ml":null,"total":null,"sub":""}],"age":{"minMonths":192,"minKg":0,"msg":"Kyselina acetylsalicylová – riziko Reyeova syndromu u dětí < 16 let (výjimka Kawasakiho nemoc v nemocnici)"},"cave":"U dětí v PNP nepoužívat – Reyeův syndrom, žádná přednemocniční indikace.","conf":"medium","src":[],"kind":"info"},{"id":"krystaloid","n":"Krystaloid (Ringerfundin / F1/1)","s":"vak 250–1000 ml","peds":"yes","base":"ml","conc":1,"amp":500,"solv":"krystaloid","dil":[{"l":"Neředit","ml":null,"total":null,"sub":"preferovat balancovaný krystaloid (Ringerfundin); u kojenců podávat stříkačkou (push-pull), ne gravitací"}],"reg":[{"l":"Šok (septický, hypovolemický, anafylaxe)","d":10,"kg":true,"max":500,"route":"i.v./i.o.","dil":0,"note":"bolus rychle (5–10 min), po každém bolusu reassessment; opakovat do 40–60 ml/kg v 1. hodině, pozor na známky přetížení (hepatomegalie, chrůpky)"},{"l":"Hemoragický šok (trauma)","d":10,"kg":true,"max":500,"route":"i.v./i.o.","dil":0,"note":"krystaloid omezit na celkem max 20 ml/kg, pak krev/krevní deriváty"},{"l":"DKA se šokem","d":10,"kg":true,"max":500,"route":"i.v./i.o.","dil":0,"note":"za 5–10 min, opatrně (riziko edému mozku)"}],"cave":"Kardiální šok / myokarditida: menší bolusy 5 ml/kg. Glukózové roztoky nejsou náhradou objemu.","conf":"high","src":["https://dontforgetthebubbles.com/resus-council-guidance-2025-paediatric-life-support/","https://www.resus.org.uk/sites/default/files/2026-01/RCUK%20Paediatric%20emergency%20algorithms%20and%20resources%20Jan%2026%20V5.pdf"],"kind":"calc"},{"id":"mesocain","n":"Mesocain 1 %","s":"100 mg / 10 ml (trimekain)","peds":"limited","base":"mg","conc":10,"amp":10,"solv":"neředit","dil":[{"l":"Neředit","ml":null,"total":null,"sub":"10 mg/ml"},{"l":"1 ml + 4 ml FR → 2 mg/ml","ml":1,"total":5,"sub":"pro malé děti (< 10 kg) – přesnější dávkování i.v."}],"reg":[{"l":"Antiarytmikum (KT/refrakterní KF)","d":1,"kg":true,"max":100,"route":"i.v./i.o.","dil":0,"note":"SPC: 1 mg/kg bolus (max 100 mg); není-li do 15 min zahájena infuze, další bolus 0,5–1 mg/kg; kumulativně max 3–5 mg/kg. Infuze 8–50 µg/kg/min."},{"l":"Lokální anestezie – MAX celková dávka","d":4.5,"kg":true,"max":300,"route":"lokálně/infiltrace","dil":0,"note":"SPC: max 4,5 mg/kg bez adrenalinu (7 mg/kg s adrenalinem 1:200 000). Hodnota = strop, ne doporučená dávka; nejnižší účinná koncentrace."}],"perf":{"unit":"µg/kg/min","range":[8,50],"def":20,"dil":0},"age":{"minMonths":0,"minKg":0,"msg":"Systémová toxicita (CNS, KVS) u dětí vyšší, zejména < 1 rok. Periferní blokády obvykle až od 3–4 let."},"cave":"Kontraindikace: bradykardie, AV blok, asystolie, kardiogenní šok, hypovolémie, hypotenze, porfyrie, MH v anamnéze. Děti < 1 rok – vyšší riziko toxicity.","conf":"medium","src":["https://mediately.co/cz/drugs/IJOtkQp9rDp0HPaS90kbUACx4ef/injectio-trimecainii-chlorati-ardeapharma-1-injekcni-roztok"],"kind":"calc"},{"id":"methylergometrin","n":"Methylergometrin","s":"0,2 mg / 1 ml","peds":"no","base":"mg","conc":0.2,"amp":1,"solv":"neředit","dil":[{"l":"Neředit","ml":null,"total":null,"sub":"přednostně i.m."}],"age":{"minMonths":216,"minKg":0,"msg":"Pouze porodnická indikace (poporodní krvácení). U dětí se nepoužívá; u mladistvé rodičky dávkování jako u dospělých."},"fixed":"Mladistvá rodička: 0,1–0,2 mg i.m./pomalu i.v. dle dospělého dávkování.","cave":"Náhodné podání novorozenci (záměna s vitaminem K) způsobuje těžkou otravu – útlum dechu, křeče.","conf":"medium","src":[],"kind":"info"},{"id":"mgso4","n":"MgSO4 20 %","s":"2 g / 10 ml","peds":"yes","base":"g","conc":0.2,"amp":10,"solv":"FR / G5 %","dil":[{"l":"10 ml + 10 ml FR → 0,1 g/ml (10 %)","ml":10,"total":20,"sub":"aplikovat pomalu během 20 min (lineární dávkovač)"},{"l":"10 ml do 100 ml FR → 0,02 g/ml","ml":10,"total":100,"sub":"infuze 20 min"}],"reg":[{"l":"Těžké astma (refrakterní)","d":0.04,"kg":true,"max":2,"route":"i.v./i.o.","dil":0,"note":"40 mg/kg (BTS/SIGN; některé protokoly 50 mg/kg) během 20 min, jednorázově. Max 2 g."},{"l":"Torsades de pointes","d":0.05,"kg":true,"max":2,"route":"i.v./i.o.","dil":0,"note":"25–50 mg/kg (ERC), max 2 g; rychlejší podání (několik minut) při nestabilitě."}],"cave":"Hypotenze, flush, bradykardie, útlum dýchání při rychlém podání. Neaplikovat neředěné rychle.","conf":"medium","src":["https://rightdecisions.scot.nhs.uk/media/lp3nxk5x/bgh-paediatric-asthma-management-2020-sign-158-referenced-v2.pdf","https://www.childrens.health.qld.gov.au/__data/assets/pdf_file/0021/171822/asthma-flowchart-and-medications.pdf"],"kind":"calc"},{"id":"midazolam","n":"Midazolam","s":"5 mg / 1 ml","peds":"yes","base":"mg","conc":5,"amp":1,"solv":"FR / G5 %","dil":[{"l":"1 ml + 4 ml FR → 1 mg/ml","ml":1,"total":5,"sub":"SPC: u dětí < 15 kg ředit na 1 mg/ml"},{"l":"Neředit (5 mg/ml)","ml":null,"total":null,"sub":"i.m., i.n. (MAD, max ~1 ml/nosní dírka), bukálně"}],"reg":[{"l":"Křeče / status epilepticus","d":0.15,"kg":true,"max":10,"route":"i.v./i.o.","dil":0,"note":"APLS/QLD: 0,15 mg/kg, max 10 mg. Lze opakovat 1× po 5–10 min (benzodiazepiny max 2 dávky celkem)."},{"l":"Křeče / status epilepticus","d":0.2,"kg":true,"max":10,"route":"i.m.","dil":1,"note":"0,2 mg/kg, max 10 mg."},{"l":"Křeče / status epilepticus","d":0.3,"kg":true,"max":10,"route":"i.n./bukálně","dil":1,"note":"0,3 mg/kg, max 10 mg; i.n. rozdělit do obou nosních dírek."},{"l":"Sedace 6 m – 5 let","d":0.05,"kg":true,"max":6,"route":"i.v.","dil":0,"note":"SPC: úvodní 0,05–0,1 mg/kg během 2–3 min; titrovat; celkem max 0,6 mg/kg, ne více než 6 mg."},{"l":"Sedace 6–12 let","d":0.025,"kg":true,"max":10,"route":"i.v.","dil":0,"note":"SPC: úvodní 0,025–0,05 mg/kg; celkem max 0,4 mg/kg, ne více než 10 mg. ≥ 12 let jako dospělí (2–2,5 mg)."},{"l":"Sedace (premedikace)","d":0.1,"kg":true,"max":10,"route":"i.m.","dil":1,"note":"SPC: 1–15 let 0,05–0,15 mg/kg; celkem > 10 mg obvykle není nutné."},{"l":"Sedace (anxiolýza)","d":0.2,"kg":true,"max":10,"route":"i.n.","dil":1,"note":"Off-label, běžně 0,2–0,3 mg/kg; max 10 mg."}],"age":{"minMonths":0,"minKg":0,"msg":"Křeče: bez věkového omezení. Sedace i.v./i.m.: SPC nedoporučuje < 6 měsíců (riziko obstrukce DC a hypoventilace); i.m. sedace dle SPC 1–15 let."},"cave":"Útlum dechu (zejména po opakovaných dávkách, kombinaci s opioidy). Kojenci < 6 m zvlášť citliví. Mít připraveno zajištění DC.","conf":"high","src":["https://www.medicines.org.uk/emc/product/6420/smpc","https://www.childrens.health.qld.gov.au/__data/assets/pdf_file/0021/174180/status-epilepticus-flowchart-and-medications.pdf"],"kind":"calc"},{"id":"morphin","n":"Morphin 1 %","s":"10 mg / 1 ml","peds":"yes","base":"mg","conc":10,"amp":1,"solv":"FR","dil":[{"l":"1 ml + 9 ml FR → 1 mg/ml","ml":1,"total":10,"sub":"standard pro děti"},{"l":"Neředit","ml":null,"total":null,"sub":"i.m."}],"reg":[{"l":"Analgezie ≥ 6 měsíců","d":0.1,"kg":true,"max":10,"route":"i.v./i.o.","dil":0,"note":"SPC/BNFc 0,1–0,2 mg/kg pomalu (≥ 5 min); v PNP začít 0,1 mg/kg a titrovat po 0,05 mg/kg á 5–10 min."},{"l":"Analgezie 1–6 měsíců","d":0.05,"kg":true,"max":2.5,"route":"i.v./i.o.","dil":0,"note":"Opatrně, monitorace SpO2/dechu; titrovat."},{"l":"Analgezie (bez i.v.)","d":0.1,"kg":true,"max":10,"route":"i.m.","dil":1,"note":"SPC: 1–5 let 2,5–5 mg, 6–12 let 5–10 mg i.m. (≈ 0,1–0,2 mg/kg)."}],"age":{"minMonths":0,"minKg":0,"msg":"Kojenci < 6 měsíců: vysoké riziko útlumu dechu – snížená dávka 0,05 mg/kg, jen s monitorací. Některá SPC (UK) neuvádějí dávkování < 1 rok."},"cave":"Útlum dechu, hypotenze, zvracení; antidotum naloxon. Mít připraven naloxon.","conf":"medium","src":["https://www.medicines.org.uk/emc/product/3576/smpc/print"],"kind":"calc"},{"id":"naloxone","n":"Naloxone","s":"0,4 mg / 1 ml","peds":"yes","base":"mg","conc":0.4,"amp":1,"solv":"FR","dil":[{"l":"1 ml + 9 ml FR → 0,04 mg/ml (40 µg/ml)","ml":1,"total":10,"sub":"pro dávky 10 µg/kg"},{"l":"Neředit (0,4 mg/ml)","ml":null,"total":null,"sub":"pro 100 µg/kg a i.m."}],"reg":[{"l":"Útlum dechu po opioidech (iatrogenní, částečná reverze)","d":0.01,"kg":true,"max":0.4,"route":"i.v./i.o.","dil":0,"note":"SPC: 10–20 µg/kg, opakovat á 2–3 min do obnovení dechu. Při léčbě bolesti titrovat nižšími dávkami (1–5 µg/kg)."},{"l":"Předávkování opioidy (plná reverze)","d":0.1,"kg":true,"max":2,"route":"i.v./i.o.","dil":1,"note":"SPC: nejprve 10 µg/kg, při nedostatečné odpovědi 100 µg/kg. BNFc/APLS: 100 µg/kg, max 2 mg; opakovat á 1 min, možná infuze."},{"l":"Předávkování / novorozenec matky s opioidy","d":0.01,"kg":true,"max":0.4,"route":"i.m.","dil":1,"note":"SPC: 10 µg/kg i.m., pokud i.v. nelze; při nedostatečné odpovědi opakovat/zvýšit."}],"cave":"Krátký účinek (30–90 min) – riziko recidivy útlumu, observace. U dítěte chronicky na opioidech riziko abstinenčního syndromu/bolesti. Novorozenec matky závislé na opioidech – riziko křečí.","conf":"medium","src":["https://www.medicines.org.uk/emc/product/8967/smpc"],"kind":"calc"},{"id":"noradrenalin","n":"Noradrenalin","s":"1 mg / 1 ml","peds":"yes","base":"mg","conc":1,"amp":1,"solv":"G5 %","solvOnly":true,"dil":[{"l":"1 mg doředit G5 % do 50 ml → 20 µg/ml","ml":1,"total":50,"sub":"děti < 10 kg"},{"l":"2 mg doředit G5 % do 50 ml → 40 µg/ml","ml":2,"total":50,"sub":"10–30 kg"},{"l":"5 mg doředit G5 % do 50 ml → 100 µg/ml","ml":5,"total":50,"sub":"> 30 kg"}],"perf":{"unit":"µg/kg/min","range":[0.05,1],"def":0.1,"dil":1},"cave":"Pouze perfuzor, ideálně samostatný vstup (CVK/i.o.; periferně jen dobře fungující velká žíla – riziko extravazace a nekrózy). Nejdříve doplnit volum. Ředit jen G5 %.","conf":"medium","src":["https://www.seslhd.health.nsw.gov.au/sites/default/files/groups/Royal_Hospital_for_Women/Neonatal/Neomed/Noradrenaline%20(Norepineprhine)%20-%20Standard%20concentration_%20ANMFv1.1_20260416.pdf"],"kind":"calc"},{"id":"ondansetron","n":"Ondansetron","s":"8 mg / 4 ml","peds":"yes","base":"mg","conc":2,"amp":4,"solv":"FR / G5 %","dil":[{"l":"1 ml + 1 ml FR → 1 mg/ml","ml":1,"total":2,"sub":"pro malé děti"},{"l":"Neředit (2 mg/ml)","ml":null,"total":null,"sub":"i.v. pomalu ≥ 30 s"}],"reg":[{"l":"Nauzea / zvracení","d":0.1,"kg":true,"max":4,"route":"i.v./i.o.","dil":0,"note":"SPC (PONV): 0,1 mg/kg, max 4 mg, pomalu ≥ 30 s. (CINV: 0,15 mg/kg max 8 mg – v PNP nevyužije.)"}],"age":{"minMonths":1,"minKg":0,"msg":"SPC: i.v. PONV od 1 měsíce (pro léčbu PONV < 2 roky nejsou data); CINV od 6 měsíců."},"cave":"Prodloužení QT – nepodávat při vrozeném LQTS, opatrně s jinými QT-prodlužujícími léky a při hypokalémii/hypomagnezémii.","conf":"high","src":["https://www.medicines.org.uk/emc/product/5216/smpc"],"kind":"calc"},{"id":"paralen_supp","n":"Paralen čípky (paracetamol)","s":"100 mg / 500 mg čípek (příp. jiné 125/250 mg)","peds":"yes","base":"mg","solv":"p.r.","dil":[],"reg":[{"l":"Horečka / bolest","d":15,"kg":true,"max":1000,"route":"p.r.","note":"10–15 mg/kg, interval ≥ 6 h (Paralen 100), max 60 mg/kg/den. Zaokrouhlit na celé čípky."}],"age":{"minMonths":0,"minKg":7,"msg":"Paralen 100 mg čípky od 7 kg; Paralen 500 mg čípky až od 33 kg (≥ 9 let)."},"fixed":"Paralen 100 mg: 7–13 kg 1 čípek (100 mg), 14–20 kg 2 čípky (200 mg). Paralen 500 mg: 33–50 kg 1 čípek (500 mg); > 50 kg 1–2 čípky. 125 mg čípek ≈ 8–12 kg, 250 mg čípek ≈ 16–25 kg (orientačně dle 10–15 mg/kg).","cave":"Ověřit předchozí podání paracetamolu (sirup, Perfalgan) – riziko kumulace. Čípky nedělit nerovnoměrně.","conf":"medium","src":["https://www.euclekarna.cz/web/sukl/PI204769.pdf","https://www.euclekarna.cz/web/sukl/PI204772.pdf"],"kind":"info"},{"id":"perfalgan","n":"Perfalgan","s":"1 g / 100 ml (paracetamol)","peds":"yes","base":"mg","conc":10,"amp":100,"solv":"neředit","dil":[{"l":"Neředit (10 mg/ml)","ml":null,"total":null,"sub":"infuze 15 min; dávku natáhnout do stříkačky / dávkovače, nevěšet celou lahev"},{"l":"1 ml + 9 ml FR/G5 % → 1 mg/ml","ml":1,"total":10,"sub":"SPC pro ≤ 10 kg (spotřebovat do 1 h); max 7,5 ml léku na dávku"}],"reg":[{"l":"≤ 10 kg","d":7.5,"kg":true,"max":75,"route":"i.v./i.o.","dil":1,"note":"SPC: 7,5 mg/kg (0,75 ml/kg), interval ≥ 4 h, max 30 mg/kg/den."},{"l":"> 10–50 kg","d":15,"kg":true,"max":750,"route":"i.v./i.o.","dil":0,"note":"SPC: 15 mg/kg (1,5 ml/kg), interval ≥ 4 h, max 60 mg/kg/den (≤ 33 kg max 2 g/den, 33–50 kg max 3 g/den)."},{"l":"> 50 kg","d":15,"kg":true,"max":1000,"route":"i.v./i.o.","dil":0,"note":"Fixně 1 g (100 ml); max 4 g/den (rizikoví 3 g)."}],"age":{"minMonths":0,"minKg":0,"msg":"Donošení novorozenci a kojenci ≤ 10 kg: jen 7,5 mg/kg. Nedonošení: chybí data. 100 ml lahev dle SPC jen pro > 33 kg – menším dětem natáhnout dávku do stříkačky."},"fixed":"> 50 kg: 1 g = 100 ml.","cave":"Záměna mg × ml vedla k fatálním předávkováním kojenců – vždy uvádět mg i ml. Ověřit, zda dítě už nedostalo paracetamol (čípek, sirup) v posledních 4–6 h.","conf":"high","src":["https://www.kliinik.ee/static/ravimid/SPC/SPC_1167735.pdf"],"kind":"calc"},{"id":"perlinganit","n":"Perlinganit","s":"10 mg / 10 ml (nitroglycerin)","peds":"no","base":"mg","conc":1,"amp":10,"solv":"FR / G5 %","dil":[],"age":{"minMonths":216,"minKg":0,"msg":"Bezpečnost a účinnost u dětí nebyla stanovena; v dětské PNP indikace prakticky neexistuje."},"cave":"Hypotenze, methemoglobinémie. U dětí jen na specializovaném pracovišti (PICU/kardiologie).","conf":"medium","src":[],"kind":"info"},{"id":"propofol1","n":"Propofol 1 %","s":"200 mg / 20 ml = 10 mg/ml","peds":"limited","base":"mg","conc":10,"amp":20,"solv":"neředit","strength":{"cls":"low","t":"1 % · 10 mg/ml"},"dil":[{"l":"Neředit (10 mg/ml)","ml":null,"total":null,"sub":""}],"reg":[{"l":"Úvod do CA","d":2.5,"kg":true,"max":200,"route":"i.v./i.o.","dil":0,"note":"SPC: > 8 let ~2,5 mg/kg; mladší děti 2,5–4 mg/kg; titrovat. U šoku/ASA 3–4 výrazně snížit (1–2 mg/kg) nebo zvolit ketamin."},{"l":"Procedurální sedace","d":1,"kg":true,"max":100,"route":"i.v./i.o.","dil":0,"note":"SPC: 1–2 mg/kg k nástupu, dále 1,5–9 mg/kg/h."}],"perf":{"unit":"mg/kg/h","range":[1.5,9],"def":3,"dil":0},"age":{"minMonths":1,"minKg":0,"msg":"SPC: propofol 1 % od 1 měsíce věku. Sedace na JIP/ventilovaných ≤ 16 let kontraindikována (PRIS)."},"cave":"Hypotenze, apnoe, bradykardie. Alergie na sóju/arašídy (relativní). Nepoužívat k dlouhodobé sedaci dětí ≤ 16 let.","conf":"medium","src":["https://www.medicines.org.uk/emc/product/1365/smpc"],"kind":"calc"},{"id":"propofol2","n":"Propofol 2 %","s":"1 000 mg / 50 ml = 20 mg/ml","peds":"limited","base":"mg","conc":20,"amp":50,"solv":"neředit","strength":{"cls":"high","t":"2 % · 20 mg/ml"},"dil":[{"l":"Neředit (20 mg/ml)","ml":null,"total":null,"sub":"DVOJNÁSOBNÁ KONCENTRACE"}],"reg":[{"l":"Úvod do CA","d":2.5,"kg":true,"max":200,"route":"i.v./i.o.","dil":0,"note":"SPC: > 8 let ~2,5 mg/kg; 3–8 let 2,5–4 mg/kg; titrovat."},{"l":"Procedurální sedace","d":1,"kg":true,"max":100,"route":"i.v./i.o.","dil":0,"note":"SPC: 1–2 mg/kg, dále 1,5–9 mg/kg/h."}],"perf":{"unit":"mg/kg/h","range":[1.5,9],"def":3,"dil":0},"age":{"minMonths":36,"minKg":0,"msg":"SPC: propofol 2 % nedoporučen u dětí < 3 let (obtížná titrace malých objemů). Pod 3 roky použít 1 %."},"cave":"Riziko záměny s 1 % (2× koncentrace). Hypotenze, apnoe. Sedace JIP ≤ 16 let kontraindikována.","conf":"high","src":["https://www.medicines.org.uk/emc/product/1365/smpc"],"kind":"calc"},{"id":"rocuronium","n":"Rocuronium","s":"50 mg / 5 ml","peds":"yes","base":"mg","conc":10,"amp":5,"solv":"neředit","dil":[{"l":"Neředit (10 mg/ml)","ml":null,"total":null,"sub":""},{"l":"1 ml + 4 ml FR → 2 mg/ml","ml":1,"total":5,"sub":"novorozenci/kojenci < 5 kg"}],"reg":[{"l":"RSI","d":1,"kg":true,"max":100,"route":"i.v./i.o.","dil":0,"note":"APLS/praxe 1 mg/kg (1–1,2). SPC: RSI u dětí nedoporučeno pro omezené zkušenosti – off-label, ale standard."},{"l":"Intubace (neurgentní)","d":0.6,"kg":true,"max":60,"route":"i.v./i.o.","dil":0,"note":"SPC: 0,6 mg/kg (novorozenci–adolescenti), udržovací 0,15 mg/kg."}],"cave":"U novorozenců a kojenců delší účinek. Anafylaxe. Antidotum sugammadex.","conf":"high","src":["https://www.medicines.org.uk/emc/product/553/smpc"],"kind":"calc"},{"id":"solumedrol","n":"Solu-Medrol","s":"40 mg prášek → 40 mg/ml","peds":"yes","base":"mg","conc":40,"amp":1,"solv":"FR / G5 % pro infuzi","form":"Rozpustit přiloženým 1 ml","dil":[{"l":"Rozpustit 1 ml → 40 mg/ml","ml":null,"total":null,"sub":""},{"l":"1 ml (40 mg) + 3 ml FR → 10 mg/ml","ml":1,"total":4,"sub":"pro malé děti"}],"reg":[{"l":"Těžké astma / anafylaxe (2. linie) / edém","d":1,"kg":true,"max":60,"route":"i.v./i.o./i.m.","dil":1,"note":"QLD: 1 mg/kg (max 60 mg), dále á 6 h. Běžná česká praxe 1–2 mg/kg."}],"cave":"Solu-Medrol 40 mg obsahuje laktózu z kravského mléka – KONTRAINDIKOVÁN při alergii na bílkovinu kravského mléka (EMA 2017). Při zhoršení alergické reakce po podání myslet na reakci na laktózu a nepodávat znovu.","conf":"medium","src":["https://www.childrens.health.qld.gov.au/__data/assets/pdf_file/0021/171822/asthma-flowchart-and-medications.pdf","https://assets.publishing.service.gov.uk/media/59f09b18e5274a18bc07411e/Methylprednisolone_DHCP.pdf","https://www.ema.europa.eu/documents/referral/lactose-bovine-origin-article-31-referral-annex-ii_bg.pdf"],"kind":"calc"},{"id":"sufenta_forte","n":"Sufentanil FORTE","s":"250 µg / 5 ml = 50 µg/ml","peds":"limited","base":"µg","conc":50,"amp":5,"solv":"FR","strength":{"cls":"high","t":"FORTE · 50 µg/ml"},"dil":[{"l":"1 ml (50 µg) + 49 ml FR → 1 µg/ml","ml":1,"total":50,"sub":"povinné ředění u dětí"}],"reg":[{"l":"Analgezie","d":0.1,"kg":true,"max":10,"route":"i.v./i.o.","dil":0,"note":"Off-label: 0,1–0,2 µg/kg, titrovat."},{"l":"Úvod do CA (analgetická složka)","d":0.3,"kg":true,"max":35,"route":"i.v./i.o.","dil":0,"note":"SPC: 0,2–0,5 µg/kg."}],"age":{"minMonths":1,"minKg":0,"msg":"Jako MITE; u dětí VŽDY ředit – 10× vyšší koncentrace, riziko fatálního předávkování."},"cave":"Neředěný FORTE u dětí nepodávat; i.n. z FORTE nepoužívat. Preferovat MITE.","conf":"low","src":["https://www.vidal.fr/actualites/16212-sufenta-solution-injectable-iv-ou-peridurale-sufentanil-indications-elargies-en-pediatrie.html"],"kind":"calc"},{"id":"sufenta_mite","n":"Sufentanil MITE","s":"10 µg / 2 ml = 5 µg/ml","peds":"limited","base":"µg","conc":5,"amp":2,"solv":"FR","strength":{"cls":"low","t":"MITE · 5 µg/ml"},"dil":[{"l":"2 ml + 8 ml FR → 1 µg/ml","ml":2,"total":10,"sub":"i.v. u dětí"},{"l":"Neředit (5 µg/ml)","ml":null,"total":null,"sub":"i.n. (MAD), max ~1 ml/nosní dírka"}],"reg":[{"l":"Analgezie","d":0.1,"kg":true,"max":10,"route":"i.v./i.o.","dil":0,"note":"Off-label: 0,1–0,2 µg/kg pomalu, titrovat á 5 min. Monitorace dechu."},{"l":"Analgezie","d":0.5,"kg":true,"max":25,"route":"i.n.","dil":1,"note":"Off-label: 0,5 µg/kg (studie 6–17 let, > 15 kg), rozdělit do obou nosních dírek."},{"l":"Úvod do CA (analgetická složka)","d":0.3,"kg":true,"max":35,"route":"i.v./i.o.","dil":0,"note":"SPC: 0,2–0,5 µg/kg pomalu ≥ 30 s; doporučena premedikace atropinem."}],"age":{"minMonths":1,"minKg":0,"msg":"SPC (Sufenta FR): i.v. u dětí > 1 měsíc jako součást anestezie; u novorozenců nelze doporučit dávku. Analgezie mimo anestezii a i.n. podání = off-label."},"cave":"Apnoe, rigidita hrudníku (rychlý bolus), bradykardie. Mít naloxon a možnost ventilace.","conf":"low","src":["https://www.vidal.fr/actualites/16212-sufenta-solution-injectable-iv-ou-peridurale-sufentanil-indications-elargies-en-pediatrie.html","https://bmjopen.bmj.com/content/16/5/e112617"],"kind":"calc"},{"id":"suxamethonium","n":"Suxamethonium","s":"100 mg prášek → 10 mg/ml","peds":"yes","base":"mg","conc":10,"amp":10,"solv":"FR","form":"Rozpustit v 10 ml FR","dil":[{"l":"Rozpustit 100 mg v 10 ml FR","ml":null,"total":null,"sub":"10 mg/ml"}],"reg":[{"l":"RSI – kojenci < 1 rok","d":2,"kg":true,"max":150,"route":"i.v./i.o.","dil":0,"note":"SPC: novorozenci a kojenci 2 mg/kg."},{"l":"RSI – děti ≥ 1 rok","d":1,"kg":true,"max":150,"route":"i.v./i.o.","dil":0,"note":"SPC: starší děti 1 mg/kg (APLS 1–2 mg/kg)."},{"l":"RSI bez i.v. přístupu","d":4,"kg":true,"max":150,"route":"i.m.","dil":1,"note":"SPC: kojenci až 4–5 mg/kg, děti až 4 mg/kg, celkem max 150 mg; nástup ~3 min."}],"cave":"Bradykardie (častější u dětí a po opakované dávce – zvážit atropin). Hyperkalémie/srdeční zástava u nediagnostikované myopatie (Duchenne), MH. KI: hyperkalémie, myopatie, MH v RA, popáleniny/crush > 24–48 h.","conf":"high","src":["https://www.medicines.org.uk/emc/product/5189/smpc"],"kind":"calc"},{"id":"syntophyllin","n":"Syntophyllin","s":"240 mg / 10 ml (aminofylin)","peds":"limited","base":"mg","conc":24,"amp":10,"solv":"FR / G5 %","dil":[{"l":"10 ml + 10 ml FR → 12 mg/ml","ml":10,"total":20,"sub":"lineární dávkovač ≥ 20 min"},{"l":"10 ml do 100 ml FR → 2,4 mg/ml","ml":10,"total":100,"sub":"infuze ≥ 20 min"}],"reg":[{"l":"Těžké astma – nasycovací dávka","d":5,"kg":true,"max":500,"route":"i.v./i.o.","dil":0,"note":"BTS/SIGN: 5 mg/kg (max 500 mg) během ≥ 20 min; vynechat, pokud užívá teofylin."}],"perf":{"unit":"mg/kg/h","range":[0.5,1],"def":1,"dil":1},"age":{"minMonths":1,"minKg":0,"msg":"Jen těžké/život ohrožující astma refrakterní na 1. linii; nepodávat bolus dítěti užívajícímu teofylin."},"cave":"Úzké terapeutické okno: arytmie, křeče, zvracení. Při rychlém podání zástava oběhu.","conf":"medium","src":["https://rightdecisions.scot.nhs.uk/media/lp3nxk5x/bgh-paediatric-asthma-management-2020-sign-158-referenced-v2.pdf"],"kind":"calc"},{"id":"ventolin_spray","n":"Ventolin inhaler (MDI) + spacer","s":"100 µg / vdech (salbutamol)","peds":"yes","base":"µg","solv":"spacer","dil":[],"fixed":"Vždy přes spacer (u < 3–4 let s maskou). Akutní astma: 1 vdech á 30–60 s, 5–6 dechů ve spaceru na vdech; do 10 vdechů (1 000 µg). Orientačně ≤ 5 let 6 vdechů, ≥ 6 let 10–12 vdechů. Opakovat á 20 min v 1. hodině dle odpovědi.","cave":"Tachykardie, třes, hypokalémie. Těžké/život ohrožující astma → nebulizace s O2.","conf":"medium","src":["https://rightdecisions.scot.nhs.uk/media/lp3nxk5x/bgh-paediatric-asthma-management-2020-sign-158-referenced-v2.pdf","https://www.childrens.health.qld.gov.au/__data/assets/pdf_file/0021/171822/asthma-flowchart-and-medications.pdf"],"kind":"info"},{"id":"ventolin_neb","n":"Ventolin roztok k rozprašování","s":"5 mg/ml (salbutamol)","peds":"yes","base":"mg","conc":5,"amp":20,"solv":"FR do nebulizátoru","dil":[{"l":"0,5 ml (2,5 mg) + FR do 2–2,5 ml","ml":0.5,"total":2.5,"sub":"< 5 let"},{"l":"1 ml (5 mg) + FR do 2,5–4 ml","ml":1,"total":4,"sub":"≥ 5 let"}],"age":{"minMonths":0,"minKg":0,"msg":"SPC: < 18 měsíců nejistá účinnost, možná přechodná hypoxémie – podávat s O2."},"fixed":"< 5 let: 2,5 mg = 0,5 ml; ≥ 5 let: 5 mg = 1 ml; doplnit FR na 2–4 ml, nebulizace O2 6–8 l/min. U těžkého astmatu opakovat á 20 min (3× v 1. hodině), příp. kontinuálně s ipratropiem.","cave":"Tachykardie, třes, hypokalémie, laktátová acidóza. Nebulizace kyslíkem.","conf":"high","src":["https://www.medicines.org.uk/emc/product/852/smpc","https://rightdecisions.scot.nhs.uk/media/lp3nxk5x/bgh-paediatric-asthma-management-2020-sign-158-referenced-v2.pdf"],"kind":"info"}];
     const SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
+    const PC = { drug: null, dil: 0, custom: { ml: null, total: null }, mode: 'bolus', perKg: true, dose: '', reg: -1 };
+    const pcNorm = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    function pcFmt(n, max = 2) {
+        if (!isFinite(n)) return '–';
+        const d = Math.abs(n) >= 100 ? 0 : Math.abs(n) >= 10 ? Math.min(1, max) : max;
+        return (Math.round(n * 10 ** d) / 10 ** d).toLocaleString('cs-CZ', { maximumFractionDigits: d });
+    }
+    const PC_FACT = { 'g': 1e6, 'mg': 1e3, 'µg': 1 };
+    function pcConv(v, from, to) { if (from === to) return v; if (PC_FACT[from] && PC_FACT[to]) return v * PC_FACT[from] / PC_FACT[to]; return NaN; }
+    function pcConcText(c, base) { if (base === 'mg' && c < 0.1) return pcFmt(c * 1000) + ' µg/ml'; return pcFmt(c, 3) + ' ' + base + '/ml'; }
+    function pcAmt(a, base) {
+        if (base === 'mg' && a > 0 && a < 0.1) return pcFmt(a * 1000) + ' µg';
+        if (base === 'mg' && a >= 1000) return pcFmt(a / 1000, 2) + ' g';
+        return pcFmt(a, 3) + ' ' + base;
+    }
+    function pcPatient() {
+        const kg = parseFloat(document.getElementById('in-kg').value) || 0;
+        const yrs = parseInt(document.getElementById('in-yr').value) || 0, mos = parseInt(document.getElementById('in-mo').value) || 0;
+        return { kg, yrs, months: yrs * 12 + mos };
+    }
+    function pcAgeWarn(d, pt) {
+        if (d.peds === 'no') return { level: 'red', t: 'U dětí v přednemocniční péči nepoužívat' + (d.cave ? ' – ' + d.cave : '.') };
+        const a = d.age;
+        if (a && ((a.minMonths && pt.months < a.minMonths) || (a.minKg && pt.kg < a.minKg))) return { level: 'red', t: a.msg || 'Pod věkovým / váhovým limitem.' };
+        if (d.peds === 'limited' && a && a.msg) return { level: 'orange', t: a.msg };
+        return null;
+    }
+    function pcSub(d) {
+        const r = (d.reg || [])[0];
+        return [d.s, r ? `${String(r.d).replace('.', ',')} ${d.base}/kg` : '', d.peds === 'no' ? 'u dětí ne' : ''].filter(Boolean).join(' · ');
+    }
+
     function openCalc() {
-        openTool('Kalkulačka ředění');
+        openTool('Kalkulačka léků');
         document.getElementById('modal-content').innerHTML = `
-            <div class="search-box">
-                <label class="search-field">${SEARCH_ICON}
-                    <input type="text" id="calc-search-input" placeholder="Hledej lék, např. Torecan" oninput="filterDrugList(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
-                    <button type="button" id="search-clear" class="clear-btn" onclick="clearCalcSearch()" aria-label="Vymazat" hidden>
-                        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
-                    </button>
-                </label>
-                <div id="drug-scroll-list" hidden></div>
+            <div class="calc-pt">
+                <span class="calc-pt-l">Pacient</span>
+                <div class="calc-pt-kg"><input type="number" inputmode="decimal" id="ca-kg" class="calc-in" aria-label="Váha v kg" onclick="this.select()" oninput="calcKgInput()"><span>kg</span></div>
+                <span class="calc-pt-b" id="ca-bros"></span>
             </div>
-            <div class="calc-grid">
-                <div class="calc-field"><label class="calc-label" for="ca-amt">Obsah ampule</label><div class="calc-input-row"><input type="number" id="ca-amt" class="calc-in" value="1" inputmode="decimal" oninput="doCalc()"><select id="ca-u" class="calc-sel" onchange="doCalc()"><option>mg</option><option>mcg</option></select></div></div>
-                <div class="calc-field"><label class="calc-label" for="ca-v">Celkový objem</label><div class="calc-input-row"><input type="number" id="ca-v" class="calc-in" value="10" inputmode="decimal" oninput="doCalc()"><span class="calc-label" style="width:22px">ml</span></div></div>
-                <div class="calc-field wide"><span class="calc-label">Objem ampule</span><div class="switch-container" id="amp-switches">${[1,2,5,10,20].map(v => `<button type="button" class="switch-btn" onclick="setAmpV(this, ${v})">${v} ml</button>`).join('')}<button type="button" class="switch-btn" onclick="setAmpV(this, null)">Vlastní</button></div><input type="number" id="ca-ampv" class="calc-in" style="display:none; margin-top:6px;" placeholder="Objem ampule v ml" inputmode="decimal" oninput="doCalc()"></div>
-                <div class="calc-field wide"><label class="calc-label" for="ca-t">Dávka pro pacienta</label><div class="calc-input-row"><input type="number" id="ca-t" class="calc-in" value="0" inputmode="decimal" oninput="doCalc()"><select id="ca-tu" class="calc-sel" onchange="doCalc()"><option>mg</option><option>mcg</option></select></div></div>
+            <button type="button" class="drug-pick" id="drug-pick" onclick="openDrugPicker()">
+                <span class="grow"><span class="dp-name" id="dp-name">Vyber lék</span><span class="dp-sub" id="dp-sub">Dávky pro děti podle váhy, ředění a kolik ml podat</span><span class="pc-badges" id="pc-badges"></span></span>
+                <span class="dp-chg" id="dp-chg">Vybrat</span>
+            </button>
+            <div id="pc-body" hidden>
+                <div id="pc-age"></div>
+                <details class="pc-info" id="pc-info" hidden><summary>Upozornění</summary><div id="pc-info-b"></div></details>
+                <div id="pc-fixed"></div>
+                <div id="pc-calc">
+                    <div class="pc-h" id="pc-reg-h">Indikace</div>
+                    <div class="pc-chips" id="pc-reg"></div>
+                    <div class="pc-h">Příprava stříkačky</div>
+                    <div class="pc-card">
+                        <div id="pc-dil"></div>
+                        <div class="pc-custom" id="pc-custom" hidden>
+                            <label><span>Léku natáhnout (ml)</span><input type="number" id="pc-cml" class="calc-in" inputmode="decimal"></label>
+                            <label><span>Doředit do (ml)</span><input type="number" id="pc-ctot" class="calc-in" inputmode="decimal"></label>
+                        </div>
+                        <div class="pc-prep" id="pc-prep"></div>
+                        <div class="pc-conc" id="pc-conc"></div>
+                    </div>
+                    <div class="pc-h">Dávka</div>
+                    <div class="pc-card">
+                        <div class="pc-mode" id="pc-mode" hidden><button type="button" data-m="bolus">Bolus</button><button type="button" data-m="perf">Perfuzor</button></div>
+                        <div class="pc-dose"><input type="number" id="pc-dose" class="calc-in" inputmode="decimal" placeholder="dávka" aria-label="Dávka"><div class="pc-unit" id="pc-unit"></div></div>
+                        <div class="pc-hint" id="pc-hint"></div>
+                    </div>
+                    <div class="pc-res" id="pc-res" aria-live="polite"></div>
+                    <div id="pc-warn"></div>
+                </div>
             </div>
-            <div id="ca-res" class="res-pill idle">Vyber lék ze seznamu, nebo zadej hodnoty ručně</div>`;
-        setAmpV(document.querySelector('#amp-switches .switch-btn'), 1, true);
+            <p class="pc-note">Orientační kalkulačka. Dávku a ředění vždy ověř podle protokolu, SPC a stavu dítěte.</p>`;
+        const mc = document.getElementById('modal-content');
+        mc.querySelector('#pc-reg').addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) { pcApplyReg(+b.dataset.i); } });
+        mc.querySelector('#pc-dil').addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (!b) return; PC.dil = +b.dataset.i; pcSyncCustom(); pcRender(); });
+        mc.querySelector('#pc-unit').addEventListener('click', (e) => { const b = e.target.closest('[data-kg]'); if (!b) return; PC.perKg = b.dataset.kg === '1'; PC.reg = -1; pcRender(); });
+        mc.querySelector('#pc-mode').addEventListener('click', (e) => { const b = e.target.closest('[data-m]'); if (!b) return; PC.mode = b.dataset.m; if (PC.mode === 'perf') pcPerfDefaults(); else if (PC.drug.reg) pcApplyReg(0, true); pcRender(); });
+        mc.querySelector('#pc-dose').addEventListener('input', (e) => { PC.dose = e.target.value; PC.reg = -1; pcRender(); });
+        mc.querySelector('#pc-cml').addEventListener('input', (e) => { PC.custom.ml = e.target.value; pcRender(); });
+        mc.querySelector('#pc-ctot').addEventListener('input', (e) => { PC.custom.total = e.target.value; pcRender(); });
+        syncCalcPt();
+        if (PC.drug) pcSelect(PC.drug.id, true);
     }
 
-    function filterDrugList(q) {
-        const list = document.getElementById('drug-scroll-list');
-        const clearBtn = document.getElementById('search-clear');
-        const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-        const query = norm(q);
-        if (clearBtn) clearBtn.hidden = q.length === 0;
-        if (q.length === 0) { list.hidden = true; list.innerHTML = ""; return; }
-        const filtered = CALC_DB.filter(d => norm(d.n).includes(query));
-        if (filtered.length > 0) {
-            list.hidden = false;
-            list.innerHTML = filtered.map(d => `<button type="button" class="drug-opt" data-name="${esc(d.n)}">${esc(d.n)}</button>`).join('');
-            list.querySelectorAll('.drug-opt').forEach(b => b.onclick = () => applyPresetByIndex(b.dataset.name));
-        } else { list.hidden = true; }
+    /* váha v kalkulačce = váha z hlavní obrazovky (obousměrně) */
+    function syncCalcPt() {
+        const kgIn = document.getElementById('ca-kg'); if (!kgIn) return;
+        if (document.activeElement !== kgIn) kgIn.value = document.getElementById('in-kg').value;
+        const b = document.getElementById('broselow-badge'), cb = document.getElementById('ca-bros');
+        const yrs = parseInt(document.getElementById('in-yr').value) || 0, mos = parseInt(document.getElementById('in-mo').value) || 0;
+        cb.textContent = (yrs ? yrs + ' r ' : '') + mos + ' m · ' + b.innerText.split(' · ')[0];
+        cb.style.background = b.style.backgroundColor; cb.style.color = b.style.color;
+        if (PC.drug && document.getElementById('pc-res')) { if (PC.reg >= 0 && PC.mode === 'bolus') pcApplyReg(PC.reg, true); pcRender(); }
+    }
+    let calcKgT = null;
+    function calcKgInput() {
+        clearTimeout(calcKgT);
+        calcKgT = setTimeout(() => {
+            const v = parseFloat(document.getElementById('ca-kg').value);
+            if (!(v > 0)) return;
+            const main = document.getElementById('in-kg'); main.value = v; manualUpdate('kg');
+            syncCalcPt();
+        }, 350);
     }
 
-    function clearCalcSearch() {
-        const input = document.getElementById('calc-search-input');
-        input.value = ''; filterDrugList(''); input.focus();
-    }
-
-    function applyPresetByIndex(name) {
-        const idx = CALC_DB.findIndex(d => d.n === name);
-        if(idx === -1) return;
-        const drug = CALC_DB[idx];
-        const kg = parseFloat(document.getElementById('in-kg').value)||3;
-        const yrs = parseInt(document.getElementById('in-yr').value)||0;
-        const mos = parseInt(document.getElementById('in-mo').value)||0;
-        const totalMos = (yrs * 12) + mos;
-        document.getElementById('calc-search-input').value = drug.n;
-        document.getElementById('drug-scroll-list').hidden = true;
-        document.getElementById('search-clear').hidden = false;
-        document.getElementById('ca-amt').value = drug.amp;
-        document.getElementById('ca-u').value = drug.u.includes('mcg') ? 'mcg' : 'mg';
-        const buttons = document.querySelectorAll('#amp-switches .switch-btn'); let found = false;
-        buttons.forEach(b => { if(b.innerText === drug.ampV + " ml") { setAmpV(b, drug.ampV, true); found = true; } });
-        if(!found) { setAmpV(buttons[buttons.length-1], null, true); document.getElementById('ca-ampv').value = drug.ampV; }
-        document.getElementById('ca-t').value = (drug.d * kg).toFixed(drug.d*kg < 1 ? 2 : 1);
-        document.getElementById('ca-tu').value = drug.u.includes('mcg') ? 'mcg' : 'mg';
-        const resBox = document.getElementById('ca-res');
-        resBox.dataset.sol = drug.sol;
-        let warning = "";
-        if(drug.limit) {
-            if(drug.limit.minY && yrs < drug.limit.minY) warning = drug.limit.msg;
-            if(drug.limit.minKg && kg < drug.limit.minKg) warning = drug.limit.msg;
-            if(drug.limit.minM && totalMos < drug.limit.minM) warning = drug.limit.msg;
+    /* výběr léku */
+    function pcSelect(id, keep) {
+        const d = PEDI.find((x) => x.id === id); if (!d) return;
+        const same = PC.drug && PC.drug.id === id && keep;
+        PC.drug = d;
+        if (!same) {
+            PC.dil = 0; PC.reg = -1; PC.mode = d.reg && d.reg.length ? 'bolus' : (d.perf ? 'perf' : 'bolus');
+            PC.custom = { ml: d.dil[0] && d.dil[0].ml != null ? d.dil[0].ml : d.amp, total: d.dil[0] && d.dil[0].total != null ? d.dil[0].total : d.amp };
+            PC.perKg = true; PC.dose = '';
+            if (PC.mode === 'perf') pcPerfDefaults(); else if (d.reg && d.reg.length) pcApplyReg(0, true);
         }
-        resBox.dataset.warning = warning;
-        resBox.dataset.ready = '1';
-        doCalc();
+        document.getElementById('dp-name').textContent = d.n;
+        document.getElementById('dp-sub').textContent = d.s;
+        document.getElementById('dp-chg').textContent = 'Změnit';
+        const bd = [];
+        if (d.strength) bd.push(`<span class="pc-b ${d.strength.cls}">${esc(d.strength.t)}</span>`);
+        if (d.solv) bd.push(`<span class="pc-b solv${d.solvOnly ? ' only' : ''}">${d.solvOnly ? 'jen ' : ''}${esc(d.solv)}</span>`);
+        if (d.form) bd.push(`<span class="pc-b form">${esc(d.form)}</span>`);
+        document.getElementById('pc-badges').innerHTML = bd.join('');
+        const pk = document.getElementById('drug-pick');
+        pk.classList.toggle('alert-high', !!(d.strength && d.strength.cls === 'high'));
+        pk.classList.toggle('alert-low', !!(d.strength && d.strength.cls === 'low'));
+        document.getElementById('pc-body').hidden = false;
+        pcRender();
+    }
+    function pcPerfDefaults() { const p = PC.drug.perf; PC.dose = String(p.def); PC.perKg = true; if (p.dil != null) { PC.dil = p.dil; pcSyncCustom(); } }
+    function pcApplyReg(i, silent) {
+        const r = PC.drug.reg[i]; if (!r) return;
+        PC.reg = i; PC.mode = 'bolus'; PC.perKg = true; PC.dose = String(r.d);
+        if (r.dil != null && PC.drug.dil[r.dil]) PC.dil = r.dil;
+        pcSyncCustom();
+        if (!silent) pcRender();
+    }
+    function pcSyncCustom() { const o = PC.drug.dil[PC.dil]; if (o && o.ml != null) PC.custom = { ml: o.ml, total: o.total }; }
+    function pcPrep() {
+        const d = PC.drug, opt = PC.dil === -1 ? { custom: true } : (d.dil[PC.dil] || { ml: null });
+        let ml, total;
+        if (opt.custom) { ml = parseFloat(PC.custom.ml) || 0; total = parseFloat(PC.custom.total) || 0; }
+        else if (opt.ml == null) return { neat: true, conc: d.conc };
+        else { ml = opt.ml; total = opt.total; }
+        const amount = ml * d.conc;
+        return { neat: false, conc: total > 0 ? amount / total : NaN, ml, total, amount, dilMl: Math.max(0, total - ml), over: ml > total };
     }
 
-    function setAmpV(btn, val, silent) {
-        document.querySelectorAll('#amp-switches .switch-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const customIn = document.getElementById('ca-ampv');
-        if(val === null) { customIn.style.display = 'block'; if (!silent) customIn.focus(); }
-        else { customIn.style.display = 'none'; customIn.value = val; if (!silent) doCalc(); }
+    /* vykreslení */
+    function pcRender() {
+        const d = PC.drug; if (!d) return;
+        const pt = pcPatient();
+        const aw = pcAgeWarn(d, pt);
+        document.getElementById('pc-age').innerHTML = aw ? `<div class="pc-w ${aw.level}">${esc(aw.t)}</div>` : '';
+        const info = document.getElementById('pc-info');
+        info.hidden = !(d.cave && d.peds !== 'no');
+        if (!info.hidden) document.getElementById('pc-info-b').innerHTML = `<p><b>CAVE:</b> ${esc(d.cave)}</p>`;
+        document.getElementById('pc-fixed').innerHTML = d.fixed ? `<div class="pc-card pc-fixed"><b>${d.kind === 'calc' ? 'Dávkování podle věku / váhy' : 'Dávkování'}</b><p>${esc(d.fixed)}</p></div>` : (d.kind !== 'calc' && d.peds !== 'no' ? '<div class="pc-card pc-fixed"><p>Pro tento lék kalkulačka nepočítá ředění.</p></div>' : '');
+        const calc = document.getElementById('pc-calc');
+        calc.hidden = d.kind !== 'calc';
+        if (calc.hidden) return;
+
+        // indikace
+        const regs = d.reg || [];
+        document.getElementById('pc-reg-h').hidden = !regs.length || PC.mode === 'perf';
+        document.getElementById('pc-reg').hidden = !regs.length || PC.mode === 'perf';
+        document.getElementById('pc-reg').innerHTML = regs.map((r, i) => `<button type="button" class="pc-chip" data-i="${i}" aria-pressed="${i === PC.reg}">${esc(r.l)}<small>${String(r.d).replace('.', ',')} ${esc(d.base)}/kg${r.route ? ' · ' + esc(r.route) : ''}${r.max ? ' · max ' + esc(pcAmt(r.max, d.base)) : ''}</small></button>`).join('');
+
+        // ředění
+        const opts = d.dil.map((o, i) => {
+            let sub = o.sub || '';
+            if (o.ml != null) sub = `${pcConcText(o.ml * d.conc / o.total, d.base)} · ${pcFmt(o.total)} ml` + (sub ? ' · ' + sub : '');
+            else sub = pcConcText(d.conc, d.base) + (sub && !/mg\/ml|µg\/ml/.test(sub) ? ' · ' + sub : '');
+            return `<button type="button" class="pc-opt" data-i="${i}" aria-pressed="${i === PC.dil}"><span class="dot"></span><span class="grow"><b>${esc(o.l)}</b><span class="sub">${esc(sub)}</span></span></button>`;
+        });
+        if (!d.form && d.base !== 'ml') opts.push(`<button type="button" class="pc-opt" data-i="-1" aria-pressed="${PC.dil === -1}"><span class="dot"></span><span class="grow"><b>Vlastní ředění</b><span class="sub">zadáš ml léku a celkový objem</span></span></button>`);
+        document.getElementById('pc-dil').innerHTML = opts.join('');
+        const cust = document.getElementById('pc-custom'); cust.hidden = PC.dil !== -1;
+        if (!cust.hidden) {
+            const a = document.getElementById('pc-cml'), b = document.getElementById('pc-ctot');
+            if (document.activeElement !== a) a.value = PC.custom.ml ?? ''; if (document.activeElement !== b) b.value = PC.custom.total ?? '';
+        }
+        const p = pcPrep();
+        const solvName = d.solvOnly ? d.solv : (/G5/.test(d.solv) && !/FR/.test(d.solv) ? 'G5 %' : (/^Aqua/.test(d.solv) ? 'Aqua' : 'FR'));
+        if (p.neat) {
+            document.getElementById('pc-prep').innerHTML = d.form ? `${esc(d.form)}, dál neředit.` : (d.base === 'ml' ? 'Podávej přímo.' : 'Natáhni přímo z ampule, bez ředění.');
+            document.getElementById('pc-conc').textContent = d.base === 'ml' ? '' : 'Koncentrace ' + pcConcText(d.conc, d.base) + ` · 1 balení = ${pcFmt(d.amp)} ml = ${pcAmt(d.amp * d.conc, d.base)}`;
+        } else {
+            document.getElementById('pc-prep').innerHTML = `Natáhni <b>${pcFmt(p.ml)} ml</b> léku (${esc(pcAmt(p.amount, d.base))}) + <b>${pcFmt(p.dilMl)} ml</b> ${esc(solvName)} → celkem <b>${pcFmt(p.total)} ml</b>`;
+            document.getElementById('pc-conc').textContent = 'Výsledná koncentrace ' + pcConcText(p.conc, d.base);
+        }
+
+        // dávka
+        const md = document.getElementById('pc-mode');
+        md.hidden = !(d.perf && regs.length);
+        md.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.m === PC.mode));
+        const di = document.getElementById('pc-dose'); if (document.activeElement !== di) di.value = PC.dose;
+        if (PC.mode === 'perf') {
+            document.getElementById('pc-unit').innerHTML = `<button type="button" aria-pressed="true" disabled>${esc(d.perf.unit)}</button>`;
+            document.getElementById('pc-hint').textContent = `Obvyklé rozmezí ${pcFmt(d.perf.range[0])}–${pcFmt(d.perf.range[1])} ${d.perf.unit} · ${pcFmt(pt.kg)} kg`;
+        } else {
+            document.getElementById('pc-unit').innerHTML = `<button type="button" data-kg="0" aria-pressed="${!PC.perKg}">${esc(d.base)}</button><button type="button" data-kg="1" aria-pressed="${PC.perKg}">${esc(d.base)}/kg</button>`;
+            document.getElementById('pc-hint').textContent = PC.perKg ? `× ${pcFmt(pt.kg)} kg` : '';
+        }
+
+        // výsledek
+        const res = document.getElementById('pc-res'), warns = [];
+        res.className = 'pc-res';
+        const dose = parseFloat(String(PC.dose).replace(',', '.'));
+        const tag = `<div class="tag">${esc(d.n)}${d.base !== 'ml' ? ' · ' + esc(pcConcText(p.conc, d.base)) : ''}</div>`;
+        if (p.over) warns.push({ level: 'red', t: 'Objem léku je větší než celkový objem stříkačky. Uprav ředění.' });
+        if (!(dose > 0)) res.innerHTML = `<div class="empty">Zadej dávku</div>${tag}`;
+        else if (!(pt.kg > 0) && (PC.perKg || PC.mode === 'perf')) res.innerHTML = `<div class="empty">Zadej váhu dítěte</div>${tag}`;
+        else if (PC.mode === 'perf') {
+            const [amtU, ...rest] = d.perf.unit.split('/');
+            const perH = dose * (rest.includes('kg') ? pt.kg : 1) * (rest.includes('min') ? 60 : 1);
+            const perHBase = pcConv(perH, amtU, d.base), mlh = perHBase / p.conc;
+            res.innerHTML = `<div class="lbl">Rychlost perfuzoru</div><div class="big">${pcFmt(mlh)}<small>ml/h</small></div><div class="sub">${pcFmt(dose, 3)} ${esc(d.perf.unit)} = ${esc(pcAmt(perHBase, d.base))}/h</div>${tag}`;
+            const [lo, hi] = d.perf.range;
+            if (dose > hi) { res.classList.add('orange'); warns.push({ level: 'orange', t: `Nad obvyklým rozmezím (${pcFmt(lo)}–${pcFmt(hi)} ${d.perf.unit}).` }); }
+        } else {
+            const raw = PC.perKg ? dose * pt.kg : dose;
+            const r = PC.reg >= 0 ? regs[PC.reg] : null;
+            const max = r && r.max ? r.max : Math.max(0, ...regs.map((x) => x.max || 0)) || null;
+            let amount = raw, capped = false;
+            if (r && r.max && raw > r.max + 1e-9) { amount = r.max; capped = true; }
+            const ml = amount / p.conc;
+            const detail = (PC.perKg ? `${pcFmt(dose, 3)} ${d.base}/kg × ${pcFmt(pt.kg)} kg = ${pcAmt(raw, d.base)}` : pcAmt(raw, d.base)) + (capped ? ` → omezeno na maximum ${pcAmt(amount, d.base)}` : '');
+            res.innerHTML = `<div class="lbl">Podej</div><div class="big">${pcFmt(ml)}<small>ml</small></div><div class="sub">${esc(detail)}</div>${tag}`;
+            if (capped) { res.classList.add('orange'); warns.push({ level: 'orange', t: `Dávka podle váhy (${pcAmt(raw, d.base)}) je nad maximem – použito maximum ${pcAmt(amount, d.base)}.` }); }
+            else if (!r && max && raw > max + 1e-9) { res.classList.add('red'); warns.push({ level: 'red', t: `Nad maximální jednotlivou dávkou (${pcAmt(max, d.base)}).` }); }
+            if (!p.neat && ml > p.total + 1e-9) warns.push({ level: 'red', t: `Dávka (${pcFmt(ml)} ml) je větší než připravená stříkačka (${pcFmt(p.total)} ml).` });
+            if (p.neat && d.base !== 'ml' && ml > d.amp + 1e-9) warns.push({ level: 'info', t: `Potřebuješ ${pcFmt(ml / d.amp, 1)} ampule (${pcFmt(d.amp)} ml / ampule).` });
+            if (r && r.note) warns.push({ level: 'info', t: r.note });
+        }
+        if (aw) res.classList.add(aw.level);
+        document.getElementById('pc-warn').innerHTML = warns.map((w) => w.level === 'info' ? `<p class="pc-note" style="margin-top:0">${esc(w.t)}</p>` : `<div class="pc-w ${w.level}">${esc(w.t)}</div>`).join('');
     }
 
-    function doCalc() {
-        const amt = parseFloat(document.getElementById('ca-amt').value)||0, ampV = parseFloat(document.getElementById('ca-ampv').value)||0.0001, totalV = parseFloat(document.getElementById('ca-v').value)||0.0001;
-        const unit = document.getElementById('ca-u').value, target = parseFloat(document.getElementById('ca-t').value)||0, tunit = document.getElementById('ca-tu').value;
-        const resBox = document.getElementById('ca-res');
-        const sol = resBox.dataset.sol || "NaCl / Aqua";
-        const warn = resBox.dataset.warning || "";
-        const finalConc = amt / totalV;
-        let targetInBase = (tunit === unit) ? target : (tunit === 'mg' ? target * 1000 : target / 1000);
-        const applyMl = targetInBase / finalConc;
-        let concStr = unit === 'mg' ? `${finalConc.toFixed(2)} mg/ml` : `${finalConc.toFixed(1)} µg/ml`;
-        if (unit === 'mg' && finalConc < 0.1) concStr = `${(finalConc * 1000).toFixed(1)} µg/ml`;
-        resBox.classList.remove('idle');
-        if (warn) resBox.classList.add('warning'); else resBox.classList.remove('warning');
-        resBox.innerHTML = `
-            ${warn ? `<span class="warning-text">⚠︎ ${esc(warn)}</span>` : ''}
-            <div><b>Příprava:</b> ${ampV} ml léku + ${(totalV-ampV).toFixed(1)} ml rozpouštědla</div>
-            <div class="solvent-badge">${esc(sol)}</div>
-            <div class="res-divider"></div>
-            <span class="res-cap">Koncentrace ${concStr}</span>
-            <span class="res-highlight">${isFinite(applyMl)?applyMl.toFixed(2):0} ml</span>
-            <span class="res-cap">Dávka pro pacienta</span>`;
+    /* panel se seznamem léků */
+    function ensurePicker() {
+        if (document.getElementById('dp-sheet')) return;
+        const ov = document.createElement('div'); ov.className = 'overlay dp-ov'; ov.id = 'dp-ov'; ov.onclick = closeDrugPicker;
+        const sh = document.createElement('section'); sh.className = 'dp-sheet'; sh.id = 'dp-sheet'; sh.setAttribute('role', 'dialog'); sh.setAttribute('aria-label', 'Výběr léku');
+        sh.innerHTML = `<div class="dp-grab"></div>
+            <div class="dp-head"><label class="search-field" style="flex:1">${SEARCH_ICON}<input type="search" id="dp-q" placeholder="Hledat lék" autocomplete="off" autocorrect="off" spellcheck="false"></label>
+            <button type="button" class="dp-close" onclick="closeDrugPicker()" aria-label="Zavřít"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+            <div class="dp-body"><div class="dp-list" id="dp-list"></div></div>`;
+        document.body.appendChild(ov); document.body.appendChild(sh);
+        document.getElementById('dp-q').addEventListener('input', renderDrugList);
+        document.getElementById('dp-list').addEventListener('click', (e) => { const b = e.target.closest('[data-id]'); if (!b) return; pcSelect(b.dataset.id); closeDrugPicker(); });
+    }
+    function renderDrugList() {
+        const q = pcNorm(document.getElementById('dp-q').value.trim());
+        const pt = pcPatient();
+        const list = PEDI.filter((d) => !q || pcNorm(d.n + ' ' + d.s).includes(q));
+        document.getElementById('dp-list').innerHTML = list.length ? list.map((d) => {
+            const w = pcAgeWarn(d, pt);
+            const badge = d.strength ? `<span class="pc-b ${d.strength.cls}">${d.strength.cls === 'high' ? 'VYSOKÁ SÍLA' : 'NÍZKÁ SÍLA'}</span>` : '';
+            return `<button type="button" class="dp-item${d.peds === 'no' ? ' off' : ''}" data-id="${esc(d.id)}" aria-current="${PC.drug && PC.drug.id === d.id}">
+                <span class="grow"><b>${esc(d.n)}</b><span class="sub">${esc(pcSub(d))}</span></span>${badge}
+                ${w && w.level === 'red' ? '<span class="dp-warn" title="' + esc(w.t) + '">⚠︎</span>' : ''}</button>`;
+        }).join('') : '<div class="dp-empty">Nic nenalezeno</div>';
+    }
+    function openDrugPicker() {
+        ensurePicker();
+        document.getElementById('dp-q').value = ''; renderDrugList();
+        document.getElementById('dp-ov').classList.add('open'); document.getElementById('dp-sheet').classList.add('open');
+        const cur = document.querySelector('#dp-list [aria-current="true"]'); if (cur) cur.scrollIntoView({ block: 'center' });
+    }
+    function closeDrugPicker() {
+        const ov = document.getElementById('dp-ov'), sh = document.getElementById('dp-sheet');
+        if (ov) ov.classList.remove('open'); if (sh) sh.classList.remove('open');
     }
 
     /* ---- JumpSTART ---- */
     const jSteps = { walk: { q: "Může dítě chodit?", btns: [{l:"Ano", s:"result-green"}, {l:"Ne", s:"breath"}] }, breath: { q: "Dýchá dítě?", btns: [{l:"Ano", s:"rate"}, {l:"Ne", s:"airway"}] }, airway: { q: "Po uvolnění cest dýchá?", btns: [{l:"Ano", s:"result-red"}, {l:"Ne", s:"pulse"}] }, pulse: { q: "Má hmatný puls?", btns: [{l:"Ano", s:"rescue"}, {l:"Ne", s:"result-black"}] }, rescue: { q: "Dýchá po 5 vdeších?", btns: [{l:"Ano", s:"result-red"}, {l:"Ne", s:"result-black"}] }, rate: { q: "Dechová frekvence?", btns: [{l:"< 15 nebo > 45", s:"result-red"}, {l:"15 - 45 /min", s:"pulseCheck"}] }, pulseCheck: { q: "Hmatný puls?", btns: [{l:"Ne", s:"result-red"}, {l:"Ano", s:"avpu"}] }, avpu: { q: "Reakce (AVPU)?", btns: [{l:"P nebo U", s:"result-red"}, {l:"A nebo V", s:"result-yellow"}] } };
     let jTrail = [];
-    function startJumpstart() { openTool('JumpSTART triage'); jTrail = []; showJumpStep('walk'); }
+    function startJumpstart() { openTool('JumpSTART triáž'); jTrail = []; showJumpStep('walk'); }
     function showJumpStep(id) {
         const content = document.getElementById('modal-content');
         if(id.startsWith('result')) {
             const color = id.split('-')[1];
             const labels = { green: 'NEZÁVAŽNÝ STAV', red: 'KRITICKÝ STAV', black: 'MRTVÉ - P4', yellow: 'URGENTNÍ STAV' };
-            content.innerHTML = `<div class="triage-step-title">Výsledek triage</div>
+            content.innerHTML = `<div class="triage-step-title">Výsledek triáže</div>
                 <div class="result-box ${color === 'yellow' ? 'dark-ink' : ''}" style="background:var(--triage-${color})">${labels[color]}</div>
                 <div class="triage-btns" style="margin-top:16px">
                     <button type="button" class="btn-triage btn-full btn-primary" onclick="startJumpstart()">Nový pacient</button>
