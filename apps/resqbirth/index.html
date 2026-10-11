@@ -291,13 +291,13 @@ function fire(k, n) { if (S.fired[k]) return; S.fired[k] = 1; save(); beep(n); }
 
 /* ---------- POROD ---------- */
 const STEPS = [
-  ['Připrav prostředí', 'Teplo (místnost/vůz ≥ 25 °C), 2–3 předehřáté ručníky, čepička, porodní balíček, odsávačka, vak a maska pro novorozence. Avizuj porodnici.'],
+  ['Připrav termomanagement a vybavení', 'Novorozenec v terénu rychle prochládá: zavři okna a dveře, topení v bytě i ve voze naplno, předehřej vůz před transportem. Nachystej 2–3 suché ručníky (mokrý hned vyměnit), čepičku, izotermickou fólii, kontakt kůže na kůži s matkou a oba přikrýt. < 32. t. t.: plastový sáček bez osušení. K tomu porodní balíček, odsávačka, vak a maska pro novorozence. Avizuj porodnici.'],
   ['Poloha rodičky', 'Polosed nebo na zádech s pokrčenými DK, případně poloha, která jí vyhovuje. Podložka pod hýždě.'],
   ['Porod hlavičky', 'Kontrolovaně, nespěchat. Dlaní chraň hráz a jemně brzdi hlavičku. Rodička mezi kontrakcemi nedýchá zhluboka „do tlačení“, ale prodýchává.'],
   ['Pupečník kolem krku', 'Volný přetáhnout přes hlavičku. Těsný nepřestřihávat – rodit „kotoulem“ (hlavičku držet u stehna matky). Jen když nejde jinak: 2 svorky a přestřihnout.'],
   ['Ramínka', 'Počkej na rotaci. S kontrakcí jemný tah dolů → přední raménko, pak nahoru → zadní. <em>Hlavička venku a tělo nejde > 1 kontrakci → dystokie ramének (Komplikace).</em>'],
   ['Tělíčko a čas porodu', 'Vychytit, ťukni „Porod dítěte“. Osušit, stimulovat, mokrý ručník pryč, kontakt kůže na kůži, čepička, přikrýt.'],
-  ['Pupečník', 'Odložený podvaz ≥ 60 s (jen pokud dítě nepotřebuje resuscitaci). 2 svorky cca 10 a 15 cm od pupku, přestřihnout mezi nimi.'],
+  ['Pupečník', 'Nepřerušovat hned – podvaz nejdřív za 60 s, ideálně až po rozdýchání. Potřebuje-li dítě ventilaci a jde to u matky (na dosah), ventiluj s neporušeným pupečníkem. Jen když ho musíš kvůli resuscitaci přenést, podvaž a přestřihni. 2 svorky cca 10 a 15 cm od pupku.'],
   ['APGAR 1, 5, 10 min', 'Záložka Novorozenec – připomene se samo.'],
   ['Placenta', 'Netahat za pupečník. Obvykle do 30 min. Po porodu zkontrolovat celistvost, vzít s sebou do porodnice. Ťukni „Porod placenty“.'],
   ['Po porodu', 'Masáž děložního fundu, odhad krevní ztráty (> 500 ml = krvácení po porodu), přiložit dítě k prsu, teplo, transport matky i dítěte.'],
@@ -359,11 +359,9 @@ const DRUGS = {
 const drugHtml = (k) => { const d = DRUGS[k]; return `<div class="drug"><div class="grow"><div class="n">${d.n}</div><div class="d">${d.d}</div>${d.c ? `<div class="c">${d.c}</div>` : ''}</div><button type="button" class="give" data-drug="${k}">Podáno</button></div>`; };
 const stepsHtml = (arr) => `<ul class="steps">${arr.map(([b, s], i) => `<li><div class="st"><span class="bx">${i + 1}</span><span><b>${b}</b>${s ? `<span class="s">${s}</span>` : ''}</span></div></li>`).join('')}</ul>`;
 const COMPL = [
-  { id: 'dyst', ic: '!', n: 'Dystokie ramének', s: 'Hlavička venku, tělo nejde – HELPERR', timer: 'head', body: () => stepsHtml([
-    ['H – Help', 'Volej pomoc, druhou posádku. Rodičce: přestat tlačit. Netahat za hlavičku, netlačit na fundus!'],
-    ['E – Evaluate', 'Epiziotomie se v PNP neprovádí – pokračuj manévry.'],
-    ['L – Legs (McRoberts)', 'Obě DK maximálně ohnout v kyčlích ke břichu (2 pomocníci). Vyřeší většinu případů.'],
-    ['P – Pressure', 'Suprapubický tlak dlaní (jako při KPR) ze strany zad dítěte, šikmo dolů, 30 s souvisle, pak přerušovaně.'],
+  { id: 'dyst', ic: '!', n: 'Dystokie ramének', s: 'Hlavička venku, tělo nejde – McRoberts první', timer: 'head', body: () => stepsHtml([
+    ['McRoberts – hned jako první', 'Obě DK maximálně ohnout v kyčlích ke břichu (2 pomocníci), pak jemný tah dolů. Zabere ve většině případů. Současně volej pomoc. Netahat silou za hlavičku, netlačit na fundus!'],
+    ['Suprapubický tlak', 'Dlaní (jako při KPR) ze strany zad dítěte, šikmo dolů, 30 s souvisle, pak přerušovaně – spolu s McRoberts.'],
     ['E – Enter', 'Ruka do pochvy, tlak na zadní plochu předního raménka směrem k hrudníku dítěte (Rubin II), případně Woods.'],
     ['R – Remove posterior arm', 'Vybavení zadní ručičky – přes hrudník dítěte ven.'],
     ['R – Roll', 'Rodička na všechny čtyři (Gaskin) a znovu jemný tah – nejdřív zadní raménko.'],
@@ -384,14 +382,13 @@ const COMPL = [
     ['Okamžitý transport', 'S avizem do porodnice – urgentní císařský řez.'],
   ]) + drugHtml('gyn') },
   { id: 'pph', ic: '🩸', n: 'Krvácení po porodu', s: '> 500 ml nebo známky šoku – 4T', body: () => stepsHtml([
-    ['Masáž dělohy', 'Masáž fundu, dokud není děloha tuhá. Vyprázdnit močový měchýř. Přiložit dítě k prsu.'],
+    ['Uterotonikum + masáž dělohy', 'Na prvním místě – v PNP není možnost okamžité revize. Methylergometrin po porodu placenty (není-li hypertenze / preeklampsie). Masáž fundu, dokud není děloha tuhá, vyprázdnit močový měchýř, přiložit dítě k prsu.'],
+    ['Kyselina tranexamová', 'Hned po uterotoniku, nejpozději do 3 h od porodu.'],
     ['Kyslík, 2× i.v. / i.o., tekutiny', 'Krystaloidy opatrně, cíl STK ~ 80–90 mmHg do zástavy krvácení. Teplo.'],
-    ['Kyselina tranexamová', 'Co nejdříve, do 3 h od porodu.'],
-    ['Uterotonikum', 'Methylergometrin po porodu placenty (není-li hypertenze / preeklampsie).'],
     ['Bimanuální komprese dělohy', 'Pěst v přední klenbě poševní, druhá ruka přes břicho stlačuje fundus proti pěsti.'],
     ['Komprese aorty', 'Pěstí nad pupkem proti páteři, při masivním krvácení během transportu.'],
     ['Pátrej po příčině – 4T', 'Tonus (atonie), Trauma (poranění porodních cest – tlak na ránu), Tkáň (zbytky placenty), Trombin (koagulopatie).'],
-  ]) + drugHtml('txa') + drugHtml('meth') },
+  ]) + drugHtml('meth') + drugHtml('txa') },
   { id: 'ecl', ic: '⚡', n: 'Eklampsie / těžká preeklampsie', s: 'Křeče, TK ≥ 160/110, bolest hlavy, poruchy vidění', body: () => stepsHtml([
     ['Bezpečí, poloha na levém boku', 'Chránit před poraněním, O₂, zajistit DC, monitorace.'],
     ['MgSO₄', 'Lék volby k zastavení i prevenci křečí. Benzodiazepin jen pokud MgSO₄ není dostupný nebo křeče trvají.'],
@@ -442,7 +439,7 @@ function renderApgar() {
   $('ap-sum').textContent = s != null ? s : '–'; $('ap-sum').style.color = s == null ? '' : s >= 7 ? 'var(--ok)' : s >= 4 ? 'var(--warn)' : 'var(--crit)';
 }
 const NLS = [
-  ['Teplo, osušit, stimulovat', 'Čepička, suché ručníky, kontakt kůže na kůži. < 32. t. t.: bez osušení do plastového sáčku. Hodnoť tonus, dýchání, TF (fonendoskop na hrudník).'],
+  ['Teplo, osušit, stimulovat', 'Ideálně s neporušeným pupečníkem u matky. Čepička, suché ručníky, kontakt kůže na kůži. < 32. t. t.: bez osušení do plastového sáčku. Hodnoť tonus, dýchání, TF (fonendoskop na hrudník).'],
   ['Dýchací cesty', 'Hlava v neutrální poloze (podložka pod ramena). Odsávat jen při viditelné obstrukci.'],
   ['5 úvodních vdechů', 'Nedýchá nebo lapavě: 5 vdechů po 2–3 s, tlak 30 cm H₂O (≥ 32. t. t.) / 25 cm H₂O (< 32. t. t.). Vzduch 21 % (< 32. t. t. ≥ 30 %).'],
   ['Zhodnoť TF', 'Stoupá → pokračuj ve ventilaci 30/min, dokud nedýchá sám. Nestoupá a hrudník se nezvedá → oprav polohu, maska oběma rukama, odsát, SGA, zopakuj 5 vdechů.'],
