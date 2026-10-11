@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqArrest</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqArrest">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+/* ResqArrest – časování KPR podle ERC 2025. Vzhled sladěný s ResqHubem. */
+:root {
+  --bg: #E4EEEF; --ink: #0A1F23; --ink-2: rgba(10, 31, 35, .6); --ink-3: rgba(10, 31, 35, .36);
+  --petrol: #0B6E79; --petrol-soft: rgba(11, 110, 121, .12); --on-petrol: #FFFFFF;
+  --warn: #B26A00; --warn-soft: rgba(242, 154, 31, .17);
+  --crit: #D0303A; --crit-soft: rgba(229, 56, 59, .14);
+  --glow-a: rgba(11, 110, 121, .5); --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .6); --glass-strong: rgba(250, 253, 253, .96);
+  --glass-edge: rgba(255, 255, 255, .8); --glass-hi: rgba(255, 255, 255, .95); --glass-shadow: rgba(6, 55, 62, .13);
+  --hairline: rgba(10, 31, 35, .1); --fill: rgba(10, 31, 35, .06);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+    --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+  --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden; font-family: var(--font); font-size: 17px; line-height: 1.3; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; padding: 0; }
+svg { display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%); border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -12px var(--glass-shadow); }
+
+/* ---- ResqArrest ---- */
+:root { --ok: #17915A; --ok-soft: rgba(23, 145, 90, .14); --shock: #D0303A; }
+:root[data-theme="dark"] { --ok: #4FD08F; --ok-soft: rgba(79, 208, 143, .15); --shock: #FF6B6E; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ok: #4FD08F; --ok-soft: rgba(79, 208, 143, .15); --shock: #FF6B6E; } }
+html { touch-action: manipulation; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: max(12px, var(--st)) 14px calc(28px + var(--sb)); }
+.head { display: flex; align-items: center; gap: 8px; padding: 6px 2px 12px; }
+.head h1 { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -.04em; line-height: 1; flex: 1; }
+.round { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--ink); }
+.round svg { width: 20px; height: 20px; }
+.round[aria-pressed="true"] { background: var(--petrol); color: var(--on-petrol); border-color: var(--petrol); }
+.round.off { color: var(--ink-3); }
+.card { border-radius: 24px; padding: 14px; margin-bottom: 12px; }
+.h { font-size: 13px; font-weight: 700; color: var(--ink-2); text-transform: uppercase; letter-spacing: .05em; margin: 0 2px 10px; display: flex; align-items: center; gap: 8px; }
+.h .grow { flex: 1; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 16px; font-size: 16px; font-weight: 700; background: var(--fill); color: var(--ink); }
+.btn.pri { background: var(--petrol); color: var(--on-petrol); }
+.btn.sm { min-height: 36px; padding: 0 12px; font-size: 14.5px; border-radius: 12px; }
+.btn svg { width: 18px; height: 18px; }
+.muted { color: var(--ink-2); font-size: 14px; }
+
+/* setup */
+.setup { max-width: 560px; margin: 4vh auto 0; }
+.seg { display: flex; gap: 2px; padding: 3px; border-radius: 15px; background: var(--fill); }
+.seg button { flex: 1; height: 44px; border-radius: 12px; font-size: 16px; font-weight: 700; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--glass-strong); color: var(--ink); box-shadow: 0 2px 8px -2px var(--glass-shadow); }
+.kgrow { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+.kgrow input { width: 110px; height: 52px; border-radius: 14px; border: 1px solid var(--hairline); background: var(--glass-strong); font-size: 24px; font-weight: 750; text-align: center; font-family: var(--font-round); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip { height: 34px; padding: 0 12px; border-radius: 17px; background: var(--fill); font-size: 14px; font-weight: 650; }
+.chip[aria-pressed="true"] { background: var(--petrol); color: var(--on-petrol); }
+.go { width: 100%; height: 96px; margin-top: 18px; border-radius: 28px; background: linear-gradient(150deg, #F25C5F 0%, #C91F23 100%); color: #fff; font-family: var(--font-display); font-size: 30px; font-weight: 850; letter-spacing: -.02em; box-shadow: 0 18px 36px -14px rgba(229, 56, 59, .8); }
+.go small { display: block; font-family: var(--font); font-size: 14px; font-weight: 600; opacity: .85; letter-spacing: 0; }
+.resume { margin-top: 14px; }
+
+/* run */
+.grid { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+.grid > div { min-width: 0; }
+.tcard .timers { padding-right: 44px; }
+@media (min-width: 900px) { .grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; } }
+.timers { display: flex; align-items: center; gap: 14px; }
+.ring { position: relative; width: 168px; height: 168px; flex: none; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .bg { fill: none; stroke: var(--fill); stroke-width: 12; }
+.ring .fg { fill: none; stroke: var(--petrol); stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset .25s linear, stroke .3s; }
+.ring .in { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.ring .cy { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.ring .cd { font-family: var(--font-round); font-size: 44px; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.ring.pre .fg { stroke: var(--warn); }
+.ring.due .fg { stroke: var(--crit); }
+.ring.due .cd { color: var(--crit); }
+.tot { flex: 1; min-width: 0; }
+.tot .l { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.tot .v { font-family: var(--font-round); font-size: 40px; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.tot .s { font-size: 14px; color: var(--ink-2); margin-top: 2px; }
+.stats { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.stat { padding: 5px 10px; border-radius: 12px; background: var(--fill); font-size: 13.5px; font-weight: 700; }
+.stat b { font-family: var(--font-round); }
+.alert { margin-top: 12px; padding: 12px 14px; border-radius: 16px; font-weight: 750; font-size: 17px; text-align: center; }
+.alert.pre { background: var(--warn-soft); color: var(--warn); }
+.alert.due { background: var(--crit); color: #fff; animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .72; } }
+
+.rh { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rh button { min-height: 76px; border-radius: 20px; padding: 10px; font-size: 17px; font-weight: 800; line-height: 1.15; text-align: center; }
+.rh button small { display: block; font-size: 12.5px; font-weight: 600; opacity: .85; margin-top: 3px; }
+.rh .sh { background: var(--shock); color: #fff; }
+.rh .ns { background: var(--glass-strong); border: 1px solid var(--glass-edge); color: var(--ink); }
+.rh .rosc { grid-column: 1 / -1; min-height: 52px; background: var(--ok-soft); color: var(--ok); }
+.energy { margin-top: 10px; font-size: 14.5px; color: var(--ink-2); }
+.energy b { color: var(--ink); }
+.tip { margin-top: 8px; padding: 9px 12px; border-radius: 14px; background: var(--warn-soft); color: var(--warn); font-size: 14px; font-weight: 650; }
+
+.drug { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 18px; background: var(--glass-strong); border: 1px solid var(--glass-edge); }
+.drug + .drug { margin-top: 8px; }
+.drug .grow { flex: 1; min-width: 0; }
+.drug .n { font-size: 17px; font-weight: 800; }
+.drug .st { font-size: 14px; font-weight: 700; margin-top: 2px; color: var(--ink-2); }
+.drug .d { font-size: 13.5px; color: var(--ink-2); margin-top: 3px; }
+.drug .give { flex: none; min-width: 92px; height: 52px; border-radius: 15px; background: var(--fill); font-weight: 800; font-size: 15.5px; }
+.drug.due { border: 2px solid var(--crit); background: var(--crit-soft); }
+.drug.due .st { color: var(--crit); }
+.drug.due .give { background: var(--crit); color: #fff; }
+.drug.soon .st { color: var(--warn); }
+.drug.soon .give { background: var(--warn); color: #fff; }
+.drug.idle { opacity: .62; }
+
+.qa { display: flex; flex-wrap: wrap; gap: 6px; }
+.qa button { height: 40px; padding: 0 13px; border-radius: 13px; background: var(--fill); font-size: 14.5px; font-weight: 650; }
+.qa button small { font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin-left: 2px; }
+.bros { padding: 4px 10px; border-radius: 10px; font-size: 12.5px; font-weight: 800; text-transform: none; letter-spacing: 0; border: 1px solid var(--hairline); }
+.eq { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.eq div { padding: 8px 10px; border-radius: 12px; background: var(--fill); }
+.eq span { display: block; font-size: 12.5px; color: var(--ink-2); font-weight: 650; }
+.eq b { font-size: 15.5px; }
+.qa button.on { background: var(--petrol-soft); color: var(--petrol); }
+
+.hts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
+.ht > span:last-child { min-width: 0; overflow-wrap: anywhere; hyphens: auto; }
+.ht { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 10px; border-radius: 13px; background: var(--fill); font-size: 14.5px; font-weight: 650; text-align: left; line-height: 1.2; }
+.ht .bx { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--ink-3); flex: none; display: grid; place-items: center; }
+.ht .bx svg { width: 13px; height: 13px; opacity: 0; }
+.ht[aria-pressed="true"] { background: var(--ok-soft); color: var(--ok); }
+.ht[aria-pressed="true"] .bx { background: var(--ok); border-color: var(--ok); color: #fff; }
+.ht[aria-pressed="true"] .bx svg { opacity: 1; }
+.ht small { display: block; font-size: 12px; font-weight: 550; color: var(--ink-2); }
+
+.log { list-style: none; margin: 0; padding: 0; max-height: 46vh; overflow: auto; }
+.log li { display: flex; gap: 10px; padding: 8px 2px; border-top: 1px solid var(--hairline); font-size: 15px; }
+.log li:first-child { border-top: 0; }
+.log .t { font-family: var(--font-round); font-weight: 750; font-variant-numeric: tabular-nums; width: 52px; flex: none; color: var(--petrol); }
+.log .c { font-size: 12.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; flex: none; }
+.log .x { flex: 1; min-width: 0; }
+.log .k-shock .x { color: var(--shock); font-weight: 700; }
+.log .k-adr .x, .log .k-amio .x { font-weight: 700; }
+.log .k-rosc .x { color: var(--ok); font-weight: 800; }
+.acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+/* ROSC */
+.roscbar { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 22px; background: var(--ok); color: #fff; margin-bottom: 12px; }
+.roscbar .grow { flex: 1; }
+.roscbar .v { font-family: var(--font-round); font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.roscbar .l { font-size: 13px; font-weight: 700; opacity: .9; }
+.rearrest { width: 100%; min-height: 64px; padding: 8px 14px; border-radius: 20px; background: var(--shock); color: #fff; font-size: 17.5px; font-weight: 800; margin-bottom: 12px; }
+.chk { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 10px 4px; text-align: left; border-top: 1px solid var(--hairline); }
+.chk:first-of-type { border-top: 0; }
+.chk .bx { width: 24px; height: 24px; border-radius: 7px; border: 2px solid var(--ink-3); flex: none; display: grid; place-items: center; margin-top: 1px; }
+.chk .bx svg { width: 15px; height: 15px; opacity: 0; }
+.chk[aria-pressed="true"] .bx { background: var(--ok); border-color: var(--ok); color: #fff; }
+.chk[aria-pressed="true"] .bx svg { opacity: 1; }
+.chk b { display: block; font-size: 16px; }
+.chk span.s { display: block; font-size: 13.5px; color: var(--ink-2); margin-top: 1px; }
+.chk[aria-pressed="true"] b { color: var(--ink-2); }
+
+/* plovoucí lišta + pauza */
+.tbtn { position: absolute; top: 12px; right: 12px; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--fill); color: var(--ink); }
+.tbtn svg { width: 22px; height: 22px; }
+.tbtn.paused { background: var(--warn); color: #fff; }
+.tcard { position: relative; }
+.mini { position: fixed; left: 0; right: 0; top: 0; z-index: 30; padding: calc(var(--st) + 6px) 12px 8px; transform: translateY(-110%); transition: transform .25s ease; pointer-events: none; }
+.mini.show { transform: none; pointer-events: auto; }
+.mini .in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 14px; border-radius: 20px; }
+.mini .cd { font-family: var(--font-round); font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; min-width: 82px; }
+.mini .meta { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 650; color: var(--ink-2); line-height: 1.25; }
+.mini .meta b { color: var(--ink); font-family: var(--font-round); }
+.mini .tbtn { position: static; width: 44px; height: 44px; flex: none; }
+.mini .in { background: var(--glass-strong); }
+.mini.pre .in { background: color-mix(in srgb, var(--warn) 24%, var(--glass-strong)); }
+.mini.pre .cd { color: var(--warn); }
+.mini.due .in { background: var(--crit); color: #fff; animation: glow 1s ease-in-out infinite; }
+@keyframes glow { 50% { box-shadow: 0 0 0 6px rgba(229, 56, 59, .35); } }
+.mini.due .cd, .mini.due .meta, .mini.due .meta b { color: #fff; }
+.mini.paused .in { background: color-mix(in srgb, var(--warn) 24%, var(--glass-strong)); }
+.mini.paused .cd { color: var(--warn); font-size: 24px; }
+.ring.paused .fg { stroke: var(--warn); }
+.ring.paused .cd { color: var(--warn); font-size: 30px; }
+.alert.paused { background: var(--warn-soft); color: var(--warn); }
+.mcount { font-family: var(--font-round); font-size: 22px; font-weight: 800; min-width: 110px; text-align: right; }
+.mcount.br { color: var(--petrol); }
+.mrow { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+/* metronom */
+.metro { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.metro .chip { height: 36px; }
+.beat { width: 14px; height: 14px; border-radius: 50%; background: var(--fill); transition: background .08s; }
+.beat.on { background: var(--petrol); }
+
+/* sheet + toast */
+.scrim { position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, .35); opacity: 0; pointer-events: none; transition: opacity .3s; }
+.scrim.open { opacity: 1; pointer-events: auto; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 61; max-width: 560px; margin: 0 auto; max-height: calc(100% - var(--st) - 16px); overflow: auto; padding: 18px 16px calc(18px + var(--sb)); border-radius: 28px 28px 0 0; background: var(--bg); box-shadow: 0 -10px 40px rgba(0, 0, 0, .2); transform: translateY(105%); visibility: hidden; transition: transform .38s cubic-bezier(.32, .72, 0, 1), visibility 0s .38s; }
+.sheet.open { transform: none; visibility: visible; transition: transform .38s cubic-bezier(.32, .72, 0, 1); }
+.sheet h2 { margin: 0 0 6px; font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+.sheet .col { display: grid; gap: 8px; margin-top: 14px; }
+.sheet textarea { width: 100%; min-height: 90px; padding: 12px; border-radius: 14px; border: 1px solid var(--hairline); background: var(--glass-strong); font-size: 16px; resize: vertical; }
+.toast { position: fixed; left: 50%; top: calc(var(--st) + 12px); z-index: 100; transform: translate(-50%, -20px); opacity: 0; pointer-events: none; max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 22px; background: var(--glass-strong); font-size: 15px; font-weight: 650; text-align: center; box-shadow: 0 12px 30px -10px var(--glass-shadow); transition: opacity .25s, transform .3s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.foot { margin-top: 18px; font-size: 12.5px; color: var(--ink-3); text-align: center; line-height: 1.45; }
+@media (max-width: 380px) { .ring { width: 140px; height: 140px; } .ring .cd { font-size: 36px; } .tot .v { font-size: 32px; } }
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="head">
+    <h1>ResqArrest</h1>
+    <button type="button" class="round glass" id="b-metro" aria-label="Metronom" aria-pressed="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l4 18H5z"/><path d="M12 15l5-9"/><path d="M7.5 15h9"/></svg></button>
+    <button type="button" class="round glass" id="b-sound" aria-label="Zvuková upozornění" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path id="snd-w" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path id="snd-x" d="m16 9 6 6m0-6-6 6" hidden/></svg></button>
+    <button type="button" class="round glass" id="b-theme" aria-label="Přepnout světlý nebo tmavý režim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+    <button type="button" class="round glass" id="b-menu" aria-label="Ukončit nebo nová resuscitace" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r=".6"/><circle cx="12" cy="12" r=".6"/><circle cx="19" cy="12" r=".6"/></svg></button>
+  </header>
+
+  <!-- start -->
+  <section id="v-setup" class="setup" hidden>
+    <div class="card glass">
+      <div class="h">Pacient</div>
+      <div class="seg" id="pt-seg"><button type="button" data-pt="adult" aria-pressed="true">Dospělý</button><button type="button" data-pt="child" aria-pressed="false">Dítě</button></div>
+      <div id="kg-box" hidden>
+        <div class="kgrow"><input id="kg" type="number" inputmode="decimal" min="1" max="120" step="0.5" placeholder="kg" aria-label="Hmotnost dítěte v kg"><span class="muted" id="kg-hint">kg – dávky a energie se počítají z váhy</span></div>
+        <div class="chips" id="kg-chips"></div>
+      </div>
+      <div class="h" style="margin-top:16px">Komprese</div>
+      <div class="seg" id="mode-seg"><button type="button" data-mode="ratio" aria-pressed="true" id="ratio-lbl">30:2</button><button type="button" data-mode="cont" aria-pressed="false">Jen komprese</button></div>
+      <p class="muted" style="margin:8px 2px 0" id="mode-hint"></p>
+    </div>
+    <button type="button" class="go" id="b-start">START KPR<small>spustí čas, cykly 2 min a záznam</small></button>
+    <p class="foot">Pomůcka pro hlídání času podle doporučení ERC 2025. Nenahrazuje klinický úsudek ani místní protokoly.</p>
+  </section>
+
+  <!-- KPR -->
+  <section id="v-run" hidden>
+    <div class="grid">
+      <div>
+        <div class="card glass tcard" id="tcard">
+          <button type="button" class="tbtn" id="b-pause" aria-label="Pozastavit"></button>
+          <div class="timers">
+            <div class="ring" id="ring">
+              <svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="ring-fg" cx="60" cy="60" r="52" stroke-dasharray="326.73" stroke-dashoffset="0"/></svg>
+              <div class="in"><div class="cy" id="cy-n">Cyklus 1</div><div class="cd" id="cy-t">2:00</div></div>
+            </div>
+            <div class="tot">
+              <div class="l">Celkový čas KPR</div>
+              <div class="v" id="tot">0:00</div>
+              <div class="s" id="tot-s"></div>
+              <div class="stats" id="stats"></div>
+            </div>
+          </div>
+          <div id="cy-alert"></div>
+        </div>
+
+        <div class="card glass">
+          <div class="h"><span class="grow">Kontrola rytmu</span><span id="pt-lbl" class="muted" style="text-transform:none;letter-spacing:0;font-weight:650"></span></div>
+          <div class="rh">
+            <button type="button" class="sh" id="b-shock">Defibrilovatelný<small>KF / bezpulzová KT → výboj</small></button>
+            <button type="button" class="ns" id="b-nonshock">Nedefibrilovatelný<small>asystolie / PEA</small></button>
+            <button type="button" class="rosc" id="b-rosc">ROSC – obnova oběhu</button>
+          </div>
+          <div class="energy" id="energy"></div>
+          <div id="refr"></div>
+        </div>
+
+        <div class="card glass">
+          <div class="h">Léky</div>
+          <div class="drug" id="d-adr"><div class="grow"><div class="n">Adrenalin</div><div class="st" id="adr-st"></div><div class="d" id="adr-d"></div></div><button type="button" class="give" id="b-adr">Podáno</button></div>
+          <div class="drug" id="d-amio"><div class="grow"><div class="n">Amiodaron</div><div class="st" id="amio-st"></div><div class="d" id="amio-d"></div></div><button type="button" class="give" id="b-amio">Podáno</button></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card glass" id="equip" hidden></div>
+        <div class="card glass">
+          <div class="h">Zápis</div>
+          <div class="qa" id="qa"></div>
+        </div>
+        <div class="card glass" id="metro-card">
+          <div class="h"><span class="grow">Metronom</span><span class="mcount" id="mcount"></span><span class="beat" id="beat"></span></div>
+          <div class="metro" id="metro"></div>
+        </div>
+        <div class="card glass">
+          <div class="h"><span class="grow">4H / 4T – reverzibilní příčiny</span></div>
+          <div class="hts" id="hts"></div>
+        </div>
+        <div class="card glass">
+          <div class="h"><span class="grow">Záznam</span><span class="muted" id="log-n" style="text-transform:none;letter-spacing:0"></span></div>
+          <ul class="log" id="log"></ul>
+          <div class="acts"><button type="button" class="btn sm" id="b-undo">Vrátit poslední</button><button type="button" class="btn sm pri" id="b-copy">Kopírovat záznam</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROSC -->
+  <section id="v-rosc" hidden>
+    <div class="grid">
+      <div>
+        <div class="roscbar"><div class="grow"><div class="l">ROSC</div><div class="v" id="rosc-t">0:00</div><div class="l" id="rosc-s"></div></div></div>
+        <button type="button" class="rearrest" id="b-rearrest">Opětovná zástava – pokračovat v KPR</button>
+        <div class="card glass">
+          <div class="h">Post-ROSC péče</div>
+          <div id="post"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card glass">
+          <div class="h"><span class="grow">Záznam</span></div>
+          <ul class="log" id="log2"></ul>
+          <div class="acts"><button type="button" class="btn sm" id="b-note2">Poznámka</button><button type="button" class="btn sm pri" id="b-copy2">Kopírovat záznam</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- konec -->
+  <section id="v-end" hidden>
+    <div class="card glass">
+      <div class="h">Souhrn</div>
+      <pre id="sum" style="white-space:pre-wrap;font-family:var(--font);font-size:15px;margin:0;line-height:1.45"></pre>
+      <div class="acts"><button type="button" class="btn pri" id="b-copy3">Kopírovat záznam</button><button type="button" class="btn" id="b-new">Nová resuscitace</button></div>
+    </div>
+  </section>
+</div>
+
+<div class="mini" id="mini" aria-hidden="true"><div class="in glass"><div class="cd" id="mini-cd">2:00</div><div class="meta" id="mini-meta"></div><button type="button" class="tbtn" id="b-pause2" aria-label="Pozastavit"></button></div></div>
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const KEY = 'resqarrest:v1';
+const CYCLE = 120;           // s
+const ADR_NEXT = 240;        // upozornit po 4 min (okno 3–5 min)
+const ADR_MIN = 180;
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+
+const HT = [
+  ['hypox', 'Hypoxie', 'O₂, zajištění DC'], ['hypovol', 'Hypovolémie', 'krvácení, tekutiny'],
+  ['metab', 'Hypo/hyperkalémie, metabol.', 'K⁺, glykémie, Ca²⁺, acidóza'], ['hypoth', 'Hypo/hypertermie', 'teplota'],
+  ['tpno', 'Tenzní PNO', 'dekomprese'], ['tamp', 'Tamponáda', 'UZ, perikardiocentéza'],
+  ['tox', 'Toxiny', 'anamnéza, antidota'], ['trom', 'Trombóza', 'koronární / plicní embolie'],
+];
+const QA = [
+  ['lma', 'LMA'], ['oti', 'OTI'], ['etco2', 'Kapnometrie'], ['iv', 'i.v.'], ['io', 'i.o.'],
+  ['mech', 'Mechanická KPR'], ['vector', 'Změna vektoru (A-P)'], ['fluid', 'Tekutiny'], ['note', '+ Poznámka'],
+];
+const QA_TXT = { lma: 'Zajištění DC: LMA', oti: 'Zajištění DC: OTI', etco2: 'Kapnometrie (EtCO₂)', iv: 'Vstup i.v.', io: 'Vstup i.o.', mech: 'Mechanická KPR', vector: 'Změna vektoru – elektrody A-P', fluid: 'Tekutiny' };
+// Broselow – stejná tabulka a hranice jako v ResqPedi
+const BROS = {
+  GREY: { c: '#808080', f: '#fff', w: '3–5', etk: '3.0', depth: '9', suction: '6 (světle zelená)', opa: '00 (růž.)', lma: '1', blade: '0 (Miller)', cannula: '24G (žlutá)', io: '15 mm (růžová)' },
+  PINK: { c: '#ffc0cb', f: '#000', w: '6–7', etk: '3.5', depth: '10', suction: '8 (modrá)', opa: '0 (čer.)', lma: '1', blade: '0–1 (Miller)', cannula: '24G (žlutá)', io: '15 mm (růžová)' },
+  RED: { c: '#ff3b30', f: '#fff', w: '8–9', etk: '3.5–4.0', depth: '11', suction: '8 (modrá)', opa: '1 (bílý)', lma: '1.5', blade: '1 (Miller)', cannula: '22G (modrá)', io: '15 mm (růžová)' },
+  PURPLE: { c: '#af52de', f: '#fff', w: '10–11', etk: '4.0–4.5', depth: '12', suction: '8 (modrá)', opa: '1 (bílý)', lma: '1.5', blade: '1 (Miller)', cannula: '22G (modrá)', io: '15 mm (růžová)' },
+  YELLOW: { c: '#ffcc00', f: '#000', w: '12–14', etk: '4.5–5.0', depth: '13', suction: '10 (černá)', opa: '2 (zel.)', lma: '2', blade: '2 (Mac)', cannula: '22G (modrá)', io: '25 mm (modrá)' },
+  WHITE: { c: '#ffffff', f: '#000', w: '15–18', etk: '5.0–5.5', depth: '14', suction: '10 (černá)', opa: '2 (zel.)', lma: '2', blade: '2 (Mac)', cannula: '20G (růžová)', io: '25 mm (modrá)' },
+  BLUE: { c: '#007aff', f: '#fff', w: '19–22', etk: '5.5–6.0', depth: '15', suction: '12 (bílá)', opa: '3 (oran.)', lma: '2.5', blade: '2 (Mac)', cannula: '20G (růžová)', io: '25 mm (modrá)' },
+  ORANGE: { c: '#ff9500', f: '#000', w: '24–28', etk: '6.0', depth: '16', suction: '12 (bílá)', opa: '3 (oran.)', lma: '2.5', blade: '3 (Mac)', cannula: '20G (růžová)', io: '25 mm (modrá)' },
+  GREEN: { c: '#4cd964', f: '#000', w: '30–36', etk: '6.5', depth: '18', suction: '14 (tmavě zelená)', opa: '4 (červ.)', lma: '3', blade: '3 (Mac)', cannula: '20G (růžová)', io: '25 mm (modrá)' },
+};
+function brosKey(kg) { let t = 'GREY'; if (kg > 5.5) t = 'PINK'; if (kg > 7.5) t = 'RED'; if (kg > 9.5) t = 'PURPLE'; if (kg > 11.5) t = 'YELLOW'; if (kg > 14.5) t = 'WHITE'; if (kg > 18.5) t = 'BLUE'; if (kg > 23.5) t = 'ORANGE'; if (kg > 29.5) t = 'GREEN'; return t; }
+const bros = () => (isChild() && S.kg <= 36 ? BROS[brosKey(S.kg)] : null);
+const badge = (kg) => { const k = brosKey(kg), b = BROS[k]; return `<span class="bros" style="background:${b.c};color:${b.f}">${k} · ${b.w} kg</span>`; };
+// velikost pomůcky do zápisu
+function qaSize(k) {
+  const b = bros(); if (!b) return '';
+  return { lma: `vel. ${b.lma.replace('.', ',')}`, oti: `ETK ${b.etk.replace(/\./g, ',')}, hloubka ${b.depth} cm`, io: b.io, iv: b.cannula }[k] || '';
+}
+const KG_CHIPS = [['novorozenec', 3.5], ['3 měs.', 6], ['6 měs.', 8], ['1 rok', 10], ['2 roky', 12], ['4 roky', 16], ['6 let', 20], ['8 let', 26], ['10 let', 32], ['12 let', 40]];
+
+const I_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>', I_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.2-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
+let S = load() || fresh();
+// migrace starších uložených stavů
+if (S.metro.bpm === 'nls') { S.metro.bpm = 110; S.metro.mode = 'nls'; }
+if (!S.metro.mode) S.metro.mode = 'ratio';
+if (S.pausedAt === undefined) S.pausedAt = null;
+function fresh() { return { v: 1, phase: 'setup', pt: 'adult', kg: null, start: null, cycleStart: null, cycleN: 1, log: [], ht: {}, post: {}, roscAt: null, endAt: null, endTxt: '', sound: true, metro: { on: false, bpm: 110, mode: 'ratio' }, pausedAt: null, fired: {} }; }
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); return s && s.v === 1 ? s : null; } catch (e) { return null; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+/* ---------- pomocné ---------- */
+const now = () => Date.now();
+const mmss = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const clock = (t) => new Date(t).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+const fmt = (n, d = 2) => { const r = Math.round(n * 10 ** d) / 10 ** d; return String(r).replace('.', ','); };
+const isChild = () => S.pt === 'child' && S.kg > 0;
+const derived = () => {
+  const L = S.log;
+  const shocks = L.filter((e) => e.k === 'shock').length;
+  const adr = L.filter((e) => e.k === 'adr').map((e) => e.t);
+  const amio = L.filter((e) => e.k === 'amio').map((e) => e.t);
+  const rh = L.filter((e) => e.k === 'shock' || e.k === 'nonshock');
+  const lastRh = rh.length ? rh[rh.length - 1].k : null;
+  const anyNon = rh.some((e) => e.k === 'nonshock');
+  return { shocks, adr, amio, lastRh, anyNon };
+};
+function addLog(k, x, extra) { const e = Object.assign({ t: now(), k, x }, extra || {}); S.log.push(e); save(); return e; }
+
+/* dávky */
+function adrDose() {
+  if (!isChild()) return '1 mg i.v./i.o. + proplach';
+  const mg = Math.min(S.kg * 0.01, 1);
+  if (S.kg < 10) return `${fmt(mg * 1000, 0)} µg = <b>${fmt(S.kg, 1)} ml</b> z vaku 10 µg/ml (1 mg do 100 ml FR)`;
+  return `${fmt(mg)} mg = <b>${fmt(mg * 10, 1)} ml</b> ředěného 0,1 mg/ml (1 ml + 9 ml FR)`;
+}
+function amioDose(second) {
+  const cap = second ? 150 : 300;
+  const mg = isChild() ? Math.min(S.kg * 5, cap) : cap;
+  if (!isChild()) return `${mg} mg = <b>${fmt(mg / 50, 1)} ml</b> (50 mg/ml) i.v./i.o.`;
+  // stejně jako ResqPedi: do 30 kg ředit G5 % na 10 mg/ml, nad 30 kg neředěný
+  if (S.kg > 30) return `5 mg/kg = ${fmt(mg, 0)} mg = <b>${fmt(mg / 50, 1)} ml</b> neředěného (50 mg/ml) i.v./i.o.`;
+  return `5 mg/kg = ${fmt(mg, 0)} mg = <b>${fmt(mg / 10, 1)} ml</b> ředěného 3 ml + 12 ml G5 % = 10 mg/ml (ředit jen G5 %)`;
+}
+function energyTxt() {
+  if (!isChild()) return 'Energie: <b>podle přístroje</b> (AED / automatický režim). Manuálně: doporučení výrobce, jinak nejvyšší energie.';
+  const j = Math.round(S.kg * 4), cap = Math.min(j, 200);
+  return `Energie: <b>${cap} J</b> (4 J/kg${j > 200 ? ', max. 120–200 J' : ''}). Refrakterní KF: až 8 J/kg (max. 360 J).`;
+}
+
+/* ---------- zvuk ---------- */
+let AC = null;
+function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+function tone(f, d, when, vol) {
+  const a = ac(); if (!a) return; const t = when || a.currentTime;
+  const o = a.createOscillator(), g = a.createGain(); o.type = 'sine'; o.frequency.value = f;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.4, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + d + 0.02);
+}
+function alarm(kind) {
+  if (navigator.vibrate) navigator.vibrate(kind === 'pre' ? [120] : [300, 120, 300, 120, 300]);
+  if (!S.sound) return; const a = ac(); if (!a) return; const t = a.currentTime;
+  if (kind === 'pre') { tone(880, .15, t); return; }
+  if (kind === 'count') { tone(1175, .12, t, .5); return; }
+  if (kind === 'drug') { [0, .22, .44].forEach((d) => tone(1046, .16, t + d, .5)); return; }
+  [0, .25, .5, .75, 1.0, 1.25].forEach((d, i) => tone(i % 2 ? 660 : 1320, .2, t + d, .7));
+}
+/* metronom – plánování dopředu kvůli přesnosti
+   režimy: ratio (30:2 / 15:2), cont (jen komprese), airway (zajištěné DC – komprese + vdech á 6 s), nls (novorozenec 3:1) */
+let mNext = 0, mTimer = null, mCount = 0, mVNext = 0;
+const ratioN = () => (isChild() ? 15 : 30);
+const mMode = () => (S.metro.mode === 'nls' && !isChild() ? 'ratio' : (S.metro.mode || 'ratio'));
+function mShow(txt, br, at) {
+  const a = ac(); const d = Math.max(0, (at - a.currentTime) * 1000);
+  setTimeout(() => { const c = $('mcount'); if (c) { c.textContent = txt; c.classList.toggle('br', !!br); } if (!br) { const b = $('beat'); b.classList.add('on'); setTimeout(() => b.classList.remove('on'), 90); } }, d);
+}
+function metroStart() {
+  const a = ac(); if (!a) return; mNext = a.currentTime + 0.08; mVNext = mNext + 6; mCount = 0; clearInterval(mTimer);
+  mTimer = setInterval(() => {
+    const mode = mMode(), iv = mode === 'nls' ? 0.5 : 60 / (+S.metro.bpm || 110), N = ratioN();
+    while (mNext < a.currentTime + 0.15) {
+      if (mode === 'ratio') {
+        if (mCount < N) {                       // komprese; posledních 5 jiným tónem
+          mCount++; const last = mCount > N - 5;
+          tone(last ? 2300 : 1500, last ? .05 : .03, mNext, last ? .5 : .35); mShow(`${mCount}/${N}`, false, mNext); mNext += iv;
+        } else if (mCount === N) {              // 1. vdech
+          mCount++; tone(520, .5, mNext, .45); mShow('VDECH 1', true, mNext); mNext += 1.6;
+        } else {                                // 2. vdech
+          tone(520, .5, mNext, .45); mShow('VDECH 2', true, mNext); mNext += 1.6; mCount = 0;
+        }
+      } else if (mode === 'nls') {
+        mCount = (mCount % 4) + 1;
+        if (mCount === 4) { tone(520, .32, mNext, .4); mShow('VDECH', true, mNext); } else { tone(1500, .03, mNext, .35); mShow(`${mCount} – 3`, false, mNext); }
+        mNext += iv;
+      } else {
+        tone(1500, .03, mNext, .35); mShow(mode === 'airway' ? 'komprese' : '', false, mNext); mNext += iv;
+      }
+    }
+    if (mMode() === 'airway') while (mVNext < a.currentTime + 0.15) { tone(620, .4, mVNext, .45); mShow('VDECH', true, mVNext); mVNext += 6; }
+  }, 25);
+}
+function metroStop() { clearInterval(mTimer); mTimer = null; const c = $('mcount'); if (c) c.textContent = ''; }
+function metroSync() { const on = S.metro.on && S.phase === 'run' && !S.pausedAt; if (on) { if (!mTimer) metroStart(); } else metroStop(); $('b-metro').setAttribute('aria-pressed', on); }
+function metroRestart() { metroStop(); metroSync(); }
+
+/* ---------- obrazovka zůstane rozsvícená ---------- */
+let wl = null;
+async function wake() { try { if ('wakeLock' in navigator && (S.phase === 'run' || S.phase === 'rosc') && !wl) { wl = await navigator.wakeLock.request('screen'); wl.addEventListener('release', () => { wl = null; }); } } catch (e) {} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { wake(); tick(); } });
+
+/* ---------- akce ---------- */
+function startCpr() {
+  ac();
+  const kg = parseFloat(String($('kg').value).replace(',', '.'));
+  if (S.pt === 'child' && !(kg > 0)) { toast('Zadej váhu dítěte'); $('kg').focus(); return; }
+  S.kg = S.pt === 'child' ? kg : null;
+  S.metro.on = true; S.metro.bpm = 110; if (S.metro.mode === 'nls' || S.metro.mode === 'airway') S.metro.mode = 'ratio';
+  S.pausedAt = null;
+  S.phase = 'run'; S.start = now(); S.cycleStart = S.start; S.cycleN = 1; S.log = []; S.ht = {}; S.post = {}; S.fired = {}; S.roscAt = null; S.endAt = null;
+  addLog('start', 'Zahájení KPR' + (isChild() ? ` (dítě ${fmt(S.kg, 1)} kg)` : ' (dospělý)') + (S.metro.mode === 'cont' ? ' – jen komprese' : ` – ${ratioN()}:2`));
+  save(); wake(); render();
+}
+function togglePause() {
+  ac();
+  if (S.phase !== 'run') return;
+  if (S.pausedAt) {
+    const dur = now() - S.pausedAt;
+    addLog('resume', `Pokračování KPR (pauza ${mmss(dur)})`, { prev: { cycleStart: S.cycleStart, cycleN: S.cycleN, pausedAt: S.pausedAt } });
+    S.cycleStart += dur; S.pausedAt = null;
+  } else {
+    S.pausedAt = now(); addLog('pause', 'Pauza KPR', { prev: { cycleStart: S.cycleStart, cycleN: S.cycleN, pausedAt: null } });
+  }
+  save(); metroSync(); render();
+}
+function newCycle() { S.cycleStart = now(); S.cycleN += 1; }
+function rhythm(k) {
+  ac();
+  const prev = { cycleStart: S.cycleStart, cycleN: S.cycleN, pausedAt: S.pausedAt };
+  if (S.pausedAt) { addLog('resume', `Pokračování KPR (pauza ${mmss(now() - S.pausedAt)})`); S.pausedAt = null; }
+  if (k === 'shock') {
+    const n = derived().shocks + 1;
+    const j = isChild() ? Math.min(Math.round(S.kg * 4), 200) + ' J' : '';
+    addLog('shock', `KF/bezpulzová KT – ${n}. výboj${j ? ' ' + j : ''}`, { prev });
+    toast(`${n}. výboj zapsán – pokračuj v kompresích`);
+  } else {
+    addLog('nonshock', 'Asystolie / PEA – bez výboje', { prev });
+  }
+  newCycle(); save(); render();
+}
+function giveAdr() { ac(); const n = derived().adr.length + 1; addLog('adr', `Adrenalin ${n}. dávka – ${isChild() ? adrDose().replace(/<[^>]+>/g, '') : '1 mg'}`); render(); }
+function giveAmio() { ac(); const n = derived().amio.length + 1; addLog('amio', `Amiodaron ${n}. dávka – ${amioDose(n > 1).replace(/<[^>]+>/g, '')}`); render(); }
+function rosc() {
+  if (!confirm('Zapsat ROSC (obnovu oběhu)?')) return;
+  S.phase = 'rosc'; S.roscAt = now(); addLog('rosc', 'ROSC – obnova spontánního oběhu'); save(); metroSync(); render();
+}
+function rearrest() {
+  ac(); S.phase = 'run'; addLog('rearrest', 'Opětovná zástava – pokračování KPR'); newCycle(); save(); metroSync(); render();
+}
+function undo() {
+  const e = S.log[S.log.length - 1];
+  if (!e || e.k === 'start') { toast('Není co vrátit'); return; }
+  if (!confirm('Vrátit: „' + e.x + '“?')) return;
+  S.log.pop();
+  if (e.prev) { S.cycleStart = e.prev.cycleStart; S.cycleN = e.prev.cycleN; if ('pausedAt' in e.prev) S.pausedAt = e.prev.pausedAt; }
+  if (e.k === 'rosc') { S.phase = 'run'; S.roscAt = null; }
+  save(); render();
+}
+function endCpr(txt) {
+  S.phase = 'end'; S.endAt = now(); S.endTxt = txt; addLog('end', txt); save(); metroSync();
+  try { wl && wl.release(); } catch (e) {} render();
+}
+
+/* ---------- text záznamu ---------- */
+function exportText() {
+  const d = derived(), end = S.endAt || now();
+  const L = [];
+  L.push('KPR – záznam (ResqArrest)');
+  L.push(`Pacient: ${isChild() ? 'dítě ' + fmt(S.kg, 1) + ' kg' : 'dospělý'}`);
+  L.push(`Zahájení: ${clock(S.start)} · trvání ${mmss((S.roscAt && S.phase !== 'run' ? S.roscAt : end) - S.start)}`);
+  const amioMg = d.amio.length ? S.log.filter((e) => e.k === 'amio').map((e) => (e.x.match(/(\d+) mg/) || [])[1]).filter(Boolean).join(' + ') + ' mg' : '0';
+  L.push(`Výboje: ${d.shocks} · adrenalin: ${d.adr.length}× · amiodaron: ${amioMg}`);
+  const done = HT.filter(([k]) => S.ht[k]).map(([, n]) => n);
+  if (done.length) L.push('4H/4T zvážené: ' + done.join(', '));
+  if (S.roscAt) L.push(`ROSC: ${clock(S.roscAt)}`);
+  L.push('');
+  S.log.forEach((e) => L.push(`${mmss(e.t - S.start).padStart(5, ' ')}  (${clock(e.t)})  ${e.x}`));
+  return L.join('\n');
+}
+async function copyLog() {
+  const t = exportText();
+  try { await navigator.clipboard.writeText(t); toast('Záznam zkopírován'); }
+  catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('Záznam zkopírován'); } catch (er) { toast('Kopírování se nepovedlo'); } ta.remove(); }
+}
+
+/* ---------- sheet ---------- */
+function openSheet(html) { const sh = $('sheet'); sh.innerHTML = html; sh.classList.add('open'); $('scrim').classList.add('open'); }
+function closeSheet() { $('sheet').classList.remove('open'); $('scrim').classList.remove('open'); }
+$('scrim').onclick = closeSheet;
+function noteSheet() {
+  openSheet(`<h2>Poznámka</h2><p class="muted" style="margin:0">Zapíše se s aktuálním časem.</p><div class="col"><textarea id="note-t" placeholder="např. příjezd RLP, změna kompresora, pH…"></textarea><button type="button" class="btn pri" id="note-ok">Zapsat</button><button type="button" class="btn" id="note-x">Zrušit</button></div>`);
+  setTimeout(() => $('note-t').focus(), 250);
+  $('note-ok').onclick = () => { const v = $('note-t').value.trim(); if (v) { addLog('note', v); render(); } closeSheet(); };
+  $('note-x').onclick = closeSheet;
+}
+function menuSheet() {
+  const run = S.phase === 'run' || S.phase === 'rosc';
+  openSheet(`<h2>${run ? 'Ukončit resuscitaci' : 'Resuscitace'}</h2>
+    <div class="col">
+      ${S.phase === 'rosc' ? '<button type="button" class="btn pri" data-end="ROSC – předání do péče / transport">Předání / transport po ROSC</button>' : ''}
+      ${run ? '<button type="button" class="btn" data-end="KPR ukončena – exitus">KPR ukončena (exitus)</button>' : ''}
+      ${run ? '<button type="button" class="btn" data-end="KPR ukončena – předání jinému týmu">Předání jinému týmu</button>' : ''}
+      <button type="button" class="btn" id="m-copy">Kopírovat záznam</button>
+      <button type="button" class="btn" id="m-new" style="color:var(--crit)">Smazat a začít novou</button>
+      <button type="button" class="btn" id="m-x">Zavřít</button>
+    </div>`);
+  $('sheet').querySelectorAll('[data-end]').forEach((b) => b.onclick = () => { closeSheet(); endCpr(b.dataset.end); });
+  $('m-copy').onclick = () => { copyLog(); };
+  $('m-new').onclick = () => { if (confirm('Smazat celý záznam a začít znovu?')) { closeSheet(); resetAll(); } };
+  $('m-x').onclick = closeSheet;
+}
+function resetAll() { const keep = { sound: S.sound, metro: S.metro, pt: S.pt }; S = Object.assign(fresh(), keep, { metro: Object.assign({}, keep.metro, { on: false }) }); save(); metroSync(); render(); }
+
+let toastT = null;
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2200); }
+
+/* ---------- vykreslení ---------- */
+function show(id) { ['v-setup', 'v-run', 'v-rosc', 'v-end'].forEach((v) => { $(v).hidden = v !== id; }); }
+function render() {
+  const p = S.phase;
+  show({ setup: 'v-setup', run: 'v-run', rosc: 'v-rosc', end: 'v-end' }[p]);
+  $('b-metro').hidden = p !== 'run'; $('b-sound').hidden = p === 'setup' || p === 'end'; $('b-menu').hidden = p === 'setup';
+  $('snd-w').toggleAttribute('hidden', !S.sound); $('snd-x').toggleAttribute('hidden', S.sound); $('b-sound').classList.toggle('off', !S.sound);
+  if (p === 'setup') renderSetup();
+  if (p === 'run') renderRun();
+  if (p === 'rosc') renderRosc();
+  if (p === 'end') { $('sum').textContent = exportText(); }
+  metroSync(); tick();
+}
+function renderSetup() {
+  $('pt-seg').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.pt === S.pt));
+  $('kg-box').hidden = S.pt !== 'child';
+  const v = parseFloat(String($('kg').value).replace(',', '.'));
+  $('kg-hint').innerHTML = v > 0 && v <= 36 ? badge(v) : 'kg – dávky, energie a pomůcky se počítají z váhy';
+  $('ratio-lbl').textContent = S.pt === 'child' ? '15:2' : '30:2';
+  $('mode-seg').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.mode === (S.metro.mode === 'cont' ? 'cont' : 'ratio')));
+  $('mode-hint').textContent = S.metro.mode === 'cont' ? 'Metronom jen pro komprese (KPR bez ventilace).' : `Metronom odpočítává ${S.pt === 'child' ? 15 : 30} kompresí (posledních 5 jiným tónem), pak 2 vdechy. Po zápisu LMA/OTI přepne na kontinuální komprese + vdech á 6 s.`;
+  $('kg-chips').innerHTML = KG_CHIPS.map(([l, k]) => `<button type="button" class="chip" data-kg="${k}" aria-pressed="${v === k}">${l} · ${String(k).replace('.', ',')} kg</button>`).join('');
+}
+function renderRun() {
+  $('pt-lbl').textContent = isChild() ? `dítě ${fmt(S.kg, 1)} kg` : 'dospělý';
+  $('energy').innerHTML = energyTxt();
+  $('qa').innerHTML = QA.map(([k, l]) => { const z = qaSize(k); return `<button type="button" data-qa="${k}" class="${S.log.some((e) => e.k === 'qa-' + k) ? 'on' : ''}">${l}${z ? ` <small>${esc(z)}</small>` : ''}</button>`; }).join('');
+  const b = bros(), eq = $('equip');
+  eq.hidden = !isChild();
+  if (isChild()) eq.innerHTML = b ? `<div class="h"><span class="grow">Pomůcky</span>${badge(S.kg)}</div><div class="eq">${[['ETK', b.etk.replace(/\./g, ',') + ' (hloubka ' + b.depth + ' cm)'], ['LMA', b.lma.replace('.', ',')], ['Laryngoskop', b.blade], ['Vzduchovod', b.opa], ['Odsávací cévka', b.suction], ['i.v. kanyla', b.cannula], ['i.o. jehla', b.io]].map(([n, v]) => `<div><span>${n}</span><b>${esc(v)}</b></div>`).join('')}</div>` : '<div class="h">Pomůcky</div><p class="muted" style="margin:0">Nad 36 kg – velikosti jako u dospělých.</p>';
+  $('hts').innerHTML = HT.map(([k, n, s]) => `<button type="button" class="ht" data-ht="${k}" aria-pressed="${!!S.ht[k]}"><span class="bx">${CHECK}</span><span>${n}<small>${s}</small></span></button>`).join('');
+  const mode = mMode(), N = ratioN();
+  const modes = [['ratio', `${N}:2`], ['cont', 'Jen komprese'], ['airway', 'Zajištěné DC']].concat(isChild() ? [['nls', 'Novorozenec 3:1']] : []);
+  const hint = { ratio: `${N} kompresí (posledních 5 vyšším tónem), pak 2 vdechy (hluboký tón).`, cont: 'Jen komprese, bez ventilace.', airway: 'Kontinuální komprese + vdech á 6 s (10/min) – po zajištění DC.', nls: 'Novorozenec po porodu: 3 komprese + 1 vdech, 120 úkonů/min.' }[mode];
+  $('metro').innerHTML = `<div class="mrow"><button type="button" class="chip" id="m-on" aria-pressed="${S.metro.on}">${S.metro.on ? 'Zapnuto' : 'Vypnuto'}</button>`
+    + modes.map(([k, l]) => `<button type="button" class="chip" data-mode="${k}" aria-pressed="${mode === k}">${l}</button>`).join('') + '</div>'
+    + (mode === 'nls' ? '' : '<div class="mrow">' + [100, 110, 120].map((b) => `<button type="button" class="chip" data-bpm="${b}" aria-pressed="${S.metro.bpm === b}">${b}/min</button>`).join('') + '</div>')
+    + `<p class="muted" style="margin:2px 2px 0;width:100%">${hint}${mode === 'nls' ? '' : ' ERC: 100–120/min u dospělých i dětí.'}</p>`;
+  renderLog('log');
+}
+function renderLog(id) {
+  const items = S.log.slice().reverse().map((e) => `<li class="k-${e.k}"><span class="t">${mmss(e.t - S.start)}</span><span class="x">${esc(e.x)}</span><span class="c">${clock(e.t).slice(0, 5)}</span></li>`);
+  $(id).innerHTML = items.join('');
+  if ($('log-n')) $('log-n').textContent = S.log.length + ' záznamů';
+}
+const POST_A = [
+  ['air', 'Dýchací cesty zajištěny', 'kapnometrie, pozice kanyly'],
+  ['spo2', 'SpO₂ 94–98 %', 'titrovat FiO₂, vyhnout se hypoxii i hyperoxii'],
+  ['vent', 'Normokapnie – EtCO₂ 35–45 mmHg', 'ventilace 6–8 ml/kg ideální hmotnosti'],
+  ['bp', 'STK > 100 mmHg, MAP > 65 mmHg', 'tekutiny, vazopresor (noradrenalin)'],
+  ['ecg', '12svodové EKG', 'STEMI → směrovat na PCI'],
+  ['glu', 'Glykémie', 'vyhnout se hypoglykémii'],
+  ['temp', 'Teplota', 'zabránit horečce (> 37,7 °C)'],
+  ['cause', 'Příčina zástavy', '4H / 4T'],
+  ['sed', 'Analgosedace', 'u intubovaného pacienta'],
+  ['dest', 'Směrování', 'centrum pro péči po zástavě / PCI'],
+];
+const POST_C = [
+  ['air', 'Dýchací cesty zajištěny', 'kapnometrie, pozice kanyly'],
+  ['spo2', 'SpO₂ 94–98 %', 'titrovat FiO₂'],
+  ['vent', 'Normokapnie – EtCO₂ 35–45 mmHg', 'ventilace podle věku'],
+  ['bp', 'TK nad 5. percentilem pro věk', 'orientačně STK > 70 + 2 × věk; tekutiny 10 ml/kg, vazopresor'],
+  ['glu', 'Glykémie', 'normoglykémie, vyhnout se hypoglykémii'],
+  ['temp', 'Teplota', 'zabránit horečce'],
+  ['ecg', '12svodové EKG', ''],
+  ['cause', 'Příčina zástavy', '4H / 4T, u dětí nejčastěji hypoxie'],
+  ['dest', 'Směrování', 'dětská JIP / ARO'],
+];
+function renderRosc() {
+  const list = isChild() ? POST_C : POST_A;
+  $('post').innerHTML = list.map(([k, b, s]) => `<button type="button" class="chk" data-post="${k}" aria-pressed="${!!S.post[k]}"><span class="bx">${CHECK}</span><span><b>${b}</b>${s ? `<span class="s">${s}</span>` : ''}</span></button>`).join('');
+  renderLog('log2');
+}
+function setDrug(id, cls, st, d, label) {
+  const el = $('d-' + id); el.className = 'drug ' + (cls || ''); $(id + '-st').textContent = st; $(id + '-d').innerHTML = d; $('b-' + id).textContent = label || 'Podáno';
+}
+function fire(key, kind) { if (S.fired[key]) return; S.fired[key] = 1; save(); alarm(kind); }
+
+function tick() {
+  if (S.phase === 'run') {
+    const t = now(), d = derived();
+    $('tot').textContent = mmss(t - S.start);
+    $('tot-s').textContent = 'start ' + clock(S.start).slice(0, 5);
+    $('stats').innerHTML = `<span class="stat">Výboje <b>${d.shocks}</b></span><span class="stat">Adrenalin <b>${d.adr.length}×</b></span><span class="stat">Amiodaron <b>${d.amio.length}×</b></span>`;
+    // cyklus
+    const P = !!S.pausedAt, el = ((P ? S.pausedAt : t) - S.cycleStart) / 1000, rem = CYCLE - el;
+    const ring = $('ring'); const C = 326.73;
+    $('ring-fg').style.strokeDashoffset = rem <= 0 ? '0' : String(C * Math.min(1, Math.max(0, el / CYCLE)));
+    $('cy-n').textContent = 'Cyklus ' + S.cycleN;
+    $('cy-t').textContent = rem >= 0 ? mmss(rem * 1000 + 999) : '+' + mmss(-rem * 1000);
+    if (P) $('cy-t').textContent = 'PAUZA';
+    ring.classList.toggle('pre', !P && rem <= 10 && rem > 0); ring.classList.toggle('due', !P && rem <= 0); ring.classList.toggle('paused', P);
+    let al = '', st = '';
+    if (P) { al = `<div class="alert paused">KPR pozastavena ${mmss(t - S.pausedAt)} – pokračuj tlačítkem ▶</div>`; st = 'paused'; }
+    else if (rem <= 0) {
+      al = '<div class="alert due">KONTROLA RYTMU – vyber výsledek níže</div>'; st = 'due';
+      const k = Math.floor(-rem / 4); if (k < 4) fire('c' + S.cycleStart + '-' + k, 'due');   // opakovat á 4 s, max 4×
+    } else if (rem <= 10) {
+      al = `<div class="alert pre">Za ${Math.ceil(rem)} s kontrola rytmu – ${d.lastRh === 'shock' ? 'nabij defibrilátor' : 'připrav se'}</div>`; st = 'pre';
+      const c = Math.ceil(rem); if (c % 2 === 0) fire('p' + S.cycleStart + '-' + c, 'count');   // pípnutí á 2 s
+    }
+    const mi = $('mini'); mi.className = 'mini' + (miniOn ? ' show' : '') + (st ? ' ' + st : '');
+    $('mini-cd').textContent = P ? 'PAUZA' : $('cy-t').textContent;
+    $('mini-meta').innerHTML = `Cyklus <b>${S.cycleN}</b> · celkem <b>${mmss(t - S.start)}</b><br>Výboje <b>${d.shocks}</b> · Adr <b>${d.adr.length}×</b>${st === 'due' ? '<br><b>KONTROLA RYTMU</b>' : ''}`;
+    ['b-pause', 'b-pause2'].forEach((id) => { const b = $(id); const h = P ? I_PLAY : I_PAUSE; if (b.dataset.st !== String(P)) { b.innerHTML = h; b.dataset.st = String(P); b.classList.toggle('paused', P); b.setAttribute('aria-label', P ? 'Pokračovat' : 'Pozastavit'); } });
+    if ($('cy-alert').innerHTML !== al) $('cy-alert').innerHTML = al;
+    // refrakterní KF
+    const refr = d.lastRh === 'shock' && d.shocks >= 3 ? '<div class="tip">Refrakterní KF: ověř polohu elektrod, zvaž změnu vektoru (antero-posteriorně).</div>' : '';
+    if ($('refr').innerHTML !== refr) $('refr').innerHTML = refr;
+    // adrenalin
+    const nA = d.adr.length;
+    if (nA === 0) {
+      if (d.anyNon || d.shocks >= 3) { setDrug('adr', 'due', d.anyNon ? 'Podej co nejdřív' : 'Podej teď – po 3. výboji', adrDose()); fire('a0', 'drug'); }
+      else if (d.lastRh === 'shock') setDrug('adr', 'idle', `Až po 3. výboji (zbývá ${3 - d.shocks})`, adrDose());
+      else setDrug('adr', 'idle', 'Nedefibrilovatelný rytmus → hned; defibrilovatelný → po 3. výboji', adrDose());
+    } else {
+      const since = (t - d.adr[nA - 1]) / 1000;
+      if (since >= ADR_NEXT) { setDrug('adr', 'due', `Další dávka teď (od poslední ${mmss(since * 1000)})`, adrDose()); fire('a' + d.adr[nA - 1], 'drug'); }
+      else if (since >= ADR_MIN) setDrug('adr', 'soon', `Lze podat – od poslední ${mmss(since * 1000)} (á 3–5 min)`, adrDose());
+      else setDrug('adr', '', `Podáno ${nA}× · další za ${mmss((ADR_NEXT - since) * 1000)}`, adrDose());
+    }
+    // amiodaron
+    const nM = d.amio.length, lido = isChild() ? 'alternativně lidokain 1 mg/kg' : 'alternativně lidokain 100 mg (pak 50 mg)';
+    if (nM === 0 && d.shocks >= 3) { setDrug('amio', 'due', 'Podej teď – po 3. výboji', amioDose(false) + '<br>' + lido); fire('m0', 'drug'); }
+    else if (nM === 1 && d.shocks >= 5) { setDrug('amio', 'due', 'Druhá dávka teď – po 5. výboji', amioDose(true)); fire('m1', 'drug'); }
+    else if (nM === 0) setDrug('amio', 'idle', d.lastRh === 'shock' ? `Po 3. výboji (zbývá ${3 - d.shocks})` : 'Jen u defibrilovatelného rytmu, po 3. výboji', amioDose(false));
+    else if (nM === 1) setDrug('amio', '', `Podáno 1× · další po 5. výboji (zbývá ${Math.max(0, 5 - d.shocks)})`, amioDose(true));
+    else setDrug('amio', 'idle', 'Podáno 2× – maximum', '');
+  } else { $('mini').className = 'mini'; }
+  if (S.phase === 'rosc') {
+    const t = now();
+    $('rosc-t').textContent = mmss(t - S.roscAt);
+    $('rosc-s').textContent = `od ${clock(S.roscAt).slice(0, 5)} · KPR trvala ${mmss(S.roscAt - S.start)}`;
+  }
+}
+setInterval(tick, 250);
+// plovoucí lišta, když hlavní odpočet odjede z obrazovky
+var miniOn = false;
+try { new IntersectionObserver((en) => { miniOn = !en[0].isIntersecting && S.phase === 'run'; tick(); }, { threshold: 0.15 }).observe($('tcard')); } catch (e) {}
+
+/* ---------- události ---------- */
+$('pt-seg').onclick = (e) => { const b = e.target.closest('[data-pt]'); if (!b) return; S.pt = b.dataset.pt; save(); renderSetup(); if (S.pt === 'child') setTimeout(() => $('kg').focus(), 50); };
+$('kg-chips').onclick = (e) => { const b = e.target.closest('[data-kg]'); if (!b) return; $('kg').value = b.dataset.kg; renderSetup(); };
+$('kg').oninput = () => renderSetup();
+$('b-start').onclick = startCpr;
+$('b-shock').onclick = () => rhythm('shock');
+$('b-nonshock').onclick = () => rhythm('nonshock');
+$('b-rosc').onclick = rosc;
+$('b-adr').onclick = giveAdr;
+$('b-amio').onclick = () => { const d = derived(); if (d.amio.length >= 2) { toast('Amiodaron už podán 2×'); return; } if (d.shocks < 3 && !confirm('Amiodaron se podává po 3. výboji. Přesto zapsat?')) return; giveAmio(); };
+$('b-undo').onclick = undo;
+$('b-copy').onclick = copyLog; $('b-copy2').onclick = copyLog; $('b-copy3').onclick = copyLog;
+$('b-note2').onclick = noteSheet;
+$('b-rearrest').onclick = rearrest;
+$('b-new').onclick = () => { if (confirm('Smazat záznam a začít novou resuscitaci?')) resetAll(); };
+$('b-menu').onclick = menuSheet;
+$('qa').onclick = (e) => { const b = e.target.closest('[data-qa]'); if (!b) return; const k = b.dataset.qa; if (k === 'note') { noteSheet(); return; } const z = qaSize(k), tx = QA_TXT[k] + (z ? ' – ' + z : ''); addLog('qa-' + k, tx); toast('Zapsáno: ' + tx);
+  if ((k === 'lma' || k === 'oti') && mMode() === 'ratio') { S.metro.mode = 'airway'; save(); metroRestart(); setTimeout(() => toast('Metronom: kontinuální komprese + vdech á 6 s'), 1400); } renderRun(); };
+$('hts').onclick = (e) => { const b = e.target.closest('[data-ht]'); if (!b) return; const k = b.dataset.ht; S.ht[k] = !S.ht[k]; save(); b.setAttribute('aria-pressed', S.ht[k]); };
+$('post').onclick = (e) => { const b = e.target.closest('[data-post]'); if (!b) return; const k = b.dataset.post; S.post[k] = !S.post[k]; save(); b.setAttribute('aria-pressed', S.post[k]); };
+$('metro').onclick = (e) => {
+  const b = e.target.closest('button'); if (!b) return; ac();
+  if (b.id === 'm-on') S.metro.on = !S.metro.on;
+  else if (b.dataset.bpm) { S.metro.bpm = +b.dataset.bpm; S.metro.on = true; }
+  else if (b.dataset.mode) { S.metro.mode = b.dataset.mode; S.metro.on = true; addLog('note', 'Metronom: ' + b.textContent); }
+  save(); metroRestart(); renderRun();
+};
+$('b-metro').onclick = () => { ac(); S.metro.on = !S.metro.on; save(); metroRestart(); renderRun(); };
+$('b-pause').onclick = togglePause; $('b-pause2').onclick = togglePause;
+$('mode-seg').onclick = (e) => { const b = e.target.closest('[data-mode]'); if (!b) return; S.metro.mode = b.dataset.mode; save(); renderSetup(); };
+$('b-sound').onclick = () => { S.sound = !S.sound; save(); render(); if (S.sound) { ac(); tone(880, .1); } };
+try { const t = localStorage.getItem('resqarrest:theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+$('b-theme').onclick = () => {
+  const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const n = cur === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; try { localStorage.setItem('resqarrest:theme', n); } catch (e) {}
+};
+// po znovunačtení: zvuk se odemkne prvním dotykem
+document.addEventListener('pointerdown', () => { ac(); }, { once: true });
+render(); wake();
+</script>
+</body>
+</html>
