@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqBirth</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqBirth">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+/* ResqBirth – porod v terénu. Vzhled sladěný s ResqHubem. */
+:root {
+  --bg: #E4EEEF; --ink: #0A1F23; --ink-2: rgba(10, 31, 35, .6); --ink-3: rgba(10, 31, 35, .36);
+  --petrol: #0B6E79; --petrol-soft: rgba(11, 110, 121, .12); --on-petrol: #FFFFFF;
+  --warn: #B26A00; --warn-soft: rgba(242, 154, 31, .17);
+  --crit: #D0303A; --crit-soft: rgba(229, 56, 59, .14);
+  --glow-a: rgba(11, 110, 121, .5); --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .6); --glass-strong: rgba(250, 253, 253, .96);
+  --glass-edge: rgba(255, 255, 255, .8); --glass-hi: rgba(255, 255, 255, .95); --glass-shadow: rgba(6, 55, 62, .13);
+  --hairline: rgba(10, 31, 35, .1); --fill: rgba(10, 31, 35, .06);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+    --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+  --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden; font-family: var(--font); font-size: 17px; line-height: 1.3; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; padding: 0; }
+svg { display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%); border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -12px var(--glass-shadow); }
+
+/* ---- ResqBirth ---- */
+:root { --ok: #17915A; --ok-soft: rgba(23, 145, 90, .13); }
+:root[data-theme="dark"] { --ok: #4FD08F; --ok-soft: rgba(79, 208, 143, .15); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ok: #4FD08F; --ok-soft: rgba(79, 208, 143, .15); } }
+html { touch-action: manipulation; }
+.wrap { max-width: 860px; margin: 0 auto; padding: max(12px, var(--st)) 14px calc(40px + var(--sb)); }
+.head { display: flex; align-items: center; gap: 8px; padding: 6px 2px 10px; }
+.head h1 { margin: 0; font-family: var(--font-display); font-size: 32px; font-weight: 800; letter-spacing: -.04em; line-height: 1; flex: 1; }
+.round { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--ink); }
+.round svg { width: 20px; height: 20px; }
+.tabs { display: flex; gap: 2px; padding: 3px; border-radius: 15px; background: var(--fill); margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; position: sticky; top: calc(var(--st) + 4px); z-index: 20; -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { flex: 1 0 auto; height: 40px; padding: 0 7px; border-radius: 12px; font-size: 13.5px; font-weight: 700; color: var(--ink-2); white-space: nowrap; }
+.tabs button[aria-selected="true"] { background: var(--glass-strong); color: var(--ink); box-shadow: 0 2px 8px -2px var(--glass-shadow); }
+.clockbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.pill { display: flex; align-items: baseline; gap: 6px; padding: 8px 12px; border-radius: 14px; font-size: 13.5px; font-weight: 650; color: var(--ink-2); }
+.pill b { font-family: var(--font-round); font-size: 19px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pill.warn { background: var(--warn-soft); } .pill.warn b { color: var(--warn); }
+.pill.crit { background: var(--crit); color: #fff; } .pill.crit b { color: #fff; }
+.card { border-radius: 24px; padding: 14px; margin-bottom: 12px; }
+.h { font-size: 13px; font-weight: 750; color: var(--ink-2); text-transform: uppercase; letter-spacing: .05em; margin: 0 2px 10px; display: flex; align-items: center; gap: 8px; }
+.h .grow { flex: 1; }
+.muted { color: var(--ink-2); font-size: 14px; }
+.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.row .lbl { font-size: 15px; font-weight: 700; min-width: 120px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { min-height: 38px; padding: 6px 12px; border-radius: 13px; background: var(--fill); font-size: 14.5px; font-weight: 650; text-align: left; }
+.chip[aria-pressed="true"] { background: var(--petrol); color: var(--on-petrol); }
+.chip.warnc[aria-pressed="true"] { background: var(--warn); color: #fff; }
+input.n { width: 90px; height: 44px; border-radius: 13px; border: 1px solid var(--hairline); background: var(--glass-strong); font-family: var(--font-round); font-size: 20px; font-weight: 750; text-align: center; }
+.flags { display: grid; gap: 6px; }
+.flag { padding: 10px 12px; border-radius: 14px; font-size: 14.5px; font-weight: 650; background: var(--warn-soft); color: var(--warn); }
+.flag.crit { background: var(--crit-soft); color: var(--crit); }
+.ev { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.evb { min-height: 76px; border-radius: 18px; padding: 10px; background: var(--petrol); color: var(--on-petrol); font-weight: 800; font-size: 15.5px; line-height: 1.2; text-align: center; }
+.evb small { display: block; font-size: 12.5px; font-weight: 600; opacity: .85; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.evb.done { background: var(--ok-soft); color: var(--ok); }
+.steps { list-style: none; margin: 0; padding: 0; }
+.st { display: flex; gap: 12px; width: 100%; padding: 11px 4px; text-align: left; border-top: 1px solid var(--hairline); }
+.steps li:first-child .st { border-top: 0; }
+.st .bx { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink-3); flex: none; display: grid; place-items: center; font-family: var(--font-round); font-weight: 800; font-size: 13px; color: var(--ink-2); margin-top: 1px; }
+.st b { display: block; font-size: 16px; }
+.st span.s { display: block; font-size: 14px; color: var(--ink-2); margin-top: 2px; line-height: 1.4; }
+.st[aria-pressed="true"] .bx { background: var(--ok); border-color: var(--ok); color: #fff; }
+.st[aria-pressed="true"] b { color: var(--ink-2); }
+.st em { font-style: normal; color: var(--crit); font-weight: 700; }
+
+/* kontrakce */
+.cbtn { width: 100%; height: 96px; border-radius: 26px; font-family: var(--font-display); font-size: 24px; font-weight: 850; background: var(--petrol); color: var(--on-petrol); }
+.cbtn.on { background: var(--crit); color: #fff; animation: pulse 1.6s ease-in-out infinite; }
+.cbtn small { display: block; font-family: var(--font); font-size: 14px; font-weight: 650; opacity: .9; font-variant-numeric: tabular-nums; }
+@keyframes pulse { 50% { opacity: .8; } }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.stat { padding: 10px; border-radius: 16px; background: var(--fill); text-align: center; }
+.stat b { display: block; font-family: var(--font-round); font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12.5px; color: var(--ink-2); font-weight: 650; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.tbl td, .tbl th { padding: 7px 6px; border-top: 1px solid var(--hairline); text-align: left; font-variant-numeric: tabular-nums; }
+.tbl th { font-size: 12.5px; color: var(--ink-2); border-top: 0; font-weight: 700; }
+.verdict { margin-top: 12px; padding: 12px 14px; border-radius: 16px; font-weight: 750; font-size: 15.5px; line-height: 1.35; }
+.verdict.ok { background: var(--ok-soft); color: var(--ok); } .verdict.warn { background: var(--warn-soft); color: var(--warn); } .verdict.crit { background: var(--crit); color: #fff; }
+
+/* komplikace */
+.acc { border-radius: 22px; margin-bottom: 10px; overflow: hidden; }
+.acc > button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px; text-align: left; }
+.acc > button .grow { flex: 1; min-width: 0; }
+.acc > button b { display: block; font-size: 17px; font-weight: 800; }
+.acc > button span.s { display: block; font-size: 13.5px; color: var(--ink-2); margin-top: 1px; }
+.acc > button svg { width: 16px; height: 16px; color: var(--ink-3); transition: transform .2s; flex: none; }
+.acc.open > button svg { transform: rotate(90deg); }
+.acc .body { display: none; padding: 0 14px 14px; }
+.acc.open .body { display: block; }
+.acc .ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--crit-soft); color: var(--crit); font-weight: 900; font-size: 18px; flex: none; }
+.drug { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 18px; background: var(--glass-strong); border: 1px solid var(--glass-edge); margin-top: 10px; }
+.drug .grow { flex: 1; min-width: 0; }
+.drug .n { font-size: 16px; font-weight: 800; }
+.drug .d { font-size: 14px; margin-top: 3px; line-height: 1.4; }
+.drug .c { font-size: 13px; color: var(--ink-2); margin-top: 4px; line-height: 1.35; }
+.drug .give { flex: none; min-width: 84px; height: 48px; border-radius: 14px; background: var(--petrol); color: var(--on-petrol); font-weight: 800; font-size: 14.5px; }
+.timerbox { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; background: var(--fill); margin-bottom: 8px; }
+.timerbox b { font-family: var(--font-round); font-size: 28px; font-weight: 850; font-variant-numeric: tabular-nums; }
+.timerbox.warn { background: var(--warn-soft); } .timerbox.warn b { color: var(--warn); }
+.timerbox.crit { background: var(--crit); color: #fff; }
+
+/* novorozenec */
+.ap { display: grid; gap: 8px; }
+.ap .r { padding: 10px 12px; border-radius: 16px; background: var(--glass-strong); border: 1px solid var(--glass-edge); }
+.ap .r .t { font-weight: 800; font-size: 15px; margin-bottom: 6px; }
+.ap .o { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.ap .o button { padding: 7px 6px; border-radius: 12px; background: var(--fill); font-size: 13px; font-weight: 600; line-height: 1.2; }
+.ap .o button b { display: block; font-family: var(--font-round); font-size: 16px; }
+.ap .o button[aria-pressed="true"] { background: var(--petrol); color: var(--on-petrol); }
+.apt { display: flex; gap: 6px; margin-bottom: 10px; }
+.apt button { flex: 1; height: 54px; border-radius: 15px; background: var(--fill); font-weight: 800; font-size: 15px; line-height: 1.15; }
+.apt button small { display: block; font-size: 12.5px; font-weight: 650; opacity: .8; }
+.apt button[aria-selected="true"] { background: var(--petrol); color: var(--on-petrol); }
+.apt button.due { background: var(--warn); color: #fff; }
+.apsum { font-family: var(--font-round); font-size: 34px; font-weight: 850; }
+.log { list-style: none; margin: 0; padding: 0; }
+.log li { display: flex; gap: 10px; padding: 9px 2px; border-top: 1px solid var(--hairline); font-size: 15px; }
+.log li:first-child { border-top: 0; }
+.log .t { font-family: var(--font-round); font-weight: 750; font-variant-numeric: tabular-nums; width: 46px; flex: none; color: var(--petrol); }
+.acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 14px; font-size: 15px; font-weight: 700; background: var(--fill); }
+.btn.pri { background: var(--petrol); color: var(--on-petrol); }
+.toast { position: fixed; left: 50%; top: calc(var(--st) + 12px); z-index: 100; transform: translate(-50%, -20px); opacity: 0; pointer-events: none; max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 22px; background: var(--glass-strong); font-size: 15px; font-weight: 650; text-align: center; box-shadow: 0 12px 30px -10px var(--glass-shadow); transition: opacity .25s, transform .3s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.foot { margin-top: 16px; font-size: 12.5px; color: var(--ink-3); text-align: center; line-height: 1.45; }
+.sec { display: none; } .sec.on { display: block; }
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="head">
+    <h1>ResqBirth</h1>
+    <button type="button" class="round glass" id="b-theme" aria-label="Přepnout světlý nebo tmavý režim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+  </header>
+  <nav class="tabs" id="tabs" role="tablist">
+    <button type="button" data-tab="porod" aria-selected="true">Porod</button>
+    <button type="button" data-tab="kontr" aria-selected="false">Kontrakce</button>
+    <button type="button" data-tab="kompl" aria-selected="false">Komplikace</button>
+    <button type="button" data-tab="novo" aria-selected="false">Dítě</button>
+    <button type="button" data-tab="zaz" aria-selected="false">Záznam</button>
+  </nav>
+  <div class="clockbar" id="clockbar"></div>
+
+  <!-- POROD -->
+  <section class="sec on" id="s-porod">
+    <div class="card glass">
+      <div class="h">Rodička</div>
+      <div class="row"><span class="lbl">Týden těhotenství</span><input class="n" id="i-week" inputmode="numeric" placeholder="–"><span class="muted">t. t.</span></div>
+      <div class="row"><span class="lbl">Parita</span><div class="chips" data-grp="para"><button type="button" class="chip" data-v="primi">Prvorodička</button><button type="button" class="chip" data-v="multi">Vícerodička</button></div></div>
+      <div class="row"><span class="lbl">Plodová voda</span><div class="chips" data-grp="waters"><button type="button" class="chip" data-v="no">Neodtekla</button><button type="button" class="chip" data-v="clear">Čirá</button><button type="button" class="chip warnc" data-v="mec">Zkalená / zelená</button><button type="button" class="chip warnc" data-v="blood">Krvavá</button></div></div>
+      <div class="row"><span class="lbl">Rizika</span><div class="chips" data-grp="risk" data-multi="1"><button type="button" class="chip warnc" data-v="sc">Po císaři</button><button type="button" class="chip warnc" data-v="twins">Dvojčata</button><button type="button" class="chip warnc" data-v="breech">Konec pánevní</button><button type="button" class="chip warnc" data-v="htn">Preeklampsie / hypertenze</button><button type="button" class="chip warnc" data-v="bleed">Krvácení</button></div></div>
+      <div class="flags" id="flags"></div>
+    </div>
+    <div class="card glass">
+      <div class="h">Časy – ťukni v okamžiku události</div>
+      <div class="ev">
+        <button type="button" class="evb" data-ev="head">Porod hlavičky<small></small></button>
+        <button type="button" class="evb" data-ev="birth">Porod dítěte<small></small></button>
+        <button type="button" class="evb" data-ev="plac">Porod placenty<small></small></button>
+      </div>
+      <div id="ev-warn"></div>
+    </div>
+    <div class="card glass">
+      <div class="h">Postup fyziologického porodu</div>
+      <ul class="steps" id="steps"></ul>
+    </div>
+    <p class="foot">Pomůcka pro porod v terénu podle doporučení ERC 2025 a porodnické praxe. Nenahrazuje klinický úsudek, místní protokoly ani konzultaci porodníka.</p>
+  </section>
+
+  <!-- KONTRAKCE -->
+  <section class="sec" id="s-kontr">
+    <div class="card glass">
+      <button type="button" class="cbtn" id="b-contr">Začátek kontrakce<small>ťukni, když kontrakce začne</small></button>
+      <div class="stats" id="c-stats"></div>
+      <div id="c-verdict"></div>
+    </div>
+    <div class="card glass">
+      <div class="h">Znaky blížícího se porodu</div>
+      <div class="chips" data-grp="signs" data-multi="1"><button type="button" class="chip warnc" data-v="push">Nutkání tlačit</button><button type="button" class="chip warnc" data-v="crown">Hlavička viditelná</button><button type="button" class="chip warnc" data-v="rupt">Odtok plodové vody</button><button type="button" class="chip warnc" data-v="anus">Tlak na konečník</button></div>
+    </div>
+    <div class="card glass">
+      <div class="h"><span class="grow">Kontrakce</span><button type="button" class="btn" id="b-cundo" style="min-height:34px;padding:0 10px;font-size:13.5px">Smazat poslední</button></div>
+      <table class="tbl" id="c-tbl"></table>
+    </div>
+  </section>
+
+  <!-- KOMPLIKACE -->
+  <section class="sec" id="s-kompl"><div id="compl"></div></section>
+
+  <!-- NOVOROZENEC -->
+  <section class="sec" id="s-novo">
+    <div class="card glass">
+      <div class="h"><span class="grow">APGAR</span><span class="apsum" id="ap-sum">–</span></div>
+      <div class="apt" id="ap-tabs"></div>
+      <div class="ap" id="ap"></div>
+    </div>
+    <div class="card glass">
+      <div class="h">Resuscitace novorozence (ERC 2025)</div>
+      <div class="row"><span class="lbl">Odhad váhy</span><input class="n" id="i-kg" inputmode="decimal" value="3,5"><span class="muted">kg</span></div>
+      <ul class="steps" id="nls"></ul>
+      <div id="nls-drugs"></div>
+    </div>
+    <div class="card glass">
+      <div class="h">Cílová SpO₂ (preduktálně – pravá ruka)</div>
+      <table class="tbl"><tr><th>Minuta</th><th>SpO₂</th></tr><tr><td>3. min</td><td>70–75 %</td></tr><tr><td>5. min</td><td>80–85 %</td></tr><tr><td>10. min</td><td>85–95 %</td></tr></table>
+      <p class="muted" style="margin:8px 2px 0">Start se vzduchem (21 %), u &lt; 32 t. t. ≥ 30 %. Při kompresích 100 % O₂. Nad 95 % kyslík snížit.</p>
+    </div>
+  </section>
+
+  <!-- ZÁZNAM -->
+  <section class="sec" id="s-zaz">
+    <div class="card glass">
+      <div class="h">Záznam</div>
+      <ul class="log" id="log"></ul>
+      <div class="acts"><button type="button" class="btn pri" id="b-copy">Kopírovat záznam</button><button type="button" class="btn" id="b-note">+ Poznámka</button><button type="button" class="btn" id="b-new" style="color:var(--crit)">Nový porod</button></div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt = (n, d = 1) => String(Math.round(n * 10 ** d) / 10 ** d).replace('.', ',');
+const now = () => Date.now();
+const mmss = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
+const clock = (t) => new Date(t).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
+const CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>';
+const KEY = 'resqbirth:v1', TTL = 24 * 3600e3;
+
+function fresh() { return { v: 1, t0: now(), info: { week: '', para: null, waters: null, risk: [], signs: [] }, ev: {}, log: [], contr: [], cur: null, apgar: { 1: {}, 5: {}, 10: {} }, steps: {}, nls: {}, kg: '3,5', open: null, tab: 'porod', apTab: 1, fired: {} }; }
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1 && now() - s.t0 < TTL) return s; } catch (e) {} return null; }
+let S = load() || fresh();
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function addLog(x, k) { S.log.push({ t: now(), x, k: k || 'n' }); save(); }
+
+/* ---------- zvuk ---------- */
+let AC = null;
+function beep(n) { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); const t = AC.currentTime; for (let i = 0; i < (n || 2); i++) { const o = AC.createOscillator(), g = AC.createGain(); o.frequency.value = 990; g.gain.setValueAtTime(.0001, t + i * .25); g.gain.exponentialRampToValueAtTime(.5, t + i * .25 + .01); g.gain.exponentialRampToValueAtTime(.0001, t + i * .25 + .18); o.connect(g); g.connect(AC.destination); o.start(t + i * .25); o.stop(t + i * .25 + .2); } } catch (e) {} if (navigator.vibrate) navigator.vibrate([200, 100, 200]); }
+function fire(k, n) { if (S.fired[k]) return; S.fired[k] = 1; save(); beep(n); }
+
+/* ---------- POROD ---------- */
+const STEPS = [
+  ['Připrav prostředí', 'Teplo (místnost/vůz ≥ 25 °C), 2–3 předehřáté ručníky, čepička, porodní balíček, odsávačka, vak a maska pro novorozence. Avizuj porodnici.'],
+  ['Poloha rodičky', 'Polosed nebo na zádech s pokrčenými DK, případně poloha, která jí vyhovuje. Podložka pod hýždě.'],
+  ['Porod hlavičky', 'Kontrolovaně, nespěchat. Dlaní chraň hráz a jemně brzdi hlavičku. Rodička mezi kontrakcemi nedýchá zhluboka „do tlačení“, ale prodýchává.'],
+  ['Pupečník kolem krku', 'Volný přetáhnout přes hlavičku. Těsný nepřestřihávat – rodit „kotoulem“ (hlavičku držet u stehna matky). Jen když nejde jinak: 2 svorky a přestřihnout.'],
+  ['Ramínka', 'Počkej na rotaci. S kontrakcí jemný tah dolů → přední raménko, pak nahoru → zadní. <em>Hlavička venku a tělo nejde > 1 kontrakci → dystokie ramének (Komplikace).</em>'],
+  ['Tělíčko a čas porodu', 'Vychytit, ťukni „Porod dítěte“. Osušit, stimulovat, mokrý ručník pryč, kontakt kůže na kůži, čepička, přikrýt.'],
+  ['Pupečník', 'Odložený podvaz ≥ 60 s (jen pokud dítě nepotřebuje resuscitaci). 2 svorky cca 10 a 15 cm od pupku, přestřihnout mezi nimi.'],
+  ['APGAR 1, 5, 10 min', 'Záložka Novorozenec – připomene se samo.'],
+  ['Placenta', 'Netahat za pupečník. Obvykle do 30 min. Po porodu zkontrolovat celistvost, vzít s sebou do porodnice. Ťukni „Porod placenty“.'],
+  ['Po porodu', 'Masáž děložního fundu, odhad krevní ztráty (> 500 ml = krvácení po porodu), přiložit dítě k prsu, teplo, transport matky i dítěte.'],
+];
+function renderSteps() { $('steps').innerHTML = STEPS.map(([b, s], i) => `<li><button type="button" class="st" data-step="${i}" aria-pressed="${!!S.steps[i]}"><span class="bx">${S.steps[i] ? '✓' : i + 1}</span><span><b>${b}</b><span class="s">${s}</span></span></button></li>`).join(''); }
+function renderInfo() {
+  $('i-week').value = S.info.week;
+  document.querySelectorAll('[data-grp]').forEach((g) => { const k = g.dataset.grp, multi = g.dataset.multi; g.querySelectorAll('[data-v]').forEach((b) => b.setAttribute('aria-pressed', multi ? S.info[k].includes(b.dataset.v) : S.info[k] === b.dataset.v)); });
+  const f = [], w = parseInt(S.info.week);
+  if (w && w < 37) f.push([w < 32 ? 'crit' : '', `Předčasný porod (${w}. t. t.) – ${w < 32 ? 'novorozence do plastového sáčku bez osušení, O₂ ≥ 30 %, ventilace 25 cm H₂O' : 'zvýšené riziko pro novorozence, teplo'}. Avizuj perinatologické centrum.`]);
+  if (w && w >= 42) f.push(['', 'Přenášení (≥ 42. t. t.) – vyšší riziko mekonia a dystokie.']);
+  if (S.info.waters === 'mec') f.push(['', 'Mekoniová plodová voda – připrav odsávání. Nevitální novorozenec: hned ventilovat, odsát jen při obstrukci.']);
+  if (S.info.waters === 'blood') f.push(['crit', 'Krvavá plodová voda – vyluč abrupci placenty (bolest, tvrdá děloha, šok).']);
+  if (S.info.risk.includes('sc')) f.push(['', 'Po císařském řezu – riziko ruptury dělohy (náhlá bolest, ustání kontrakcí, šok).']);
+  if (S.info.risk.includes('twins')) f.push(['crit', 'Dvojčata – vyžádej druhou posádku, 2× vybavení pro novorozence. Druhé dítě často v KP poloze.']);
+  if (S.info.risk.includes('breech')) f.push(['crit', 'Konec pánevní – „hands off“, viz Komplikace.']);
+  if (S.info.risk.includes('htn')) f.push(['crit', 'Preeklampsie – riziko eklampsie. Methylergometrin kontraindikován. Viz Komplikace.']);
+  if (S.info.risk.includes('bleed')) f.push(['crit', 'Krvácení před porodem – nevyšetřovat vaginálně (placenta praevia), poloha na levém boku, viz Komplikace.']);
+  $('flags').innerHTML = f.map(([c, t]) => `<div class="flag ${c}">${t}</div>`).join('');
+}
+const EVN = { head: 'Porod hlavičky', birth: 'Porod dítěte', plac: 'Porod placenty' };
+function renderEv() {
+  document.querySelectorAll('[data-ev]').forEach((b) => { const t = S.ev[b.dataset.ev]; b.classList.toggle('done', !!t); b.querySelector('small').textContent = t ? clock(t) : 'ťukni teď'; });
+}
+
+/* ---------- KONTRAKCE ---------- */
+function contrStats() {
+  const c = S.contr.filter((x) => x.e); const last = c.slice(-4);
+  const dur = last.length ? last.reduce((a, x) => a + (x.e - x.s), 0) / last.length / 1000 : null;
+  const iv = []; for (let i = 1; i < last.length; i++) iv.push((last[i].s - last[i - 1].s) / 1000);
+  const ivA = iv.length ? iv.reduce((a, b) => a + b, 0) / iv.length : null;
+  return { n: c.length, dur, iv: ivA };
+}
+function renderContr() {
+  const b = $('b-contr'), on = !!S.cur;
+  b.classList.toggle('on', on);
+  b.innerHTML = on ? `Konec kontrakce<small id="c-run">${mmss(now() - S.cur)}</small>` : `Začátek kontrakce<small>${S.contr.length ? 'od poslední ' + mmss(now() - S.contr[S.contr.length - 1].s) : 'ťukni, když kontrakce začne'}</small>`;
+  const st = contrStats();
+  $('c-stats').innerHTML = `<div class="stat"><b>${st.n}</b><span>kontrakcí</span></div><div class="stat"><b>${st.dur != null ? Math.round(st.dur) + ' s' : '–'}</b><span>průměrná délka</span></div><div class="stat"><b>${st.iv != null ? mmss(st.iv * 1000) : '–'}</b><span>interval (začátek–začátek)</span></div>`;
+  const sg = S.info.signs, multi = S.info.para === 'multi';
+  let v = null;
+  if (sg.includes('crown')) v = ['crit', 'Hlavička viditelná → porod na místě. Připrav vše k porodu, nespěchej s transportem.'];
+  else if (sg.includes('push') && (multi || (st.iv != null && st.iv <= 150))) v = ['crit', 'Nutkání tlačit + ' + (multi ? 'vícerodička' : 'kontrakce á ≤ 2,5 min') + ' → porod pravděpodobně blízko. Připrav se na porod na místě, zvaž transport jen při krátké vzdálenosti.'];
+  else if (st.iv != null && st.iv <= 180 && st.dur >= 50) v = ['warn', `Aktivní porod (kontrakce á ${mmss(st.iv * 1000)}, ${Math.round(st.dur)} s). ${multi ? 'Vícerodička – porod může být rychlý.' : 'Prvorodička – obvykle je čas na transport.'} Transport do porodnice s avizem.`];
+  else if (st.iv != null) v = ['ok', 'Kontrakce zatím nepravidelné / řídké → transport do porodnice.'];
+  $('c-verdict').innerHTML = v ? `<div class="verdict ${v[0]}">${v[1]}</div>` : '';
+  const rows = S.contr.slice().reverse().map((x, i, arr) => { const prev = arr[i + 1]; return `<tr><td>${clock(x.s)}</td><td>${x.e ? Math.round((x.e - x.s) / 1000) + ' s' : 'probíhá'}</td><td>${prev ? mmss(x.s - prev.s) : '–'}</td></tr>`; });
+  $('c-tbl').innerHTML = '<tr><th>Začátek</th><th>Délka</th><th>Interval</th></tr>' + (rows.join('') || '<tr><td colspan="3" class="muted">Zatím žádná kontrakce</td></tr>');
+}
+
+/* ---------- KOMPLIKACE ---------- */
+const DRUGS = {
+  mg: { n: 'MgSO₄ 20 % (2 g / 10 ml)', d: '<b>4 g = 20 ml (2 amp.)</b> i.v. pomalu během 15–20 min, pak <b>1 g/h</b>: 1 amp. doplnit FR do 100 ml (20 mg/ml) → <b>50 ml/h</b>.', c: 'Opakované křeče: další 2 g = 10 ml během 5 min. Toxicita: vymizení patelárních reflexů, DF < 12/min → stop, antidotum Calcium gluconicum 10 % 10 ml i.v. pomalu.', log: 'MgSO₄ 4 g i.v.' },
+  mg2: { n: 'MgSO₄ – opakované křeče', d: '<b>2 g = 10 ml (1 amp.)</b> i.v. během 5 min.', c: '', log: 'MgSO₄ 2 g i.v. (recidiva křečí)' },
+  txa: { n: 'Exacyl (k. tranexamová 500 mg / 5 ml)', d: '<b>1 g = 10 ml (2 amp.)</b> i.v. pomalu během 10 min (max. 1 ml/min).', c: 'Co nejdříve, nejpozději do 3 h od porodu. Pokračuje-li krvácení po 30 min, lze podat další 1 g.', log: 'Exacyl 1 g i.v.' },
+  meth: { n: 'Methylergometrin 0,2 mg / 1 ml', d: '<b>0,2 mg = 1 ml i.m.</b> (přednostně), i.v. jen pomalu ≥ 60 s.', c: 'Až po porodu placenty. KI: hypertenze, preeklampsie / eklampsie, ICHS, těžké onemocnění jater a ledvin.', log: 'Methylergometrin 0,2 mg i.m.' },
+  gyn: { n: 'Gynipral 10 µg / 2 ml (hexoprenalin)', d: '<b>10 µg</b> = 1 amp. doplnit FR nebo G5 % do 10 ml, i.v. pomalu během 5–10 min.', c: 'Pokud vozíte. KI: < 22. t. t., ICHS, tachyarytmie, těžká preeklampsie, abrupce placenty, hypertyreóza, glaukom. NÚ: tachykardie matky – při TF > 120 nepokračovat.', log: 'Gynipral 10 µg i.v.' },
+};
+const drugHtml = (k) => { const d = DRUGS[k]; return `<div class="drug"><div class="grow"><div class="n">${d.n}</div><div class="d">${d.d}</div>${d.c ? `<div class="c">${d.c}</div>` : ''}</div><button type="button" class="give" data-drug="${k}">Podáno</button></div>`; };
+const stepsHtml = (arr) => `<ul class="steps">${arr.map(([b, s], i) => `<li><div class="st"><span class="bx">${i + 1}</span><span><b>${b}</b>${s ? `<span class="s">${s}</span>` : ''}</span></div></li>`).join('')}</ul>`;
+const COMPL = [
+  { id: 'dyst', ic: '!', n: 'Dystokie ramének', s: 'Hlavička venku, tělo nejde – HELPERR', timer: 'head', body: () => stepsHtml([
+    ['H – Help', 'Volej pomoc, druhou posádku. Rodičce: přestat tlačit. Netahat za hlavičku, netlačit na fundus!'],
+    ['E – Evaluate', 'Epiziotomie se v PNP neprovádí – pokračuj manévry.'],
+    ['L – Legs (McRoberts)', 'Obě DK maximálně ohnout v kyčlích ke břichu (2 pomocníci). Vyřeší většinu případů.'],
+    ['P – Pressure', 'Suprapubický tlak dlaní (jako při KPR) ze strany zad dítěte, šikmo dolů, 30 s souvisle, pak přerušovaně.'],
+    ['E – Enter', 'Ruka do pochvy, tlak na zadní plochu předního raménka směrem k hrudníku dítěte (Rubin II), případně Woods.'],
+    ['R – Remove posterior arm', 'Vybavení zadní ručičky – přes hrudník dítěte ven.'],
+    ['R – Roll', 'Rodička na všechny čtyři (Gaskin) a znovu jemný tah – nejdřív zadní raménko.'],
+  ]) + '<p class="muted" style="margin:8px 2px 0">Cíl: porodit tělo do 5 min od hlavičky. Po porodu počítej s nutností resuscitace novorozence a s krvácením matky.</p>' },
+  { id: 'breech', ic: 'KP', n: 'Konec pánevní', s: '„Hands off“ – nechat rodit samovolně', body: () => stepsHtml([
+    ['Hands off', 'Netahat! Rodička na okraj lůžka nebo na všechny čtyři. Nechat porodit samovolně až po lopatky.'],
+    ['Zádíčka nahoru', 'Dítě drž za pánev (kostní části), nikdy za břicho. Zádíčka směřují nahoru.'],
+    ['Pupečník', 'Po porodu pupku jemně povytáhnout kličku pupečníku. Od porodu pupku do porodu hlavičky max. cca 3–5 min.'],
+    ['Ručičky', 'Nejdou-li samy: Løvset – rotace trupu o 90° a vybavení ručičky přes obličej, pak na druhou stranu.'],
+    ['Hlavička', 'Mauriceau: dítě „jezdí“ na předloktí, prst do úst / prsty na lícní kosti → flexe hlavičky, druhá ruka na šíji, pomocník suprapubicky tlačí.'],
+    ['Po porodu', 'Novorozenec často potřebuje resuscitaci – připrav vak a masku.'],
+  ]) },
+  { id: 'cord', ic: '!', n: 'Výhřez pupečníku', s: 'Pupečník před hlavičkou – okamžitě transport', body: () => stepsHtml([
+    ['Odlehčit pupečník', 'Rukou v pochvě zvedat naléhající část (hlavičku) od pupečníku, nepřetržitě až do porodnice.'],
+    ['Poloha', 'Koleno-loketní nebo Trendelenburg na levém boku.'],
+    ['Pupečník nemanipulovat', 'Nevracet ho zpět. Venku zakrýt teplým vlhkým obkladem.'],
+    ['Rodička netlačí', 'Prodýchávat kontrakce, zvaž tokolýzu (konzultace porodníka).'],
+    ['Okamžitý transport', 'S avizem do porodnice – urgentní císařský řez.'],
+  ]) + drugHtml('gyn') },
+  { id: 'pph', ic: '🩸', n: 'Krvácení po porodu', s: '> 500 ml nebo známky šoku – 4T', body: () => stepsHtml([
+    ['Masáž dělohy', 'Masáž fundu, dokud není děloha tuhá. Vyprázdnit močový měchýř. Přiložit dítě k prsu.'],
+    ['Kyslík, 2× i.v. / i.o., tekutiny', 'Krystaloidy opatrně, cíl STK ~ 80–90 mmHg do zástavy krvácení. Teplo.'],
+    ['Kyselina tranexamová', 'Co nejdříve, do 3 h od porodu.'],
+    ['Uterotonikum', 'Methylergometrin po porodu placenty (není-li hypertenze / preeklampsie).'],
+    ['Bimanuální komprese dělohy', 'Pěst v přední klenbě poševní, druhá ruka přes břicho stlačuje fundus proti pěsti.'],
+    ['Komprese aorty', 'Pěstí nad pupkem proti páteři, při masivním krvácení během transportu.'],
+    ['Pátrej po příčině – 4T', 'Tonus (atonie), Trauma (poranění porodních cest – tlak na ránu), Tkáň (zbytky placenty), Trombin (koagulopatie).'],
+  ]) + drugHtml('txa') + drugHtml('meth') },
+  { id: 'ecl', ic: '⚡', n: 'Eklampsie / těžká preeklampsie', s: 'Křeče, TK ≥ 160/110, bolest hlavy, poruchy vidění', body: () => stepsHtml([
+    ['Bezpečí, poloha na levém boku', 'Chránit před poraněním, O₂, zajistit DC, monitorace.'],
+    ['MgSO₄', 'Lék volby k zastavení i prevenci křečí. Benzodiazepin jen pokud MgSO₄ není dostupný nebo křeče trvají.'],
+    ['TK ≥ 160/110', 'Snižovat opatrně (cíl ~ 140–150/90–100), podle místního protokolu – např. urapidil titračně.'],
+    ['Methylergometrin je kontraindikován', ''],
+    ['Transport', 'Do porodnice s avizem, klid, minimum podnětů.'],
+  ]) + drugHtml('mg') + drugHtml('mg2') },
+  { id: 'pre', ic: '⏱', n: 'Hrozící předčasný porod', s: 'Pravidelné kontrakce < 37. t. t.', body: () => stepsHtml([
+    ['Avizuj perinatologické centrum', 'Pod 32. t. t. ideálně transport „in utero“.'],
+    ['Poloha na levém boku, i.v. vstup', ''],
+    ['Tokolýza', 'Zvaž po konzultaci porodníka – jen pokud zbývá čas na transport a nejsou kontraindikace.'],
+    ['Připrav se na předčasný porod', 'Teplo, plastový sáček (< 32. t. t.), maska vhodné velikosti, ventilace 25 cm H₂O.'],
+  ]) + drugHtml('gyn') },
+  { id: 'aph', ic: '🩸', n: 'Krvácení před porodem', s: 'Placenta praevia, abrupce placenty', body: () => stepsHtml([
+    ['Nevyšetřovat vaginálně', 'Hrozí masivní krvácení u placenty praevia.'],
+    ['Poloha na levém boku', 'Odlehčení dolní duté žíly.'],
+    ['O₂, 2× i.v., tekutiny', 'Odhad krevní ztráty – u abrupce často skrytá (tvrdá bolestivá děloha).'],
+    ['Okamžitý transport', 'Do porodnice s avizem.'],
+  ]) },
+  { id: 'cpr', ic: '♥', n: 'KPR u těhotné', s: 'Manuální posun dělohy, perimortem císařský řez', body: () => stepsHtml([
+    ['KPR podle ALS', 'Komprese standardně, dávky léků a energie výboje beze změny (ResqArrest).'],
+    ['Manuální posun dělohy doleva', 'Od ~ 20. t. t. (fundus u pupku nebo výš) – odlehčení dolní duté žíly.'],
+    ['Časné zajištění DC', 'Vyšší riziko aspirace a rychlé desaturace.'],
+    ['Perimortem císařský řez', 'Při ≥ 20. t. t. zvážit do 5 min od zástavy – prakticky v nemocnici, proto časné rozhodnutí o transportu a avizo.'],
+    ['Reverzibilní příčiny', 'Krvácení, embolie plodovou vodou, eklampsie (Mg), předávkování Mg (Ca), sepse, PE.'],
+  ]) },
+];
+function renderCompl() {
+  $('compl').innerHTML = COMPL.map((c) => `<div class="acc glass ${S.open === c.id ? 'open' : ''}" data-acc="${c.id}"><button type="button" data-toggle="${c.id}"><span class="ic">${c.ic}</span><span class="grow"><b>${c.n}</b><span class="s">${c.s}</span></span>${CHEV}</button><div class="body">${c.timer ? '<div class="timerbox" id="t-dyst"></div>' : ''}${S.open === c.id ? c.body() : ''}</div></div>`).join('');
+  tick();
+}
+
+/* ---------- NOVOROZENEC ---------- */
+const AP = [
+  ['a', 'Barva (Appearance)', [['Bledý / celý cyanotický', 0], ['Tělo růžové, končetiny modré', 1], ['Celý růžový', 2]]],
+  ['p', 'Puls (Pulse)', [['Nehmatný', 0], ['< 100/min', 1], ['≥ 100/min', 2]]],
+  ['g', 'Reflexy (Grimace)', [['Žádná reakce', 0], ['Grimasa', 1], ['Pláč, kýchnutí, kašel', 2]]],
+  ['ac', 'Tonus (Activity)', [['Hypotonie', 0], ['Lehká flexe', 1], ['Aktivní pohyby', 2]]],
+  ['r', 'Dýchání (Respiration)', [['Nedýchá', 0], ['Slabé, nepravidelné, lapavé', 1], ['Silný pláč', 2]]],
+];
+const apSum = (m) => { const v = S.apgar[m]; return AP.every(([k]) => v[k] != null) ? AP.reduce((a, [k]) => a + v[k], 0) : null; };
+function renderApgar() {
+  const b = S.ev.birth;
+  $('ap-tabs').innerHTML = [1, 5, 10].map((m) => { const s = apSum(m); const due = b && !s && now() - b >= m * 60e3; const rem = b ? m * 60e3 - (now() - b) : null; return `<button type="button" data-apt="${m}" aria-selected="${S.apTab === m}" class="${due && S.apTab !== m ? 'due' : ''}">${m}. min<small>${s != null ? s + ' b.' : rem != null && rem > 0 ? 'za ' + mmss(rem) : due ? 'teď' : '–'}</small></button>`; }).join('');
+  const v = S.apgar[S.apTab];
+  $('ap').innerHTML = AP.map(([k, t, o]) => `<div class="r"><div class="t">${t}</div><div class="o">${o.map(([l, x]) => `<button type="button" data-ap="${k}" data-v="${x}" aria-pressed="${v[k] === x}"><b>${x}</b>${l}</button>`).join('')}</div></div>`).join('');
+  const s = apSum(S.apTab);
+  $('ap-sum').textContent = s != null ? s : '–'; $('ap-sum').style.color = s == null ? '' : s >= 7 ? 'var(--ok)' : s >= 4 ? 'var(--warn)' : 'var(--crit)';
+}
+const NLS = [
+  ['Teplo, osušit, stimulovat', 'Čepička, suché ručníky, kontakt kůže na kůži. < 32. t. t.: bez osušení do plastového sáčku. Hodnoť tonus, dýchání, TF (fonendoskop na hrudník).'],
+  ['Dýchací cesty', 'Hlava v neutrální poloze (podložka pod ramena). Odsávat jen při viditelné obstrukci.'],
+  ['5 úvodních vdechů', 'Nedýchá nebo lapavě: 5 vdechů po 2–3 s, tlak 30 cm H₂O (≥ 32. t. t.) / 25 cm H₂O (< 32. t. t.). Vzduch 21 % (< 32. t. t. ≥ 30 %).'],
+  ['Zhodnoť TF', 'Stoupá → pokračuj ve ventilaci 30/min, dokud nedýchá sám. Nestoupá a hrudník se nezvedá → oprav polohu, maska oběma rukama, odsát, SGA, zopakuj 5 vdechů.'],
+  ['TF < 60/min po 30 s účinné ventilace', 'Komprese hrudníku 3 : 1 (90 kompresí + 30 vdechů/min), O₂ 100 %. Metronom „Novorozenec 3:1“ v ResqArrestu.'],
+  ['Každých 30 s zhodnoť TF', 'TF > 60 → ukonči komprese, pokračuj ventilací.'],
+  ['Adrenalin, tekutiny', 'TF trvale < 60 přes komprese → adrenalin i.o. (v PNP), opakovat á 4 min. Při krvácení / bez odpovědi zvaž 10 ml/kg krystaloidu.'],
+];
+function renderNls() {
+  $('nls').innerHTML = NLS.map(([b, s], i) => `<li><button type="button" class="st" data-nls="${i}" aria-pressed="${!!S.nls[i]}"><span class="bx">${S.nls[i] ? '✓' : i + 1}</span><span><b>${b}</b><span class="s">${s}</span></span></button></li>`).join('');
+  const kg = parseFloat(String(S.kg).replace(',', '.')) || 0;
+  $('nls-drugs').innerHTML = kg > 0 ? `<div class="drug"><div class="grow"><div class="n">Adrenalin – novorozenec</div><div class="d"><b>20 µg/kg = ${fmt(kg * 20, 0)} µg = ${fmt(kg * 2, 1)} ml</b> z vaku 10 µg/ml (1 mg do 100 ml FR) i.o.</div><div class="c">Stejné ředění jako v ResqPedi a ResqArrestu pod 10 kg. U novorozence po porodu je dávka 20 µg/kg (ERC NLS), u starších dětí 10 µg/kg. Opakovat á 4 min.</div></div><button type="button" class="give" data-drug="nadr">Podáno</button></div><div class="drug"><div class="grow"><div class="n">Krystaloid</div><div class="d"><b>10 ml/kg = ${fmt(kg * 10, 0)} ml</b> i.o. / i.v.</div><div class="c">Při podezření na krevní ztrátu nebo bez odpovědi na resuscitaci.</div></div><button type="button" class="give" data-drug="nfl">Podáno</button></div>` : '';
+}
+
+/* ---------- ZÁZNAM ---------- */
+function renderLog() {
+  const b = S.ev.birth;
+  $('log').innerHTML = S.log.slice().reverse().map((e) => `<li><span class="t">${clock(e.t)}</span><span>${esc(e.x)}</span></li>`).join('') || '<li class="muted">Zatím nic. Události, léky a APGAR se zapisují samy.</li>';
+}
+function exportText() {
+  const L = ['Porod v terénu – záznam (ResqBirth)'];
+  const i = S.info, para = { primi: 'prvorodička', multi: 'vícerodička' }[i.para], wat = { no: 'neodtekla', clear: 'čirá', mec: 'zkalená/zelená', blood: 'krvavá' }[i.waters];
+  const rk = { sc: 'po SC', twins: 'dvojčata', breech: 'KP poloha', htn: 'preeklampsie/HT', bleed: 'krvácení' };
+  L.push(['Rodička: ' + [i.week ? i.week + '. t. t.' : null, para].filter(Boolean).join(', ') || '–', wat ? 'plodová voda ' + wat : null, i.risk.length ? 'rizika: ' + i.risk.map((r) => rk[r]).join(', ') : null].filter(Boolean).join(' · '));
+  for (const k of ['head', 'birth', 'plac']) if (S.ev[k]) L.push(`${EVN[k]}: ${clock(S.ev[k])}`);
+  const ap = [1, 5, 10].map((m) => apSum(m)).map((s, j) => s != null ? s : '–');
+  if (ap.some((x) => x !== '–')) L.push(`APGAR: ${ap.join(' / ')} (1. / 5. / 10. min)`);
+  const st = contrStats(); if (st.n) L.push(`Kontrakce: ${st.n}×, průměrně ${st.dur != null ? Math.round(st.dur) + ' s' : '–'}, interval ${st.iv != null ? mmss(st.iv * 1000) : '–'}`);
+  L.push('');
+  S.log.forEach((e) => L.push(`${clock(e.t)}  ${e.x}`));
+  return L.join('\n');
+}
+
+/* ---------- lišta s časy ---------- */
+function tick() {
+  const t = now(), p = [];
+  if (S.ev.birth) {
+    p.push(['', 'Od porodu', mmss(t - S.ev.birth)]);
+    for (const m of [1, 5, 10]) if (apSum(m) == null && t - S.ev.birth >= m * 60e3 && t - S.ev.birth < (m + 3) * 60e3) { p.push(['warn', `APGAR ${m}. min`, 'teď']); fire('ap' + m + S.ev.birth, 2); }
+    if (!S.ev.plac) { const d = t - S.ev.birth; p.push([d > 30 * 60e3 ? 'crit' : '', 'Placenta', d > 30 * 60e3 ? 'retence > 30 min' : 'čeká se']); }
+  } else if (S.ev.head) {
+    const d = t - S.ev.head; p.push([d > 120e3 ? 'crit' : d > 60e3 ? 'warn' : '', 'Od hlavičky', mmss(d)]);
+    if (d > 60e3) fire('dy' + S.ev.head, 3);
+  }
+  if (S.cur) p.push(['warn', 'Kontrakce', mmss(t - S.cur)]);
+  const h = p.map(([c, l, v]) => `<div class="pill glass ${c}">${l} <b>${v}</b></div>`).join('');
+  if ($('clockbar').innerHTML !== h) $('clockbar').innerHTML = h;
+  const tb = $('t-dyst');
+  if (tb) { if (S.ev.head && !S.ev.birth) { const d = t - S.ev.head; tb.className = 'timerbox ' + (d > 240e3 ? 'crit' : d > 60e3 ? 'warn' : ''); tb.innerHTML = `<span class="grow">Od porodu hlavičky</span><b>${mmss(d)}</b>`; } else { tb.className = 'timerbox'; tb.innerHTML = '<span class="muted">Časovač se spustí po ťuknutí „Porod hlavičky“ na záložce Porod.</span>'; } }
+  if (S.tab === 'kontr') { const r = $('c-run'); if (r && S.cur) r.textContent = mmss(t - S.cur); else if (!S.cur) { const sm = $('b-contr').querySelector('small'); if (sm && S.contr.length) sm.textContent = 'od poslední ' + mmss(t - S.contr[S.contr.length - 1].s); } }
+  if (S.tab === 'novo' && S.ev.birth) renderApgarTabsOnly();
+}
+function renderApgarTabsOnly() {
+  const b = S.ev.birth; if (!b) return;
+  $('ap-tabs').querySelectorAll('[data-apt]').forEach((el) => { const m = +el.dataset.apt, s = apSum(m), rem = m * 60e3 - (now() - b), due = s == null && rem <= 0; el.classList.toggle('due', due && S.apTab !== m); el.querySelector('small').textContent = s != null ? s + ' b.' : rem > 0 ? 'za ' + mmss(rem) : 'teď'; });
+}
+setInterval(tick, 500);
+
+/* ---------- render ---------- */
+function setTab(t) {
+  S.tab = t; save();
+  document.querySelectorAll('#tabs [data-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.tab === t));
+  document.querySelectorAll('.sec').forEach((s) => s.classList.toggle('on', s.id === 's-' + t));
+  render();
+}
+function render() {
+  renderInfo(); renderSteps(); renderEv(); renderContr(); renderCompl(); renderApgar(); renderNls(); renderLog(); tick();
+}
+
+/* ---------- události ---------- */
+$('tabs').onclick = (e) => { const b = e.target.closest('[data-tab]'); if (b) { setTab(b.dataset.tab); window.scrollTo(0, 0); } };
+$('i-week').oninput = (e) => { S.info.week = e.target.value.replace(/\D/g, ''); save(); renderInfo(); };
+document.addEventListener('click', (e) => {
+  let b;
+  if ((b = e.target.closest('[data-grp] [data-v]'))) {
+    const g = b.closest('[data-grp]'), k = g.dataset.grp, v = b.dataset.v;
+    if (g.dataset.multi) { const a = S.info[k]; const i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else a.push(v); } else S.info[k] = S.info[k] === v ? null : v;
+    save(); renderInfo(); renderContr(); return;
+  }
+  if ((b = e.target.closest('[data-ev]'))) {
+    const k = b.dataset.ev; beep(1);
+    if (S.ev[k]) { if (!confirm(`${EVN[k]} už je zapsán v ${clock(S.ev[k])}. Přepsat na teď?`)) return; }
+    S.ev[k] = now(); addLog(EVN[k], 'ev');
+    if (k === 'birth') { toast('Čas porodu zapsán – APGAR v 1. minutě'); }
+    save(); render(); return;
+  }
+  if ((b = e.target.closest('[data-step]'))) { const i = b.dataset.step; S.steps[i] = !S.steps[i]; save(); renderSteps(); return; }
+  if ((b = e.target.closest('[data-nls]'))) { const i = b.dataset.nls; S.nls[i] = !S.nls[i]; if (S.nls[i]) addLog('NLS: ' + NLS[i][0]); save(); renderNls(); renderLog(); return; }
+  if ((b = e.target.closest('[data-toggle]'))) { S.open = S.open === b.dataset.toggle ? null : b.dataset.toggle; save(); renderCompl(); return; }
+  if ((b = e.target.closest('[data-drug]'))) {
+    const k = b.dataset.drug, kg = parseFloat(String(S.kg).replace(',', '.')) || 0;
+    const txt = k === 'nadr' ? `Novorozenec: adrenalin ${fmt(kg * 20, 0)} µg (${fmt(kg * 2, 1)} ml z 10 µg/ml) i.o.` : k === 'nfl' ? `Novorozenec: krystaloid ${fmt(kg * 10, 0)} ml` : DRUGS[k].log;
+    addLog(txt, 'drug'); toast('Zapsáno: ' + txt); renderLog(); return;
+  }
+  if ((b = e.target.closest('[data-apt]'))) { S.apTab = +b.dataset.apt; save(); renderApgar(); return; }
+  if ((b = e.target.closest('[data-ap]'))) {
+    const v = S.apgar[S.apTab], k = b.dataset.ap; v[k] = v[k] === +b.dataset.v ? null : +b.dataset.v; save();
+    const s = apSum(S.apTab);
+    if (s != null) { S.log = S.log.filter((x) => x.k !== 'ap' + S.apTab); addLog(`APGAR ${S.apTab}. min: ${s}`, 'ap' + S.apTab); }
+    renderApgar(); renderLog(); return;
+  }
+});
+$('i-kg').value = S.kg; $('i-kg').oninput = (e) => { S.kg = e.target.value; save(); renderNls(); };
+$('b-contr').onclick = () => {
+  if (S.cur) { S.contr.push({ s: S.cur, e: now() }); S.cur = null; } else { S.cur = now(); }
+  save(); renderContr(); tick();
+};
+$('b-cundo').onclick = () => { if (S.cur) S.cur = null; else S.contr.pop(); save(); renderContr(); };
+$('b-copy').onclick = async () => { const t = exportText(); try { await navigator.clipboard.writeText(t); toast('Záznam zkopírován'); } catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('Záznam zkopírován'); } catch (er) {} ta.remove(); } };
+$('b-note').onclick = () => { const t = prompt('Poznámka (zapíše se s aktuálním časem):'); if (t && t.trim()) { addLog(t.trim()); renderLog(); } };
+$('b-new').onclick = () => { if (confirm('Smazat celý záznam a začít nový porod?')) { S = fresh(); save(); setTab('porod'); } };
+let toastT = null;
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2200); }
+try { const t = localStorage.getItem('resqbirth:theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+$('b-theme').onclick = () => { const c = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); const n = c === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; try { localStorage.setItem('resqbirth:theme', n); } catch (e) {} };
+document.addEventListener('pointerdown', () => { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume(); } catch (e) {} }, { once: true });
+setTab(S.tab || 'porod');
+</script>
+</body>
+</html>
