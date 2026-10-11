@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqSTART</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqSTART">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+/* ResqSTART – třídění START a JumpSTART. Vzhled sladěný s ResqHubem. */
+:root {
+  --bg: #E4EEEF; --ink: #0A1F23; --ink-2: rgba(10, 31, 35, .6); --ink-3: rgba(10, 31, 35, .36);
+  --petrol: #0B6E79; --petrol-soft: rgba(11, 110, 121, .12); --on-petrol: #FFFFFF;
+  --warn: #B26A00; --warn-soft: rgba(242, 154, 31, .17);
+  --crit: #D0303A; --crit-soft: rgba(229, 56, 59, .14);
+  --glow-a: rgba(11, 110, 121, .5); --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .6); --glass-strong: rgba(250, 253, 253, .96);
+  --glass-edge: rgba(255, 255, 255, .8); --glass-hi: rgba(255, 255, 255, .95); --glass-shadow: rgba(6, 55, 62, .13);
+  --hairline: rgba(10, 31, 35, .1); --fill: rgba(10, 31, 35, .06);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+    --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+  --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden; font-family: var(--font); font-size: 17px; line-height: 1.3; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; padding: 0; }
+svg { display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%); border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -12px var(--glass-shadow); }
+
+/* ---- ResqSTART ---- */
+:root { --red: #D62D32; --yellow: #F2B705; --green: #1E9E57; --black: #1B1F22; }
+html { touch-action: manipulation; }
+.wrap { max-width: 720px; margin: 0 auto; padding: max(12px, var(--st)) 14px calc(30px + var(--sb)); }
+.head { display: flex; align-items: center; gap: 8px; padding: 6px 2px 12px; }
+.head h1 { margin: 0; font-family: var(--font-display); font-size: 32px; font-weight: 800; letter-spacing: -.04em; line-height: 1; flex: 1; }
+.round { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--ink); }
+.round svg { width: 20px; height: 20px; }
+.card { border-radius: 24px; padding: 14px; margin-bottom: 12px; }
+.h { font-size: 13px; font-weight: 750; color: var(--ink-2); text-transform: uppercase; letter-spacing: .05em; margin: 0 2px 10px; display: flex; align-items: center; gap: 8px; }
+.h .grow { flex: 1; }
+.muted { color: var(--ink-2); font-size: 14px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 16px; border-radius: 15px; font-size: 15.5px; font-weight: 700; background: var(--fill); }
+.btn.pri { background: var(--petrol); color: var(--on-petrol); }
+.btn.danger { color: var(--crit); }
+.big { width: 100%; min-height: 84px; border-radius: 26px; font-family: var(--font-display); font-size: 24px; font-weight: 850; background: var(--petrol); color: var(--on-petrol); box-shadow: 0 14px 30px -14px var(--petrol); }
+.big small { display: block; font-family: var(--font); font-size: 14px; font-weight: 600; opacity: .85; }
+input.t { width: 100%; height: 48px; padding: 0 14px; border-radius: 14px; border: 1px solid var(--hairline); background: var(--glass-strong); font-size: 16.5px; }
+.sess { display: flex; align-items: center; gap: 10px; }
+.sess .grow { flex: 1; min-width: 0; }
+.sess b { display: block; font-size: 18px; font-weight: 800; }
+.counts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
+.cnt { border-radius: 16px; padding: 10px 6px; text-align: center; color: #fff; }
+.cnt b { display: block; font-family: var(--font-round); font-size: 30px; font-weight: 850; line-height: 1; }
+.cnt span { font-size: 12px; font-weight: 700; opacity: .92; }
+.c-red { background: var(--red); } .c-yellow { background: var(--yellow); color: #1B1F22; } .c-green { background: var(--green); } .c-black { background: var(--black); color: #fff; }
+:root[data-theme="dark"] .c-black { background: #000; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .c-black { background: #000; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35); } }
+.total { margin-top: 8px; font-size: 14px; color: var(--ink-2); font-weight: 650; text-align: center; }
+.plist { list-style: none; margin: 0; padding: 0; }
+.plist li + li { border-top: 1px solid var(--hairline); }
+.pi { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 2px; text-align: left; }
+.pi .dot { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-family: var(--font-round); font-weight: 850; font-size: 15px; flex: none; }
+.pi .grow { flex: 1; min-width: 0; }
+.pi b { display: block; font-size: 16px; }
+.pi span.s { display: block; font-size: 13px; color: var(--ink-2); }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.filters button { height: 32px; padding: 0 11px; border-radius: 16px; background: var(--fill); font-size: 13.5px; font-weight: 700; }
+.filters button[aria-pressed="true"] { background: var(--petrol); color: var(--on-petrol); }
+
+/* průchod algoritmem */
+.flow { position: fixed; inset: 0; z-index: 50; background: var(--bg); overflow: auto; display: none; }
+.flow.on { display: block; }
+.flow .wrap { padding-top: max(14px, var(--st)); min-height: 100%; display: flex; flex-direction: column; }
+.ftop { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.ftop .grow { flex: 1; font-weight: 800; font-size: 17px; }
+.crumbs { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+.crumbs span { font-size: 12.5px; font-weight: 650; padding: 4px 9px; border-radius: 10px; background: var(--fill); color: var(--ink-2); }
+.q { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; padding: 10px 4px 20px; }
+.q .step { font-size: 13px; font-weight: 750; color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; }
+.q h2 { margin: 8px 0 10px; font-family: var(--font-display); font-size: 34px; font-weight: 850; letter-spacing: -.03em; line-height: 1.1; }
+.q p { margin: 0 auto; max-width: 480px; font-size: 16px; color: var(--ink-2); line-height: 1.4; }
+.q .act { margin: 14px auto 0; max-width: 480px; padding: 10px 14px; border-radius: 14px; background: var(--warn-soft); color: var(--warn); font-weight: 700; font-size: 15px; }
+.ans { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: calc(10px + var(--sb)); }
+.ans button { min-height: 110px; border-radius: 26px; font-family: var(--font-display); font-size: 30px; font-weight: 850; }
+.ans .y { background: var(--petrol); color: var(--on-petrol); }
+.ans .n { background: var(--glass-strong); border: 1.5px solid var(--hairline); color: var(--ink); }
+.ans.age button { font-size: 26px; }
+.ans.age button small { display: block; font-family: var(--font); font-size: 13.5px; font-weight: 600; opacity: .8; margin-top: 4px; }
+.res { border-radius: 30px; padding: 26px 18px; text-align: center; color: #fff; margin-bottom: 14px; }
+.res .p { font-size: 15px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .9; }
+.res h2 { margin: 6px 0 4px; font-family: var(--font-display); font-size: 46px; font-weight: 900; letter-spacing: -.03em; }
+.res p { margin: 0; font-size: 16px; font-weight: 600; opacity: .95; line-height: 1.4; }
+.res.c-yellow { color: #1B1F22; }
+.form { display: grid; gap: 10px; margin-bottom: 12px; }
+.form label { font-size: 13px; font-weight: 700; color: var(--ink-2); margin: 0 4px -4px; }
+.pick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.pick button { min-height: 64px; border-radius: 18px; font-weight: 800; font-size: 14.5px; }
+.pick button[aria-pressed="true"] { outline: 4px solid var(--petrol); outline-offset: 2px; }
+.hist { font-size: 13.5px; color: var(--ink-2); margin: 4px 4px 12px; line-height: 1.5; }
+.toast { position: fixed; left: 50%; top: calc(var(--st) + 12px); z-index: 100; transform: translate(-50%, -20px); opacity: 0; pointer-events: none; max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 22px; background: var(--glass-strong); font-size: 15px; font-weight: 650; text-align: center; box-shadow: 0 12px 30px -10px var(--glass-shadow); transition: opacity .25s, transform .3s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.foot { margin-top: 16px; font-size: 12.5px; color: var(--ink-3); text-align: center; line-height: 1.45; }
+pre.sum { white-space: pre-wrap; font-family: var(--font); font-size: 15px; line-height: 1.5; margin: 0; }
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+<div class="wrap" id="main">
+  <header class="head">
+    <h1>ResqSTART</h1>
+    <button type="button" class="round glass" id="b-theme" aria-label="Přepnout světlý nebo tmavý režim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+  </header>
+  <div id="view"></div>
+  <p class="foot">Třídění START (dospělí) a JumpSTART (děti). Pomůcka, nenahrazuje klinický úsudek ani traumatologický plán.</p>
+</div>
+<div class="flow" id="flow"><div class="wrap" id="fwrap"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const now = () => Date.now();
+const clock = (t) => new Date(t).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
+const dur = (ms) => { const m = Math.floor(ms / 60000); return m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min`; };
+const KEY = 'resqstart:v1';
+
+const COL = {
+  red: { n: 'Červená', p: 'I. priorita – okamžité ošetření', act: 'Zastav masivní krvácení, uvolni DC, poloha. Transport přednostně.' },
+  yellow: { n: 'Žlutá', p: 'II. priorita – odkladné ošetření', act: 'Stav stabilní, ošetření a transport může počkat. Pravidelně přetřiďuj.' },
+  green: { n: 'Zelená', p: 'III. priorita – lehce zranění', act: 'Odveď na shromaždiště lehce zraněných, přetřiď.' },
+  black: { n: 'Černá', p: 'Mrtvý / bez známek života', act: 'Neresuscituj, označ a pokračuj k dalšímu.' },
+};
+const ORDER = ['red', 'yellow', 'green', 'black'];
+
+/* ---------- algoritmy: uzel = otázka, y/n = další uzel nebo výsledek ---------- */
+const START = {
+  walk: { s: 'Chůze', q: 'Chodí sám?', d: 'Vyzvi všechny, kdo mohou chodit, ať odejdou na určené místo.', y: 'green', n: 'breath' },
+  breath: { s: 'Dýchání', q: 'Dýchá?', d: 'Podívej se, poslouchej, cíť.', y: 'rr', n: 'airway' },
+  airway: { s: 'Dýchací cesty', q: 'Dýchá po uvolnění DC?', d: 'Zakloň hlavu / předsuň čelist.', act: 'Uvolni dýchací cesty', y: 'red', n: 'black' },
+  rr: { s: 'Dechová frekvence', q: 'DF nad 30/min?', d: 'Počítej 15 s × 4.', y: 'red', n: 'perf' },
+  perf: { s: 'Oběh', q: 'Kapilární návrat > 2 s nebo chybí pulz na a. radialis?', d: 'Při masivním krvácení ho hned zastav (škrtidlo, tlak).', y: 'red', n: 'cmd' },
+  cmd: { s: 'Vědomí', q: 'Plní jednoduché pokyny?', d: '„Stiskněte mi ruku“, „otevřete oči“.', y: 'yellow', n: 'red' },
+};
+const JUMP = {
+  walk: { s: 'Chůze', q: 'Chodí samo?', d: 'Kojenec, který ještě nechodí → NE a pokračuj algoritmem.', y: 'green', n: 'breath' },
+  breath: { s: 'Dýchání', q: 'Dýchá?', d: 'Podívej se, poslouchej, cíť.', y: 'rr', n: 'airway' },
+  airway: { s: 'Dýchací cesty', q: 'Dýchá po uvolnění DC?', d: 'Neutrální poloha hlavy / předsunutí čelisti.', act: 'Uvolni dýchací cesty', y: 'red', n: 'pulse0' },
+  pulse0: { s: 'Pulz', q: 'Hmatný periferní pulz?', d: 'Bez pulzu → bez známek života.', y: 'rescue', n: 'black' },
+  rescue: { s: '5 vdechů', q: 'Dýchá po 5 záchranných vdeších?', d: 'Dítě s pulzem, které nedýchá, dostane 5 vdechů (rouška / maska).', act: 'Podej 5 záchranných vdechů', y: 'red', n: 'black' },
+  rr: { s: 'Dechová frekvence', q: 'DF pod 15 nebo nad 45/min?', d: 'Počítej 15 s × 4.', y: 'red', n: 'pulse' },
+  pulse: { s: 'Oběh', q: 'Chybí hmatný periferní pulz?', d: 'Při masivním krvácení ho hned zastav.', y: 'red', n: 'avpu' },
+  avpu: { s: 'Vědomí (AVPU)', q: 'Reaguje jen nevhodně na bolest, nebo nereaguje?', d: 'A, V nebo P s lokalizací bolesti → NE. P bez lokalizace (posturing) nebo U → ANO.', y: 'red', n: 'yellow' },
+};
+
+/* ---------- stav ---------- */
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return s; } catch (e) {} return null; }
+let S = load() || { v: 1, sessions: [], cur: null };
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+const sess = () => S.sessions.find((x) => x.id === S.cur);
+const counts = (s) => { const c = { red: 0, yellow: 0, green: 0, black: 0 }; s.pts.forEach((p) => c[p.c]++); return c; };
+let F = null;     // průchod: { age, node, path: [[s, ans]], edit: index }
+let filter = null, viewSess = null;
+
+/* ---------- domovská obrazovka ---------- */
+function render() {
+  const s = sess();
+  if (viewSess) return renderSummary(S.sessions.find((x) => x.id === viewSess));
+  if (!s) {
+    const past = S.sessions.slice().reverse();
+    $('view').innerHTML = `<div class="card glass"><div class="h">Nová triage</div>
+      <div class="form"><input class="t" id="s-name" placeholder="Název / místo události (nepovinné)"></div>
+      <button type="button" class="big" id="b-newsess">Nová triage<small>spustí událost a počítání pacientů</small></button></div>
+      ${past.length ? `<div class="card glass"><div class="h">Předchozí události</div><ul class="plist">${past.map((x) => { const c = counts(x); return `<li><button type="button" class="pi" data-past="${x.id}"><span class="dot c-red">${x.pts.length}</span><span class="grow"><b>${esc(x.name || 'Událost')}</b><span class="s">${new Date(x.start).toLocaleDateString('cs-CZ')} ${clock(x.start)} · 🔴 ${c.red} · 🟡 ${c.yellow} · 🟢 ${c.green} · ⚫ ${c.black}</span></span></button></li>`; }).join('')}</ul></div>` : ''}`;
+    return;
+  }
+  const c = counts(s), list = s.pts.map((p, i) => [p, i]).filter(([p]) => !filter || p.c === filter).reverse();
+  $('view').innerHTML = `<div class="card glass">
+      <div class="sess"><span class="grow"><b>${esc(s.name || 'Probíhající triage')}</b><span class="muted">od ${clock(s.start)} · ${dur(now() - s.start)}</span></span><button type="button" class="btn" id="b-sum">Souhrn</button></div>
+      <div class="counts">${ORDER.map((k) => `<div class="cnt c-${k}"><b>${c[k]}</b><span>${COL[k].n}</span></div>`).join('')}</div>
+      <div class="total">Celkem ${s.pts.length} postižených</div>
+    </div>
+    <button type="button" class="big" id="b-next" style="margin-bottom:12px">+ Další pacient<small>${s.pts.length ? 'pacient č. ' + (s.pts.length + 1) : 'začni prvním pacientem'}</small></button>
+    ${s.pts.length ? `<div class="card glass"><div class="h"><span class="grow">Pacienti</span><span class="muted" style="text-transform:none;letter-spacing:0">ťukni pro přetřídění</span></div>
+      <div class="filters"><button type="button" data-f="" aria-pressed="${!filter}">Všichni</button>${ORDER.map((k) => `<button type="button" data-f="${k}" aria-pressed="${filter === k}">${COL[k].n} (${c[k]})</button>`).join('')}</div>
+      <ul class="plist">${list.map(([p, i]) => `<li><button type="button" class="pi" data-p="${i}"><span class="dot c-${p.c}">${i + 1}</span><span class="grow"><b>${p.tag ? 'Karta ' + esc(p.tag) : 'Pacient ' + (i + 1)}${p.age === 'child' ? ' · dítě' : ''}</b><span class="s">${COL[p.c].n} · ${clock(p.t)}${p.hist.length > 1 ? ' · přetříděn ' + (p.hist.length - 1) + '×' : ''}${p.note ? ' · ' + esc(p.note) : ''}</span></span></button></li>`).join('') || '<li class="muted" style="padding:8px 2px">Žádný pacient v této kategorii.</li>'}</ul></div>` : ''}
+    <div class="card glass"><div class="acts" style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" id="b-copy">Kopírovat hlášení</button><button type="button" class="btn danger" id="b-end">Ukončit triage</button></div></div>`;
+}
+function reportText(s) {
+  const c = counts(s), L = [];
+  L.push(`Třídění START${s.name ? ' – ' + s.name : ''}`);
+  L.push(`Začátek ${new Date(s.start).toLocaleDateString('cs-CZ')} ${clock(s.start)}${s.end ? ', konec ' + clock(s.end) : ', stav k ' + clock(now())}`);
+  L.push(`Celkem ${s.pts.length} postižených: červená ${c.red}, žlutá ${c.yellow}, zelená ${c.green}, černá ${c.black}`);
+  const kids = s.pts.filter((p) => p.age === 'child'); if (kids.length) { const k = counts({ pts: kids }); L.push(`z toho dětí ${kids.length} (červ. ${k.red}, žl. ${k.yellow}, zel. ${k.green}, čer. ${k.black})`); }
+  L.push('');
+  s.pts.forEach((p, i) => L.push(`${i + 1}. ${p.tag ? 'karta ' + p.tag + ' – ' : ''}${COL[p.c].n}${p.age === 'child' ? ' (dítě)' : ''} ${clock(p.t)}${p.hist.length > 1 ? ' [přetříděn: ' + p.hist.map((h) => COL[h.c].n.toLowerCase() + ' ' + clock(h.t)).join(' → ') + ']' : ''}${p.note ? ' – ' + p.note : ''}`));
+  return L.join('\n');
+}
+function renderSummary(s) {
+  const c = counts(s), tot = s.pts.length || 1;
+  $('view').innerHTML = `<div class="card glass"><div class="sess"><span class="grow"><b>${esc(s.name || 'Souhrn triage')}</b><span class="muted">${new Date(s.start).toLocaleDateString('cs-CZ')} ${clock(s.start)}${s.end ? '–' + clock(s.end) : ''} · ${dur((s.end || now()) - s.start)}</span></span></div>
+      <div class="counts">${ORDER.map((k) => `<div class="cnt c-${k}"><b>${c[k]}</b><span>${COL[k].n} · ${Math.round(c[k] / tot * 100)} %</span></div>`).join('')}</div>
+      <div class="total">Celkem ${s.pts.length} postižených</div></div>
+    <div class="card glass"><div class="h">Hlášení</div><pre class="sum">${esc(reportText(s))}</pre>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button type="button" class="btn pri" id="b-copy2">Kopírovat</button><button type="button" class="btn" id="b-back">Zpět</button>${!s.end ? '' : `<button type="button" class="btn danger" data-del="${s.id}">Smazat událost</button>`}</div></div>`;
+}
+
+/* ---------- průchod ---------- */
+function startFlow(edit) { F = { age: null, node: null, path: [], edit }; renderFlow(); $('flow').classList.add('on'); window.scrollTo(0, 0); }
+function closeFlow() { F = null; $('flow').classList.remove('on'); render(); }
+const ALG = () => (F.age === 'child' ? JUMP : START);
+function renderFlow() {
+  const s = sess(), title = F.edit != null ? `Přetřídění – ${s.pts[F.edit].tag ? 'karta ' + esc(s.pts[F.edit].tag) : 'pacient ' + (F.edit + 1)}` : `Pacient ${s.pts.length + 1}`;
+  const top = `<div class="ftop"><button type="button" class="btn" id="f-back">← Zpět</button><span class="grow">${title}</span><button type="button" class="btn" id="f-x">Zrušit</button></div>
+    <div class="crumbs">${F.age ? `<span>${F.age === 'child' ? 'Dítě – JumpSTART' : 'Dospělý – START'}</span>` : ''}${F.path.map(([n, a]) => `<span>${ALG()[n].s}: ${a ? 'ano' : 'ne'}</span>`).join('')}</div>`;
+  let body;
+  if (!F.age) {
+    body = `<div class="q"><div class="step">Krok 1</div><h2>Dospělý, nebo dítě?</h2><p>Dítě (orientačně do 8 let / bez známek puberty) se třídí podle JumpSTART.</p></div>
+      <div class="ans age"><button type="button" class="y" data-age="adult">Dospělý<small>START</small></button><button type="button" class="y" data-age="child" style="background:#7A4FC9">Dítě<small>JumpSTART</small></button></div>`;
+    if (F.edit != null) body += `<div class="card glass" style="margin-top:12px"><div class="h">Nebo rovnou zvol barvu</div><div class="pick">${ORDER.map((k) => `<button type="button" class="c-${k}" data-direct="${k}">${COL[k].n}</button>`).join('')}</div></div>`;
+  } else if (COL[F.node]) {
+    const k = F.node, p = F.edit != null ? s.pts[F.edit] : null;
+    body = `<div class="res c-${k}"><div class="p">${COL[k].p}</div><h2>${COL[k].n.toUpperCase()}</h2><p>${COL[k].act}</p></div>
+      <div class="form"><label for="f-tag">Číslo identifikační karty (nepovinné)</label><input class="t" id="f-tag" value="${esc(p ? p.tag : '')}" placeholder="např. 0123">
+      <label for="f-note">Poznámka (nepovinné)</label><input class="t" id="f-note" value="${esc(p ? p.note : '')}" placeholder="např. poranění hlavy, škrtidlo 10:42"></div>
+      <div class="ans"><button type="button" class="y" id="f-save" style="font-size:22px">${F.edit != null ? 'Uložit' : 'Uložit + další'}</button><button type="button" class="n" id="f-save1" style="font-size:22px">${F.edit != null ? 'Zrušit' : 'Uložit'}</button></div>`;
+  } else {
+    const q = ALG()[F.node], n = F.path.length + 2;
+    body = `<div class="q"><div class="step">Krok ${n} · ${q.s}</div>${q.act ? `<div class="act" style="margin:0 auto 12px">${q.act}</div>` : ''}<h2>${q.q}</h2><p>${q.d}</p></div>
+      <div class="ans"><button type="button" class="y" data-a="1">ANO</button><button type="button" class="n" data-a="0">NE</button></div>`;
+  }
+  $('fwrap').innerHTML = top + body;
+}
+function savePatient(next) {
+  const s = sess(), k = F.node, tag = ($('f-tag')?.value || '').trim(), note = ($('f-note')?.value || '').trim();
+  const path = F.path.map(([n, a]) => ALG()[n].s + ': ' + (a ? 'ano' : 'ne'));
+  if (F.edit != null) {
+    const p = s.pts[F.edit]; p.tag = tag; p.note = note;
+    if (p.c !== k) { p.c = k; p.hist.push({ c: k, t: now() }); } p.path = path; p.age = F.age || p.age;
+    save(); toast(`Přetříděno: ${COL[k].n}`); closeFlow(); return;
+  }
+  s.pts.push({ c: k, age: F.age, tag, note, t: now(), path, hist: [{ c: k, t: now() }] }); save();
+  if (navigator.vibrate) navigator.vibrate(60);
+  toast(`Pacient ${s.pts.length}: ${COL[k].n}`);
+  if (next) startFlow(); else closeFlow();
+}
+$('fwrap').addEventListener('click', (e) => {
+  let b;
+  if (e.target.closest('#f-x')) { closeFlow(); return; }
+  if (e.target.closest('#f-back')) {
+    if (COL[F.node] || F.path.length) { const last = F.path.pop(); F.node = last ? last[0] : 'walk'; if (!last) F.node = 'walk'; }
+    else if (F.age) { F.age = null; F.node = null; } else { closeFlow(); return; }
+    renderFlow(); return;
+  }
+  if ((b = e.target.closest('[data-age]'))) { F.age = b.dataset.age; F.node = 'walk'; renderFlow(); return; }
+  if ((b = e.target.closest('[data-a]'))) { const yes = b.dataset.a === '1', q = ALG()[F.node]; F.path.push([F.node, yes]); F.node = yes ? q.y : q.n; renderFlow(); window.scrollTo(0, 0); return; }
+  if ((b = e.target.closest('[data-direct]'))) { const p = sess().pts[F.edit]; F.age = p.age; F.node = b.dataset.direct; renderFlow(); return; }
+  if (e.target.closest('#f-save')) { savePatient(true); return; }
+  if (e.target.closest('#f-save1')) { if (F.edit != null) closeFlow(); else savePatient(false); return; }
+});
+
+/* ---------- domov – události ---------- */
+$('view').addEventListener('click', async (e) => {
+  let b;
+  if (e.target.closest('#b-newsess')) { const id = 's' + now(); S.sessions.push({ id, name: ($('s-name').value || '').trim(), start: now(), end: null, pts: [] }); S.cur = id; save(); render(); startFlow(); return; }
+  if (e.target.closest('#b-next')) { startFlow(); return; }
+  if ((b = e.target.closest('[data-p]'))) { startFlow(+b.dataset.p); return; }
+  if ((b = e.target.closest('[data-f]'))) { filter = b.dataset.f || null; render(); return; }
+  if (e.target.closest('#b-sum')) { viewSess = S.cur; render(); return; }
+  if ((b = e.target.closest('[data-past]'))) { viewSess = b.dataset.past; render(); return; }
+  if (e.target.closest('#b-back')) { viewSess = null; render(); return; }
+  if ((b = e.target.closest('[data-del]'))) { if (confirm('Smazat tuto událost?')) { S.sessions = S.sessions.filter((x) => x.id !== b.dataset.del); save(); viewSess = null; render(); } return; }
+  if (e.target.closest('#b-copy') || e.target.closest('#b-copy2')) {
+    const s = viewSess ? S.sessions.find((x) => x.id === viewSess) : sess(), t = reportText(s);
+    try { await navigator.clipboard.writeText(t); toast('Hlášení zkopírováno'); } catch (er) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('Hlášení zkopírováno'); } catch (x) {} ta.remove(); }
+    return;
+  }
+  if (e.target.closest('#b-end')) { if (!confirm('Ukončit triage? Souhrn zůstane uložený.')) return; const s = sess(); s.end = now(); S.cur = null; save(); viewSess = s.id; render(); return; }
+});
+let toastT = null;
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 1800); }
+try { const t = localStorage.getItem('resqstart:theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+$('b-theme').onclick = () => { const c = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); const n = c === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; try { localStorage.setItem('resqstart:theme', n); } catch (e) {} };
+setInterval(() => { if (!F && sess() && !viewSess) { const m = document.querySelector('.sess .muted'); if (m) m.textContent = `od ${clock(sess().start)} · ${dur(now() - sess().start)}`; } }, 30000);
+render();
+</script>
+</body>
+</html>
