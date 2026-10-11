@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqScore</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqScore">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+/* ResqScore – skórovací systémy pro PNP. Vzhled sladěný s ResqHubem. */
+:root {
+  --bg: #E4EEEF; --ink: #0A1F23; --ink-2: rgba(10, 31, 35, .6); --ink-3: rgba(10, 31, 35, .36);
+  --petrol: #0B6E79; --petrol-soft: rgba(11, 110, 121, .12); --on-petrol: #FFFFFF;
+  --warn: #B26A00; --warn-soft: rgba(242, 154, 31, .17);
+  --crit: #D0303A; --crit-soft: rgba(229, 56, 59, .14);
+  --glow-a: rgba(11, 110, 121, .5); --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .6); --glass-strong: rgba(250, 253, 253, .96);
+  --glass-edge: rgba(255, 255, 255, .8); --glass-hi: rgba(255, 255, 255, .95); --glass-shadow: rgba(6, 55, 62, .13);
+  --hairline: rgba(10, 31, 35, .1); --fill: rgba(10, 31, 35, .06);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+    --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+  --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden; font-family: var(--font); font-size: 17px; line-height: 1.3; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; padding: 0; }
+svg { display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%); border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -12px var(--glass-shadow); }
+
+/* ---- ResqScore ---- */
+:root { --ok: #17915A; --ok-soft: rgba(23, 145, 90, .13); }
+:root[data-theme="dark"] { --ok: #4FD08F; --ok-soft: rgba(79, 208, 143, .15); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ok: #4FD08F; --ok-soft: rgba(79, 208, 143, .15); } }
+html { touch-action: manipulation; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: max(12px, var(--st)) 14px calc(150px + var(--sb)); }
+.head { display: flex; align-items: center; gap: 8px; padding: 6px 2px 12px; }
+.head h1 { margin: 0; font-family: var(--font-display); font-size: 32px; font-weight: 800; letter-spacing: -.04em; line-height: 1; flex: 1; }
+.round { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--ink); }
+.round svg { width: 20px; height: 20px; }
+.muted { color: var(--ink-2); font-size: 14px; }
+
+.layout { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .layout { grid-template-columns: 340px minmax(0, 1fr); align-items: start; } .list-pane { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; } }
+@media (max-width: 899px) { body.detail .list-pane { display: none; } body:not(.detail) .detail-pane { display: none; } }
+
+.search { display: flex; align-items: center; gap: 8px; height: 46px; padding: 0 14px; border-radius: 16px; margin-bottom: 12px; }
+.search svg { width: 18px; height: 18px; color: var(--ink-3); flex: none; }
+.search input { flex: 1; min-width: 0; border: 0; background: none; outline: none; font-size: 16.5px; }
+.grp { font-size: 13px; font-weight: 750; color: var(--ink-2); text-transform: uppercase; letter-spacing: .05em; margin: 14px 4px 8px; }
+.sc { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border-radius: 18px; text-align: left; margin-bottom: 6px; background: var(--glass-strong); border: 1px solid var(--glass-edge); }
+.sc .grow { flex: 1; min-width: 0; }
+.sc b { display: block; font-size: 16.5px; font-weight: 750; }
+.sc span.s { display: block; font-size: 13.5px; color: var(--ink-2); margin-top: 1px; }
+.sc svg { width: 14px; height: 14px; color: var(--ink-3); flex: none; }
+.sc[aria-current="true"] { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
+.sc[aria-current="true"] span.s, .sc[aria-current="true"] svg { color: inherit; opacity: .85; }
+
+.dhead { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.dhead h2 { margin: 0; flex: 1; font-family: var(--font-display); font-size: 26px; font-weight: 800; letter-spacing: -.03em; }
+.back { display: inline-flex; align-items: center; gap: 4px; height: 38px; padding: 0 12px 0 8px; border-radius: 19px; font-weight: 650; font-size: 15px; color: var(--petrol); }
+.back svg { width: 18px; height: 18px; }
+@media (min-width: 900px) { .back { display: none; } }
+.ddesc { font-size: 14.5px; color: var(--ink-2); margin: 0 2px 12px; line-height: 1.4; }
+.reset { height: 36px; padding: 0 12px; border-radius: 12px; background: var(--fill); font-size: 14px; font-weight: 650; }
+
+.it { border-radius: 20px; padding: 12px 14px; margin-bottom: 10px; }
+.it .q { font-size: 16px; font-weight: 750; display: flex; align-items: baseline; gap: 8px; }
+.it .q .grow { flex: 1; }
+.it .qs { font-size: 13.5px; color: var(--ink-2); margin-top: 2px; }
+.pts { font-family: var(--font-round); font-size: 13px; font-weight: 800; padding: 2px 8px; border-radius: 9px; background: var(--fill); color: var(--ink-2); white-space: nowrap; }
+.pts.p1 { background: var(--warn-soft); color: var(--warn); }
+.pts.p3 { background: var(--crit-soft); color: var(--crit); }
+.opts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.opts.col { flex-direction: column; }
+.o { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 12px; border-radius: 14px; background: var(--fill); font-size: 15px; font-weight: 600; text-align: left; line-height: 1.25; }
+.opts.col .o { width: 100%; }
+.o .grow { flex: 1; min-width: 0; }
+.o small { display: block; font-size: 12.5px; font-weight: 500; color: var(--ink-2); margin-top: 1px; }
+.o .v { font-family: var(--font-round); font-size: 13px; font-weight: 800; opacity: .7; flex: none; }
+.o[aria-pressed="true"] { background: var(--petrol); color: var(--on-petrol); }
+.o[aria-pressed="true"] small { color: inherit; opacity: .85; }
+.chk { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; }
+.chk .bx { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--ink-3); flex: none; display: grid; place-items: center; }
+.chk .bx svg { width: 16px; height: 16px; opacity: 0; }
+.chk .grow { flex: 1; min-width: 0; }
+.it.on { background: var(--petrol-soft); }
+.it.on .chk .bx { background: var(--petrol); border-color: var(--petrol); color: var(--on-petrol); }
+.it.on .chk .bx svg { opacity: 1; }
+.numrow { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.numrow input { width: 120px; height: 48px; border-radius: 14px; border: 1px solid var(--hairline); background: var(--glass-strong); font-family: var(--font-round); font-size: 22px; font-weight: 750; text-align: center; }
+.numrow input[type="time"] { width: 140px; font-size: 19px; }
+.yn { display: flex; gap: 6px; margin-top: 10px; }
+.yn button { flex: 1; height: 44px; border-radius: 13px; background: var(--fill); font-weight: 750; font-size: 15.5px; }
+.yn button[aria-pressed="true"].y { background: var(--crit); color: #fff; }
+.yn button[aria-pressed="true"].n { background: var(--ok); color: #fff; }
+.note { font-size: 13.5px; color: var(--ink-2); padding: 10px 14px; border-radius: 16px; background: var(--fill); margin-bottom: 10px; line-height: 1.4; }
+.note b { color: var(--ink); }
+.src { font-size: 12.5px; color: var(--ink-3); margin: 6px 4px 0; line-height: 1.4; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 6px; }
+.tbl td, .tbl th { padding: 5px 6px; border-top: 1px solid var(--hairline); text-align: left; }
+.tbl th { font-weight: 700; color: var(--ink-2); border-top: 0; }
+.jump { margin-top: 10px; height: 42px; padding: 0 14px; border-radius: 13px; background: var(--petrol); color: var(--on-petrol); font-weight: 700; font-size: 15px; }
+
+.res { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 8px 12px calc(10px + var(--sb)); pointer-events: none; }
+.res .in { pointer-events: auto; max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 16px; border-radius: 22px; background: var(--glass-strong); box-shadow: 0 -6px 30px -10px var(--glass-shadow); border: 1px solid var(--glass-edge); }
+@media (min-width: 900px) { .res .in { margin-left: max(14px, calc((100vw - 1180px) / 2 + 368px)); } }
+.res .val { font-family: var(--font-round); font-size: 36px; font-weight: 850; letter-spacing: -.02em; min-width: 54px; text-align: center; line-height: 1; }
+.res .txt { flex: 1; min-width: 0; }
+.res .t { font-size: 16px; font-weight: 800; line-height: 1.2; }
+.res .x { font-size: 13.5px; color: var(--ink-2); margin-top: 2px; line-height: 1.3; }
+.res .cp { flex: none; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: var(--fill); }
+.res .cp svg { width: 20px; height: 20px; }
+.res.ok .in { background: color-mix(in srgb, var(--ok) 16%, var(--glass-strong)); } .res.ok .val, .res.ok .t { color: var(--ok); }
+.res.warn .in { background: color-mix(in srgb, var(--warn) 20%, var(--glass-strong)); } .res.warn .val, .res.warn .t { color: var(--warn); }
+.res.crit .in { background: var(--crit); } .res.crit .val, .res.crit .t, .res.crit .x { color: #fff; } .res.crit .cp { background: rgba(255, 255, 255, .2); color: #fff; }
+.res.none .val { color: var(--ink-3); }
+.toast { position: fixed; left: 50%; top: calc(var(--st) + 12px); z-index: 100; transform: translate(-50%, -20px); opacity: 0; pointer-events: none; max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 22px; background: var(--glass-strong); font-size: 15px; font-weight: 650; text-align: center; box-shadow: 0 12px 30px -10px var(--glass-shadow); transition: opacity .25s, transform .3s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.foot { margin-top: 16px; font-size: 12.5px; color: var(--ink-3); text-align: center; line-height: 1.45; }
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="head">
+    <h1>ResqScore</h1>
+    <button type="button" class="round glass" id="b-theme" aria-label="Přepnout světlý nebo tmavý režim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+  </header>
+  <div class="layout">
+    <nav class="list-pane">
+      <label class="search glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Hledat skóre…" autocomplete="off"></label>
+      <div id="list"></div>
+      <p class="foot">Pomůcka pro výpočet skóre. Nenahrazuje klinický úsudek ani místní protokoly.</p>
+    </nav>
+    <main class="detail-pane" id="detail"></main>
+  </div>
+</div>
+<div class="res none" id="res" hidden><div class="in"><div class="val" id="r-v">–</div><div class="txt"><div class="t" id="r-t"></div><div class="x" id="r-x"></div></div><button type="button" class="cp" id="r-cp" aria-label="Kopírovat výsledek"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt = (n, d = 1) => String(Math.round(n * 10 ** d) / 10 ** d).replace('.', ',');
+const num = (v) => { const x = parseFloat(String(v ?? '').replace(',', '.')); return isNaN(x) ? null : x; };
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+const CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>';
+
+/* ---------- pomocné pro definice ---------- */
+const opt = (id, t, o, extra) => Object.assign({ k: 'opt', id, t, o }, extra || {});   // o: [[label, value, sub?]]
+const chk = (id, t, v, sub) => ({ k: 'chk', id, t, v: v ?? 1, sub });
+const nm = (id, t, unit, pts, extra) => Object.assign({ k: 'num', id, t, unit, pts }, extra || {});
+const yn = (id, t, sub) => ({ k: 'yn', id, t, sub });
+const note = (html) => ({ k: 'note', html });
+const R = (v, lvl, t, x) => ({ v, lvl, t, x });
+const band = (x, arr) => { for (const [lo, hi, p] of arr) if (x >= lo && x <= hi) return p; return null; };
+const sumOf = (s, items) => items.reduce((a, it) => a + (it.k === 'chk' ? (s[it.id] ? it.v : 0) : it.k === 'opt' ? (s[it.id] != null ? it.o[s[it.id]][1] : 0) : 0), 0);
+const filled = (s, items) => items.filter((it) => (it.k === 'opt' || it.k === 'yn' || it.k === 'num') && !it.opt).every((it) => it.k === 'num' ? num(s[it.id]) != null : s[it.id] != null);
+
+/* ---------- definice skóre ---------- */
+const GCS_E = [['Spontánně', 4], ['Na oslovení', 3], ['Na bolest', 2], ['Žádné', 1]];
+const SC = [];
+
+/* ===== CELKOVÝ STAV ===== */
+const NEWS_I = [
+  nm('rr', 'Dechová frekvence', '/min', (x) => band(x, [[0, 8, 3], [9, 11, 1], [12, 20, 0], [21, 24, 2], [25, 999, 3]])),
+  opt('scale', 'Škála SpO₂', [['Škála 1 – běžná', 1], ['Škála 2 – hyperkapnie (cíl 88–92 %)', 2]], { noPts: true }),
+  opt('o2', 'Kyslík', [['Vzduch', 0], ['Kyslík', 2]]),
+  nm('spo2', 'SpO₂', '%', (x, s) => {
+    if (s.scale === 1) { // škála 2
+      const o2 = s.o2 === 1;
+      if (x <= 83) return 3; if (x <= 85) return 2; if (x <= 87) return 1; if (x <= 92 || !o2) return 0;
+      if (x <= 94) return 1; if (x <= 96) return 2; return 3;
+    }
+    return band(x, [[0, 91, 3], [92, 93, 2], [94, 95, 1], [96, 100, 0]]);
+  }),
+  nm('sbp', 'Systolický TK', 'mmHg', (x) => band(x, [[0, 90, 3], [91, 100, 2], [101, 110, 1], [111, 219, 0], [220, 999, 3]])),
+  nm('hr', 'Tepová frekvence', '/min', (x) => band(x, [[0, 40, 3], [41, 50, 1], [51, 90, 0], [91, 110, 1], [111, 130, 2], [131, 999, 3]])),
+  opt('cons', 'Vědomí', [['A – při vědomí', 0], ['Nová zmatenost / V / P / U', 3]]),
+  nm('temp', 'Teplota', '°C', (x) => band(x, [[0, 35.0, 3], [35.05, 36.0, 1], [36.05, 38.0, 0], [38.05, 39.0, 1], [39.05, 99, 2]]), { step: '0.1' }),
+];
+SC.push({ id: 'news2', n: 'NEWS2', g: 'Celkový stav a sepse', d: 'Časné varování – zhoršení stavu dospělého',
+  desc: 'National Early Warning Score 2. Vyplň vitální funkce, body se počítají automaticky. Škálu 2 používej jen u potvrzené hyperkapnické respirační insuficience (např. CHOPN) s cílovou SpO₂ 88–92 %.',
+  items: NEWS_I,
+  calc(s) {
+    let sum = 0, any3 = false, n = 0;
+    for (const it of NEWS_I) {
+      let p = null;
+      if (it.k === 'num') { const x = num(s[it.id]); if (x != null) p = it.pts(x, s); }
+      else if (it.id === 'o2' || it.id === 'cons') { if (s[it.id] != null) p = it.o[s[it.id]][1]; }
+      else continue;
+      if (p != null) { sum += p; n++; if (p === 3) any3 = true; }
+    }
+    if (!n) return null;
+    const part = n < 7 ? ` (vyplněno ${n}/7)` : '';
+    if (sum >= 7) return R(sum, 'crit', 'Vysoké riziko' + part, 'Okamžité vyšetření lékařem, zvaž vyšší úroveň péče.');
+    if (sum >= 5) return R(sum, 'warn', 'Střední riziko' + part, 'Urgentní posouzení lékařem, monitorace min. á 1 h.');
+    if (any3) return R(sum, 'warn', 'Nízké–střední riziko' + part, 'Jeden parametr za 3 body – urgentní posouzení.');
+    return R(sum, 'ok', 'Nízké riziko' + part, 'Monitorace podle stavu.');
+  },
+  src: 'Royal College of Physicians: NEWS2 (2017).' });
+
+SC.push({ id: 'qsofa', n: 'qSOFA', g: 'Celkový stav a sepse', d: 'Riziko nepříznivého průběhu u infekce',
+  desc: 'quick SOFA – u pacienta s podezřením na infekci. Každé kritérium = 1 bod.',
+  items: [chk('rr', 'Dechová frekvence ≥ 22/min'), chk('gcs', 'Porucha vědomí (GCS < 15)'), chk('sbp', 'Systolický TK ≤ 100 mmHg')],
+  calc(s) { const v = sumOf(s, this.items); return v >= 2 ? R(v, 'crit', 'Pozitivní (≥ 2)', 'Vysoké riziko sepse s nepříznivým průběhem – časné ATB, tekutiny, směrování.') : R(v, v ? 'warn' : 'ok', 'Negativní', 'Neguje sepsi jen částečně – zhodnoť i NEWS2.'); },
+  src: 'Singer et al., Sepsis-3, JAMA 2016.' });
+
+SC.push({ id: 'si', n: 'Shock index', g: 'Celkový stav a sepse', d: 'TF / systolický TK',
+  desc: 'Poměr tepové frekvence a systolického tlaku. U dětí 4–16 let se používá věkově upravená hranice (SIPA).',
+  items: [opt('age', 'Pacient', [['Dospělý', 0], ['Dítě 4–6 let', 1], ['Dítě 7–12 let', 2], ['13–16 let', 3]], { noPts: true }), nm('hr', 'Tepová frekvence', '/min', null), nm('sbp', 'Systolický TK', 'mmHg', null)],
+  calc(s) {
+    const hr = num(s.hr), sbp = num(s.sbp); if (!hr || !sbp) return null;
+    const si = hr / sbp, v = fmt(si, 2);
+    const lim = [null, 1.22, 1.0, 0.9][s.age || 0];
+    if (lim) return si > lim ? R(v, 'crit', `Zvýšený (> ${fmt(lim, 2)})`, 'SIPA pozitivní – vyšší riziko závažného poranění / šoku.') : R(v, 'ok', `V normě (≤ ${fmt(lim, 2)})`, 'SIPA negativní.');
+    if (si >= 1) return R(v, 'crit', 'Šok pravděpodobný (≥ 1,0)', 'Zvaž krvácení / hypovolémii, aktivní léčbu.');
+    if (si >= 0.7) return R(v, 'warn', 'Zvýšený (0,7–0,99)', 'Možná skrytá hypoperfuze – sleduj vývoj.');
+    return R(v, 'ok', 'Normální (< 0,7)', '');
+  },
+  src: 'Allgöwer; Acker et al. (SIPA), J Pediatr Surg 2015.' });
+
+/* ===== NEUROLOGIE ===== */
+const gcsCalc = function (s) {
+  if (!filled(s, this.items)) { const v = sumOf(s, this.items); return v ? R(v, 'none', 'Nevyplněno vše', '') : null; }
+  const v = sumOf(s, this.items), t = `E${this.items[0].o[s.e][1]} V${this.items[1].o[s.v][1]} M${this.items[2].o[s.m][1]}`;
+  if (v <= 8) return R(v, 'crit', 'Těžká porucha vědomí – ' + t, 'GCS ≤ 8: ohrožení dýchacích cest, zvaž zajištění.');
+  if (v <= 12) return R(v, 'warn', 'Středně těžká – ' + t, '');
+  return R(v, v === 15 ? 'ok' : 'warn', (v === 15 ? 'Normální – ' : 'Lehká porucha – ') + t, '');
+};
+SC.push({ id: 'gcs', n: 'GCS', g: 'Neurologie', d: 'Glasgow Coma Scale – dospělý a dítě ≥ 2 roky',
+  desc: 'Hodnoť nejlepší odpověď. Shodné popisy jako v ResqNote.',
+  items: [opt('e', 'Oči (E)', GCS_E, { col: true }), opt('v', 'Slovní odpověď (V)', [['Orientovaný', 5], ['Zmatená', 4], ['Nepřiléhavá slova', 3], ['Zvuky', 2], ['Žádná', 1]], { col: true }), opt('m', 'Motorická odpověď (M)', [['Vyhoví výzvě', 6], ['Lokalizuje bolest', 5], ['Úhyb na bolest', 4], ['Abnormní flexe', 3], ['Extenze', 2], ['Žádná', 1]], { col: true })],
+  calc: gcsCalc, src: 'Teasdale & Jennett 1974.' });
+SC.push({ id: 'gcsk', n: 'GCS – dítě < 2 roky', g: 'Neurologie', d: 'Pediatrická modifikace slovní a motorické odpovědi',
+  desc: 'Pro kojence a batolata, která ještě nemluví.',
+  items: [opt('e', 'Oči (E)', [['Spontánně', 4], ['Na zvuk / oslovení', 3], ['Na bolest', 2], ['Žádné', 1]], { col: true }), opt('v', 'Slovní odpověď (V)', [['Brouká, žvatlá, sleduje', 5], ['Dráždivý pláč, utišitelný', 4], ['Pláč na bolest', 3], ['Sténání na bolest', 2], ['Žádná', 1]], { col: true }), opt('m', 'Motorická odpověď (M)', [['Spontánní účelný pohyb', 6], ['Úhyb na dotek', 5], ['Úhyb na bolest', 4], ['Abnormní flexe', 3], ['Extenze', 2], ['Žádná', 1]], { col: true })],
+  calc: gcsCalc, src: 'Pediatric GCS (James 1986).' });
+
+SC.push({ id: 'avpu', n: 'AVPU', g: 'Neurologie', d: 'Rychlé hodnocení vědomí',
+  desc: 'Orientačně: P odpovídá zhruba GCS ≤ 8.',
+  items: [opt('a', 'Stav vědomí', [['A – Alert', 0, 'bdělý, spontánně otevřené oči'], ['V – Voice', 1, 'reaguje na oslovení'], ['P – Pain', 2, 'reaguje jen na bolest'], ['U – Unresponsive', 3, 'nereaguje']], { col: true, noPts: true })],
+  calc(s) { if (s.a == null) return null; const L = ['A', 'V', 'P', 'U'][s.a]; return R(L, ['ok', 'warn', 'crit', 'crit'][s.a], ['Při vědomí', 'Reaguje na oslovení', 'Reaguje na bolest', 'Bezvědomí'][s.a], s.a >= 2 ? 'Odpovídá zhruba GCS ≤ 8 – chraň dýchací cesty.' : ''); },
+  src: 'ACS ATLS.' });
+
+SC.push({ id: 'rass', n: 'RASS', g: 'Neurologie', d: 'Richmond Agitation–Sedation Scale',
+  desc: 'Hloubka sedace a agitovanost (+4 až −5).',
+  items: [opt('r', 'Stav', [['+4 Agresivní', 4, 'násilný, bezprostřední nebezpečí'], ['+3 Velmi agitovaný', 3, 'vytahuje vstupy, agresivní'], ['+2 Agitovaný', 2, 'časté neúčelné pohyby, „bojuje“ s ventilátorem'], ['+1 Neklidný', 1, 'úzkostný, pohyby ne agresivní'], ['0 Bdělý a klidný', 0, ''], ['−1 Ospalý', -1, 'na oslovení oční kontakt > 10 s'], ['−2 Lehká sedace', -2, 'na oslovení krátce, < 10 s'], ['−3 Střední sedace', -3, 'na oslovení pohyb, bez očního kontaktu'], ['−4 Hluboká sedace', -4, 'jen na fyzický podnět'], ['−5 Nebuditelný', -5, 'bez reakce na hlas i dotek']], { col: true, noPts: true })],
+  calc(s) { if (s.r == null) return null; const v = this.items[0].o[s.r][1]; return R((v > 0 ? '+' : '') + v, v === 0 ? 'ok' : (v >= 3 || v <= -4 ? 'crit' : 'warn'), this.items[0].o[s.r][0].replace(/^[+−-]?\d\s/, ''), v >= 3 ? 'Riziko pro pacienta i posádku.' : v <= -4 ? 'Hluboká sedace – chraň dýchací cesty.' : ''); },
+  src: 'Sessler et al., AJRCCM 2002.' });
+
+SC.push({ id: 'belfast', n: 'BELFAST', g: 'Neurologie', d: 'Rozpoznání CMP včetně zadní cirkulace',
+  desc: 'Náhle vzniklé příznaky. Kterýkoli pozitivní = podezření na CMP → zjisti čas vzniku a pokračuj FAST PLUS.',
+  items: [chk('b', 'B – Balance', 1, 'náhlá porucha rovnováhy, koordinace, závrať'), chk('e', 'E – Eyes', 1, 'náhlá porucha vidění, dvojité vidění, výpadek zorného pole'), chk('l', 'L – Leg', 1, 'slabost dolní končetiny'), chk('f', 'F – Face', 1, 'pokles koutku, asymetrie obličeje'), chk('a', 'A – Arm', 1, 'slabost horní končetiny'), chk('sp', 'S – Speech', 1, 'porucha řeči, nesrozumitelnost, nerozumí'), { k: 'time', id: 't', t: 'T – Time: naposledy zdráv v', sub: 'čas vzniku nebo kdy byl naposledy viděn zdravý' }],
+  calc(s) {
+    const v = sumOf(s, this.items), el = elapsed(s.t);
+    const tt = el != null ? ` · od vzniku ${el}` : '';
+    if (v) return R(v, 'crit', 'Podezření na CMP' + tt, 'Pokračuj FAST PLUS, zjisti antikoagulaci, glykémii.');
+    return R(0, 'ok', 'Bez příznaků CMP' + tt, '');
+  },
+  after: '<button type="button" class="jump" data-jump="fastplus">Pokračovat na FAST PLUS →</button>',
+  src: 'BE-FAST (Aroor et al., Stroke 2017) rozšířené o slabost DK.' });
+
+SC.push({ id: 'fastplus', n: 'FAST PLUS', g: 'Neurologie', d: 'Iktová karta – těžká hemiparéza → KCC',
+  desc: 'U pacienta s pozitivním FAST. Hodnoť vleže, každou končetinu zvlášť. Pozitivní = po nastavení do polohy končetina klesá k podložce a pak žádný pohyb nebo jen pohyb po podložce (nezvedne ji).',
+  items: [
+    note('<b>1. Horní končetiny</b> – vleže výdrž ve 90°'), yn('lhk', 'Levá HK klesne a nezvedne ji'), yn('phk', 'Pravá HK klesne a nezvedne ji'),
+    note('<b>2. Dolní končetiny</b> – vleže výdrž ve 30°'), yn('ldk', 'Levá DK klesne a nezvedne ji'), yn('pdk', 'Pravá DK klesne a nezvedne ji'),
+    { k: 'time', id: 't', t: 'Naposledy zdráv v', sub: 'čas vzniku příznaků' }],
+  calc(s) {
+    const L = s.lhk === true || s.ldk === true, P = s.phk === true || s.pdk === true;
+    const hk = s.lhk === true || s.phk === true, dk = s.ldk === true || s.pdk === true;
+    const one = (L !== P) && hk && dk && ((s.lhk === true && s.ldk === true) || (s.phk === true && s.pdk === true));
+    const ans = [s.lhk, s.phk, s.ldk, s.pdk].filter((x) => x != null).length;
+    if (!ans) return null;
+    const n = (hk ? 1 : 0) + (dk ? 1 : 0) + (one ? 1 : 0), el = elapsed(s.t), tt = el != null ? ` · od vzniku ${el}` : '';
+    if (n === 3) return R('3×', 'crit', 'Vysoká pravděpodobnost uzávěru velké tepny' + tt, 'Přes dispečink kontaktuj KCC (iktová karta: do 6 h + 3× ANO). Řiď se regionálním protokolem.');
+    return R(n + '×', 'warn', 'Těžká hemiparéza nepotvrzena' + tt, 'Podezření na CMP → spádové iktové centrum (IC).');
+  },
+  src: 'Iktová karta ZZS – FAST PLUS test (Neurologie pro praxi 2020; Brain Behav 2018: senzitivita 92 %, specificita 44 %).' });
+
+/* ===== TRAUMA ===== */
+SC.push({ id: 'ccs', n: 'Canadian C-spine', g: 'Trauma', d: 'Kdy je nutná imobilizace / zobrazení C páteře',
+  desc: 'Pro bdělého (GCS 15), stabilního pacienta ≥ 16 let po úrazu. Postupuj po krocích 1 → 3.',
+  items: [
+    note('<b>1. Vysoce rizikový faktor?</b>'), chk('h1', 'Věk ≥ 65 let'), chk('h2', 'Nebezpečný mechanismus', 1, 'pád z ≥ 1 m / 5 schodů, axiální náraz na hlavu, DN > 100 km/h, převrácení, vymrštění, motorka, čtyřkolka, srážka cyklisty'), chk('h3', 'Parestezie končetin'),
+    note('<b>2. Nízce rizikový faktor umožňující vyšetřit hybnost?</b>'), chk('l1', 'Prostý náraz zezadu (DN)', 1, 'ne: náraz do protijedoucího, převrácení, náraz velkým vozidlem'), chk('l2', 'Sedí'), chk('l3', 'Kdykoli od úrazu chodil'), chk('l4', 'Bolest krku nastoupila až později'), chk('l5', 'Bez bolestivosti ve střední čáře C páteře'),
+    note('<b>3. Aktivní rotace krku o 45° vlevo i vpravo?</b>'), yn('rot', 'Zvládne aktivně otočit hlavu 45° na obě strany')],
+  calc(s) {
+    if (s.h1 || s.h2 || s.h3) return R('!', 'crit', 'Imobilizace / zobrazení indikováno', 'Přítomen vysoce rizikový faktor.');
+    const low = s.l1 || s.l2 || s.l3 || s.l4 || s.l5;
+    if (!low) return R('!', 'crit', 'Imobilizace / zobrazení indikováno', 'Chybí nízce rizikový faktor – hybnost nevyšetřuj.');
+    if (s.rot == null) return R('?', 'none', 'Vyšetři aktivní rotaci krku', 'Krok 3.');
+    return s.rot === true ? R('✓', 'ok', 'Imobilizace / zobrazení není nutné', 'Splněna všechna kritéria.') : R('!', 'crit', 'Imobilizace / zobrazení indikováno', 'Rotaci nezvládne.');
+  },
+  src: 'Stiell et al., JAMA 2001.' });
+
+SC.push({ id: 'nexus', n: 'NEXUS', g: 'Trauma', d: '5 kritérií nízkého rizika poranění C páteře',
+  desc: 'Pokud není přítomno ani jedno z kritérií, je riziko poranění C páteře nízké. U malých dětí a seniorů omezená spolehlivost.',
+  items: [chk('a', 'Bolestivost ve střední čáře C páteře'), chk('b', 'Ložiskový neurologický deficit'), chk('c', 'Porucha vědomí / bdělosti'), chk('d', 'Intoxikace (alkohol, drogy)'), chk('e', 'Bolestivé distrakční poranění', 1, 'např. zlomenina dlouhé kosti, rozsáhlé poranění')],
+  calc(s) { const v = sumOf(s, this.items); return v ? R(v, 'crit', 'Nelze vyloučit poranění C páteře', 'Imobilizace / zobrazení indikováno.') : R(0, 'ok', 'Nízké riziko', 'Žádné kritérium – imobilizace / zobrazení obvykle není nutné.'); },
+  src: 'Hoffman et al., NEJM 2000.' });
+
+SC.push({ id: 'rts', n: 'RTS', g: 'Trauma', d: 'Revised Trauma Score',
+  desc: 'Z GCS, systolického TK a dechové frekvence. T-RTS (součet kódů 0–12) slouží k triáži, RTS (vážený, 0–7,84) k prognóze.',
+  items: [nm('gcs', 'GCS', 'b.', (x) => band(x, [[13, 15, 4], [9, 12, 3], [6, 8, 2], [4, 5, 1], [3, 3, 0]])), nm('sbp', 'Systolický TK', 'mmHg', (x) => band(x, [[90, 999, 4], [76, 89, 3], [50, 75, 2], [1, 49, 1], [0, 0, 0]])), nm('rr', 'Dechová frekvence', '/min', (x) => band(x, [[10, 29, 4], [30, 999, 3], [6, 9, 2], [1, 5, 1], [0, 0, 0]]))],
+  calc(s) {
+    const c = this.items.map((it) => { const x = num(s[it.id]); return x == null ? null : it.pts(x); });
+    if (c.some((x) => x == null)) return null;
+    const t = c[0] + c[1] + c[2], rts = 0.9368 * c[0] + 0.7326 * c[1] + 0.2908 * c[2];
+    return t <= 11 ? R(t, 'crit', `T-RTS ${t} · RTS ${fmt(rts, 2)}`, 'T-RTS ≤ 11 → směrovat do traumacentra.') : R(t, 'ok', `T-RTS ${t} · RTS ${fmt(rts, 2)}`, 'Bez fyziologického kritéria pro traumacentrum.');
+  },
+  src: 'Champion et al., J Trauma 1989.' });
+
+SC.push({ id: 'mgap', n: 'MGAP', g: 'Trauma', d: 'Mechanismus, GCS, věk, TK – prognóza traumatu',
+  desc: 'Přednemocniční skóre mortality u traumatu (3–29 bodů).',
+  items: [opt('m', 'Mechanismus', [['Tupý', 4], ['Penetrující', 0]]), nm('gcs', 'GCS', 'b.', (x) => (x >= 3 && x <= 15 ? x : null)), opt('a', 'Věk', [['< 60 let', 5], ['≥ 60 let', 0]]), nm('sbp', 'Systolický TK', 'mmHg', (x) => (x > 120 ? 5 : x >= 60 ? 3 : 0))],
+  calc(s) {
+    const g = num(s.gcs), b = num(s.sbp); if (s.m == null || s.a == null || g == null || b == null) return null;
+    const v = this.items[0].o[s.m][1] + this.items[2].o[s.a][1] + this.items[1].pts(g) + this.items[3].pts(b);
+    if (v <= 17) return R(v, 'crit', 'Vysoké riziko (3–17)', 'Mortalita kolem 48 %.');
+    if (v <= 22) return R(v, 'warn', 'Střední riziko (18–22)', 'Mortalita kolem 15 %.');
+    return R(v, 'ok', 'Nízké riziko (23–29)', 'Mortalita kolem 3 %.');
+  },
+  src: 'Sartorius et al., Crit Care Med 2010.' });
+
+/* ===== DÝCHACÍ CESTY, PROSTŘEDÍ ===== */
+SC.push({ id: 'lemon', n: 'LEMON', g: 'Dýchací cesty a prostředí', d: 'Predikce obtížné intubace',
+  desc: 'Každý pozitivní bod zvyšuje riziko obtížné laryngoskopie. Mallampati často v PNP nelze – pak vynech.',
+  items: [chk('l', 'L – Look externally', 1, 'trauma obličeje, vousy, velké řezáky, malá čelist, krátký krk'), chk('e', 'E – Evaluate 3-3-2', 1, 'ústa < 3 prsty, brada–jazylka < 3 prsty, jazylka–štítná chrupavka < 2 prsty'), chk('m', 'M – Mallampati ≥ 3'), chk('o', 'O – Obstrukce / obezita', 1, 'epiglotitida, absces, cizí těleso, hematom; BMI'), chk('n', 'N – Neck mobility omezená', 1, 'krční límec, Bechtěrev, artróza')],
+  calc(s) { const v = sumOf(s, this.items); return v ? R(v, v >= 2 ? 'crit' : 'warn', 'Očekávej obtížnou intubaci', 'Plán B: videolaryngoskop, bougie, SGA, připravit FONA.') : R(0, 'ok', 'Bez prediktorů obtížné intubace', 'Přesto vždy připrav plán B.'); },
+  src: 'Reed et al., Emerg Med J 2005 (LEMON).' });
+
+SC.push({ id: 'hypo', n: 'Hypotermie – švýcarské stadium', g: 'Dýchací cesty a prostředí', d: 'Stadium podle klinického stavu, směrování na ECLS',
+  desc: 'Pokud nemáš teploměr pro tělesné jádro, stadium odhadni podle vědomí a třesu. Riziko zástavy roste od HT III.',
+  items: [opt('st', 'Klinický stav', [['HT I – při vědomí, třese se', 1, 'orientačně 35–32 °C'], ['HT II – porucha vědomí, netřese se', 2, 'orientačně < 32–28 °C'], ['HT III – bezvědomí, vitální funkce zachovány', 3, 'orientačně < 28 °C'], ['HT IV – bez známek života', 4, 'orientačně < 24 °C']], { col: true, noPts: true })],
+  calc(s) {
+    if (s.st == null) return null;
+    return [
+      R('I', 'warn', 'HT I', 'Teplé prostředí, suché oblečení, izolace, teplé slazené nápoje, pohyb.'),
+      R('II', 'crit', 'HT II', 'Šetrná manipulace, horizontální poloha, izolace + aktivní zahřívání, EKG, teplé infuze. Při nestabilitě oběhu → centrum s ECLS.'),
+      R('III', 'crit', 'HT III', 'Jako HT II + zajištění DC dle potřeby. Riziko zástavy – transport do centra s ECLS.'),
+      R('IV', 'crit', 'HT IV', 'KPR (mechanická), transport do centra s ECLS. < 30 °C: max. 3 výboje a adrenalin vynechat; 30–35 °C: intervaly adrenalinu zdvojit.'),
+    ][s.st];
+  },
+  src: 'Švýcarská klasifikace (revidovaná); ERC 2025 – zvláštní okolnosti.' });
+
+/* ===== EMBOLIE ===== */
+SC.push({ id: 'wellspe', n: 'Wells – plicní embolie', g: 'Tromboembolie', d: 'Předtestová pravděpodobnost PE',
+  desc: 'Při nízké pravděpodobnosti lze dále použít PERC.',
+  items: [chk('a', 'Klinické známky HŽT', 3, 'otok DK, bolestivost v průběhu hlubokých žil'), chk('b', 'PE je nejpravděpodobnější diagnóza', 3), chk('c', 'TF > 100/min', 1.5), chk('d', 'Imobilizace ≥ 3 dny nebo operace v posledních 4 týdnech', 1.5), chk('e', 'Předchozí PE nebo HŽT', 1.5), chk('f', 'Hemoptýza', 1), chk('g', 'Aktivní malignita', 1, 'léčba v posledních 6 měsících nebo paliativní')],
+  calc(s) {
+    const v = sumOf(s, this.items), vv = fmt(v);
+    const three = v > 6 ? 'vysoká' : v >= 2 ? 'střední' : 'nízká';
+    return v > 4 ? R(vv, 'crit', 'PE pravděpodobná (> 4)', `Tříúrovňově: ${three} pravděpodobnost.`) : R(vv, v >= 2 ? 'warn' : 'ok', 'PE nepravděpodobná (≤ 4)', `Tříúrovňově: ${three} pravděpodobnost.${v < 2 ? ' Zvaž PERC.' : ''}`);
+  },
+  after: '<button type="button" class="jump" data-jump="perc">PERC →</button>',
+  src: 'Wells et al., Thromb Haemost 2000.' });
+
+SC.push({ id: 'perc', n: 'PERC', g: 'Tromboembolie', d: 'Vyloučení PE u nízké pravděpodobnosti',
+  desc: 'Použij jen při nízké předtestové pravděpodobnosti (Wells < 2 nebo klinický odhad < 15 %). Pokud není splněno žádné kritérium, je PE klinicky vyloučena.',
+  items: [chk('a', 'Věk ≥ 50 let'), chk('b', 'TF ≥ 100/min'), chk('c', 'SpO₂ < 95 % na vzduchu'), chk('d', 'Jednostranný otok DK'), chk('e', 'Hemoptýza'), chk('f', 'Nedávný úraz nebo operace', 1, 'v posledních 4 týdnech, vyžadující celkovou anestezii'), chk('g', 'Předchozí PE nebo HŽT'), chk('h', 'Hormonální léčba', 1, 'antikoncepce, HRT, estrogeny')],
+  calc(s) { const v = sumOf(s, this.items); return v ? R(v, 'warn', 'PERC pozitivní', 'PE nelze vyloučit klinicky – další vyšetření.') : R(0, 'ok', 'PERC negativní', 'Při nízké předtestové pravděpodobnosti je PE vyloučena.'); },
+  src: 'Kline et al., J Thromb Haemost 2004.' });
+
+SC.push({ id: 'wellsdvt', n: 'Wells – HŽT', g: 'Tromboembolie', d: 'Pravděpodobnost hluboké žilní trombózy',
+  desc: 'Dvouúrovňové hodnocení.',
+  items: [chk('a', 'Aktivní malignita'), chk('b', 'Paréza / plegie nebo nedávná sádra DK'), chk('c', 'Upoutání na lůžko > 3 dny nebo velká operace do 12 týdnů'), chk('d', 'Lokální bolestivost v průběhu hlubokých žil'), chk('e', 'Otok celé DK'), chk('f', 'Otok lýtka o > 3 cm proti druhé straně', 1, 'měřeno 10 cm pod tuberositas tibiae'), chk('g', 'Důlkový otok jen na postižené DK'), chk('h', 'Kolaterální povrchové žíly (ne varixy)'), chk('i', 'Předchozí HŽT'), chk('j', 'Jiná diagnóza je stejně nebo více pravděpodobná', -2)],
+  calc(s) { const v = sumOf(s, this.items); return v >= 2 ? R(v, 'crit', 'HŽT pravděpodobná (≥ 2)', 'Indikováno další vyšetření (UZ).') : R(v, 'ok', 'HŽT nepravděpodobná (< 2)', 'D-dimery k vyloučení.'); },
+  src: 'Wells et al., NEJM 2003.' });
+
+/* ===== DĚTI ===== */
+SC.push({ id: 'pat', n: 'PAT', g: 'Děti', d: 'Pediatrický hodnotící trojúhelník – první pohled',
+  desc: 'Hodnocení „od dveří“ do 30 s, bez dotyku. Vzhled podle TICLS: tonus, interakce, utišitelnost, pohled, řeč / pláč.',
+  items: [yn('a', 'Vzhled abnormální', 'TICLS: hypotonie, nereaguje, neutišitelný, prázdný pohled, slabý pláč'), yn('w', 'Dechová práce zvýšená', 'zatahování, alární souhyb, stridor, chrčení, poloha'), yn('c', 'Cirkulace kůže abnormální', 'bledost, mramorování, cyanóza')],
+  calc(s) {
+    if (s.a == null || s.w == null || s.c == null) return null;
+    const k = (s.a ? 'A' : '') + (s.w ? 'W' : '') + (s.c ? 'C' : '');
+    const m = { '': ['ok', 'Stabilní'], A: ['warn', 'Dysfunkce CNS / metabolická'], W: ['warn', 'Dechová tíseň'], AW: ['crit', 'Dechové selhání'], C: ['warn', 'Kompenzovaný šok'], AC: ['crit', 'Dekompenzovaný šok'], WC: ['crit', 'Dechová tíseň + porucha perfuze'], AWC: ['crit', 'Kardiopulmonální selhání'] }[k];
+    return R(k.length ? k.length + '/3' : '0/3', m[0], m[1], k.length >= 2 ? 'Neodkladná intervence, ABCDE.' : '');
+  },
+  src: 'Dieckmann et al., Pediatr Emerg Care 2010.' });
+
+SC.push({ id: 'pews', n: 'PEWS', g: 'Děti', d: 'Pediatrické časné varování (Brighton)',
+  desc: 'Tachykardii a tachypnoi posuzuj vůči normě pro věk (tabulka dole).',
+  items: [
+    opt('b', 'Chování', [['Hraje si, přiměřené', 0], ['Spí', 1], ['Dráždivé', 2], ['Letargie, zmatenost, snížená reakce na bolest', 3]], { col: true }),
+    opt('c', 'Oběh', [['Růžový, CRT 1–2 s', 0], ['Bledý nebo CRT 3 s', 1], ['Šedý nebo CRT 4 s, nebo TF o 20 nad normou', 2], ['Šedý a mramorovaný, CRT ≥ 5 s, TF o 30 nad normou nebo bradykardie', 3]], { col: true }),
+    opt('r', 'Dýchání', [['V normě, bez zatahování', 0], ['DF o 10 nad normou, pomocné svaly nebo O₂ ≥ 3 l/min', 1], ['DF o 20 nad normou, zatahování nebo O₂ ≥ 6 l/min', 2], ['DF 5 pod normou se zatahováním, chrčení nebo O₂ ≥ 8 l/min', 3]], { col: true }),
+    chk('n', 'Inhalace á 15 min', 2)],
+  calc(s) {
+    if (s.b == null || s.c == null || s.r == null) { const v = sumOf(s, this.items); return v ? R(v, 'none', 'Nevyplněno vše', '') : null; }
+    const v = sumOf(s, this.items), any3 = [s.b, s.c, s.r].includes(3);
+    if (v >= 5 || any3) return R(v, 'crit', 'Vysoké riziko', 'Neodkladné posouzení lékařem.');
+    if (v >= 3) return R(v, 'warn', 'Zvýšené riziko', 'Častější monitorace, konzultace.');
+    return R(v, 'ok', 'Nízké riziko', '');
+  },
+  after: '<div class="it glass"><div class="q">Normy podle věku (APLS)</div><table class="tbl"><tr><th>Věk</th><th>TF /min</th><th>DF /min</th><th>STK mmHg</th></tr><tr><td>&lt; 1 rok</td><td>110–160</td><td>30–40</td><td>70–90</td></tr><tr><td>1–2 roky</td><td>100–150</td><td>25–35</td><td>80–95</td></tr><tr><td>2–5 let</td><td>95–140</td><td>25–30</td><td>80–100</td></tr><tr><td>5–12 let</td><td>80–120</td><td>20–25</td><td>90–110</td></tr><tr><td>&gt; 12 let</td><td>60–100</td><td>15–20</td><td>100–120</td></tr></table></div>',
+  src: 'Monaghan, Brighton PEWS 2005; normy APLS.' });
+
+SC.push({ id: 'westley', n: 'Westley', g: 'Děti', d: 'Tíže laryngitidy (croup)',
+  desc: 'Hodnoť v klidu, dítě nerozrušuj.',
+  items: [opt('s', 'Stridor', [['Žádný', 0], ['Při rozrušení', 1], ['V klidu', 2]]), opt('r', 'Zatahování', [['Žádné', 0], ['Lehké', 1], ['Střední', 2], ['Těžké', 3]]), opt('a', 'Vzduch v plicích', [['Normální', 0], ['Oslabený', 1], ['Výrazně oslabený', 2]]), opt('c', 'Cyanóza', [['Žádná', 0], ['Při rozrušení', 4], ['V klidu', 5]]), opt('v', 'Vědomí', [['Normální', 0], ['Dezorientace', 5]])],
+  calc(s) {
+    const v = sumOf(s, this.items); if (!Object.keys(s).length) return null;
+    if (v >= 12) return R(v, 'crit', 'Hrozící respirační selhání (≥ 12)', 'Adrenalin inhalačně, dexamethason, O₂, připrav zajištění DC.');
+    if (v >= 8) return R(v, 'crit', 'Těžká (8–11)', 'Adrenalin inhalačně + dexamethason, transport.');
+    if (v >= 3) return R(v, 'warn', 'Střední (3–7)', 'Dexamethason, zvaž adrenalin inhalačně.');
+    return R(v, 'ok', 'Lehká (≤ 2)', 'Dexamethason p.o., klid.');
+  },
+  src: 'Westley et al., Am J Dis Child 1978.' });
+
+SC.push({ id: 'flacc', n: 'FLACC', g: 'Děti', d: 'Bolest u dětí 2 měsíce – 7 let',
+  desc: 'Pozoruj 1–5 minut. Pro děti, které bolest neumí vyjádřit.',
+  items: [opt('f', 'Face – obličej', [['Klidný, úsměv', 0], ['Občas grimasa, stažené obočí, nezájem', 1], ['Častá grimasa, sevřená čelist, třes brady', 2]], { col: true }), opt('l', 'Legs – nohy', [['Volné, uvolněné', 0], ['Neklidné, napjaté', 1], ['Kope, přitahuje', 2]], { col: true }), opt('a', 'Activity – aktivita', [['Leží klidně, volně se hýbe', 0], ['Vrtí se, přešlapuje, napjatý', 1], ['Prohnutý, ztuhlý, škubavé pohyby', 2]], { col: true }), opt('c', 'Cry – pláč', [['Bez pláče', 0], ['Sténá, kňourá, občas si stěžuje', 1], ['Trvalý pláč, křik, vzlyky', 2]], { col: true }), opt('co', 'Consolability – utišitelnost', [['Spokojený, uvolněný', 0], ['Utiší se dotykem, mluvením', 1], ['Těžko utišitelný', 2]], { col: true })],
+  calc(s) {
+    if (!Object.keys(s).length) return null; const v = sumOf(s, this.items);
+    if (v >= 7) return R(v, 'crit', 'Silná bolest (7–10)', 'Analgezie podle váhy (ResqPedi).');
+    if (v >= 4) return R(v, 'warn', 'Střední bolest (4–6)', 'Analgezie.');
+    return R(v, v ? 'warn' : 'ok', v ? 'Mírná bolest (1–3)' : 'Bez bolesti', '');
+  },
+  src: 'Merkel et al., Pediatr Nurs 1997.' });
+
+/* ===== KŘEHKOST ===== */
+SC.push({ id: 'cfs', n: 'Clinical Frailty Scale', g: 'Celkový stav a sepse', d: 'Křehkost – podklad pro intenzitu péče',
+  desc: 'Hodnoť stav 2 týdny před akutním onemocněním. Validní pro pacienty ≥ 65 let.',
+  items: [opt('c', 'Stav před onemocněním', [['1 – Velmi zdatný', 1, 'robustní, aktivní, pravidelně cvičí'], ['2 – Zdatný', 2, 'bez aktivní nemoci, občas sportuje'], ['3 – Zvládá dobře', 3, 'nemoci kompenzované, nad rámec chůze aktivní není'], ['4 – Velmi lehce křehký', 4, 'nezávislý, ale zpomalený, unavený'], ['5 – Lehce křehký', 5, 'potřebuje pomoc s nákupy, financemi, domácností'], ['6 – Středně křehký', 6, 'potřebuje pomoc venku i doma, se schody, koupáním'], ['7 – Těžce křehký', 7, 'zcela závislý v osobní péči, ale stabilní'], ['8 – Velmi těžce křehký', 8, 'zcela závislý, blíží se konec života'], ['9 – Terminálně nemocný', 9, 'očekávaná doba života < 6 měsíců']], { col: true, noPts: true })],
+  calc(s) { if (s.c == null) return null; const v = s.c + 1; return R(v, v <= 3 ? 'ok' : v <= 6 ? 'warn' : 'crit', this.items[0].o[s.c][0].replace(/^\d – /, ''), v >= 7 ? 'Zvaž přiměřenost intenzivní péče, dříve vyslovená přání, konzultace.' : v >= 5 ? 'Křehký pacient – vyšší riziko komplikací.' : ''); },
+  src: 'Rockwood et al., CMAJ 2005; CFS verze 2.0.' });
+
+/* ---------- čas od vzniku ---------- */
+function elapsed(hm) {
+  if (!hm) return null; const [h, m] = hm.split(':').map(Number); if (isNaN(h)) return null;
+  const n = new Date(), t = new Date(); t.setHours(h, m, 0, 0); if (t > n) t.setDate(t.getDate() - 1);
+  const min = Math.round((n - t) / 60000); return `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, '0')} min`;
+}
+
+/* ---------- stav ---------- */
+const ORDER = ['Celkový stav a sepse', 'Neurologie', 'Trauma', 'Dýchací cesty a prostředí', 'Tromboembolie', 'Děti'];
+const ST = {}; let cur = null;
+const st = (id) => (ST[id] = ST[id] || {});
+
+/* ---------- seznam ---------- */
+function renderList() {
+  const q = $('q').value.trim().toLowerCase();
+  const norm = (x) => x.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const qq = norm(q);
+  let h = '';
+  for (const g of ORDER) {
+    const xs = SC.filter((s) => s.g === g && (!qq || norm(s.n + ' ' + s.d).includes(qq)));
+    if (!xs.length) continue;
+    h += `<div class="grp">${g}</div>` + xs.map((s) => `<button type="button" class="sc" data-id="${s.id}" aria-current="${cur === s.id}"><span class="grow"><b>${esc(s.n)}</b><span class="s">${esc(s.d)}</span></span>${CHEV}</button>`).join('');
+  }
+  $('list').innerHTML = h || '<p class="muted" style="margin:16px 4px">Nic nenalezeno.</p>';
+}
+
+/* ---------- detail ---------- */
+function ptsBadge(p) { if (p == null) return ''; return `<span class="pts ${p >= 3 ? 'p3' : p >= 1 ? 'p1' : ''}">${p > 0 ? '+' : ''}${String(p).replace('.', ',')}</span>`; }
+function renderDetail() {
+  const S = SC.find((x) => x.id === cur);
+  document.body.classList.toggle('detail', !!S);
+  if (!S) { $('detail').innerHTML = window.innerWidth >= 900 ? '<div class="it glass"><p class="muted" style="margin:0">Vyber skóre vlevo.</p></div>' : ''; $('res').hidden = true; return; }
+  const s = st(S.id);
+  let h = `<div class="dhead"><button type="button" class="back" id="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>Skóre</button></div>
+    <div class="dhead"><h2>${esc(S.n)}</h2><button type="button" class="reset" id="reset">Vymazat</button></div><p class="ddesc">${esc(S.desc)}</p>`;
+  S.items.forEach((it) => { h += itemHtml(S, it, s); });
+  if (S.after) h += S.after;
+  h += `<p class="src">Zdroj: ${esc(S.src)}</p>`;
+  $('detail').innerHTML = h;
+  renderRes();
+}
+function itemHtml(S, it, s) {
+  if (it.k === 'note') return `<div class="note">${it.html}</div>`;
+  if (it.k === 'chk') return `<div class="it glass ${s[it.id] ? 'on' : ''}"><button type="button" class="chk" data-chk="${it.id}"><span class="bx">${CHECK}</span><span class="grow"><span class="q">${esc(it.t)}</span>${it.sub ? `<span class="qs">${esc(it.sub)}</span>` : ''}</span>${S.id === 'belfast' || S.id === 'ccs' || S.id === 'nexus' || S.id === 'perc' || S.id === 'qsofa' || S.id === 'lemon' ? '' : ptsBadge(it.v)}</button></div>`;
+  if (it.k === 'opt') {
+    const cur = s[it.id];
+    const p = cur != null && !it.noPts ? ptsBadge(it.o[cur][1]) : '';
+    return `<div class="it glass"><div class="q"><span class="grow">${esc(it.t)}</span>${p}</div><div class="opts ${it.col ? 'col' : ''}">${it.o.map(([l, v, sub], i) => `<button type="button" class="o" data-opt="${it.id}" data-i="${i}" aria-pressed="${cur === i}"><span class="grow">${esc(l)}${sub ? `<small>${esc(sub)}</small>` : ''}</span>${it.noPts ? '' : `<span class="v">${v > 0 ? '+' : ''}${v}</span>`}</button>`).join('')}</div></div>`;
+  }
+  if (it.k === 'num') {
+    const x = num(s[it.id]); const p = x != null && it.pts ? it.pts(x, s) : null;
+    return `<div class="it glass"><div class="q"><span class="grow">${esc(it.t)}</span><span data-pts="${it.id}">${ptsBadge(p)}</span></div><div class="numrow"><input type="text" inputmode="decimal" data-num="${it.id}" value="${esc(s[it.id] ?? '')}" placeholder="–" aria-label="${esc(it.t)}"><span class="muted">${esc(it.unit)}</span></div></div>`;
+  }
+  if (it.k === 'yn') return `<div class="it glass"><div class="q">${esc(it.t)}</div>${it.sub ? `<div class="qs">${esc(it.sub)}</div>` : ''}<div class="yn"><button type="button" class="y" data-yn="${it.id}" data-v="1" aria-pressed="${s[it.id] === true}">ANO</button><button type="button" class="n" data-yn="${it.id}" data-v="0" aria-pressed="${s[it.id] === false}">NE</button></div></div>`;
+  if (it.k === 'time') return `<div class="it glass"><div class="q">${esc(it.t)}</div>${it.sub ? `<div class="qs">${esc(it.sub)}</div>` : ''}<div class="numrow"><input type="time" data-time="${it.id}" value="${esc(s[it.id] ?? '')}"><button type="button" class="reset" data-now="${it.id}">Teď</button></div></div>`;
+  return '';
+}
+let lastRes = null;
+function renderRes() {
+  const S = SC.find((x) => x.id === cur); if (!S) return;
+  const r = S.calc(st(S.id)); lastRes = r;
+  const el = $('res'); el.hidden = false;
+  if (!r) { el.className = 'res none'; $('r-v').textContent = '–'; $('r-t').textContent = 'Výsledek'; $('r-x').textContent = 'Vyplň položky výše.'; return; }
+  el.className = 'res ' + (r.lvl || 'none');
+  $('r-v').textContent = r.v; $('r-t').textContent = r.t; $('r-x').textContent = r.x || '';
+}
+function summary() {
+  const S = SC.find((x) => x.id === cur), s = st(S.id), r = lastRes; if (!r) return '';
+  const parts = [];
+  S.items.forEach((it) => {
+    if (it.k === 'chk' && s[it.id]) parts.push(it.t);
+    if (it.k === 'opt' && s[it.id] != null) parts.push(`${it.t}: ${it.o[s[it.id]][0]}`);
+    if (it.k === 'num' && num(s[it.id]) != null) parts.push(`${it.t} ${s[it.id]} ${it.unit}`);
+    if (it.k === 'yn' && s[it.id] != null) parts.push(`${it.t}: ${s[it.id] ? 'ano' : 'ne'}`);
+    if (it.k === 'time' && s[it.id]) parts.push(`${it.t} ${s[it.id]}`);
+  });
+  return `${S.n}: ${r.v} – ${r.t}${r.x ? '. ' + r.x : ''}${parts.length ? '\n(' + parts.join('; ') + ')' : ''}`;
+}
+
+/* ---------- události ---------- */
+function open(id) { cur = id; renderList(); renderDetail(); window.scrollTo(0, 0); try { history.replaceState(null, '', '#' + id); } catch (e) {} }
+$('list').onclick = (e) => { const b = e.target.closest('[data-id]'); if (b) open(b.dataset.id); };
+$('q').oninput = renderList;
+$('detail').addEventListener('click', (e) => {
+  const S = SC.find((x) => x.id === cur); if (!S) return; const s = st(S.id); let b;
+  if (e.target.closest('#back')) { cur = null; renderList(); renderDetail(); try { history.replaceState(null, '', location.pathname); } catch (er) {} return; }
+  if (e.target.closest('#reset')) { ST[S.id] = {}; renderDetail(); return; }
+  if ((b = e.target.closest('[data-jump]'))) { open(b.dataset.jump); return; }
+  if ((b = e.target.closest('[data-chk]'))) { s[b.dataset.chk] = !s[b.dataset.chk]; b.closest('.it').classList.toggle('on', !!s[b.dataset.chk]); renderRes(); return; }
+  if ((b = e.target.closest('[data-opt]'))) { const k = b.dataset.opt, i = +b.dataset.i; s[k] = s[k] === i ? null : i; renderDetail(); return; }
+  if ((b = e.target.closest('[data-yn]'))) { const k = b.dataset.yn, v = b.dataset.v === '1'; s[k] = s[k] === v ? null : v; renderDetail(); return; }
+  if ((b = e.target.closest('[data-now]'))) { const n = new Date(); s[b.dataset.now] = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0'); renderDetail(); return; }
+});
+$('detail').addEventListener('input', (e) => {
+  const S = SC.find((x) => x.id === cur); if (!S) return; const s = st(S.id), t = e.target;
+  if (t.dataset.num) {
+    s[t.dataset.num] = t.value; const it = S.items.find((x) => x.id === t.dataset.num), x = num(t.value);
+    const pe = document.querySelector(`[data-pts="${it.id}"]`); if (pe) pe.innerHTML = x != null && it.pts ? ptsBadge(it.pts(x, s)) : '';
+    renderRes();
+  }
+  if (t.dataset.time) { s[t.dataset.time] = t.value; renderRes(); }
+});
+// SpO2 body závisí na škále a O2 – po změně je překreslit
+$('r-cp').onclick = async () => {
+  const t = summary(); if (!t) { toast('Není co kopírovat'); return; }
+  try { await navigator.clipboard.writeText(t); toast('Zkopírováno'); } catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('Zkopírováno'); } catch (er) { toast('Kopírování se nepovedlo'); } ta.remove(); }
+};
+let toastT = null;
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2000); }
+try { const t = localStorage.getItem('resqscore:theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+$('b-theme').onclick = () => {
+  const c = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const n = c === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; try { localStorage.setItem('resqscore:theme', n); } catch (e) {}
+};
+window.addEventListener('resize', () => { if (!cur) renderDetail(); });
+setInterval(() => { if (cur === 'belfast' || cur === 'fastplus') renderRes(); }, 30000);
+const h0 = location.hash.slice(1); if (SC.some((x) => x.id === h0)) cur = h0;
+renderList(); renderDetail();
+</script>
+</body>
+</html>
