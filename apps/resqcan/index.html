@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqCAN</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqCAN">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+/* ResqCAN – podezření na týrání a zanedbávání dítěte. Vzhled sladěný s ResqHubem. */
+:root {
+  --bg: #E4EEEF; --ink: #0A1F23; --ink-2: rgba(10, 31, 35, .6); --ink-3: rgba(10, 31, 35, .36);
+  --petrol: #0B6E79; --petrol-soft: rgba(11, 110, 121, .12); --on-petrol: #FFFFFF;
+  --warn: #B26A00; --warn-soft: rgba(242, 154, 31, .17);
+  --crit: #D0303A; --crit-soft: rgba(229, 56, 59, .14);
+  --glow-a: rgba(11, 110, 121, .5); --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .6); --glass-strong: rgba(250, 253, 253, .96);
+  --glass-edge: rgba(255, 255, 255, .8); --glass-hi: rgba(255, 255, 255, .95); --glass-shadow: rgba(6, 55, 62, .13);
+  --hairline: rgba(10, 31, 35, .1); --fill: rgba(10, 31, 35, .06);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+    --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+  --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden; font-family: var(--font); font-size: 17px; line-height: 1.3; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; padding: 0; }
+svg { display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%); border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -12px var(--glass-shadow); }
+
+/* ---- ResqCAN ---- */
+:root { --ok: #17915A; --ok-soft: rgba(23, 145, 90, .13); --vio: #6A4BC4; --vio-soft: rgba(106, 75, 196, .13); }
+:root[data-theme="dark"] { --ok: #4FD08F; --ok-soft: rgba(79, 208, 143, .15); --vio: #A994F2; --vio-soft: rgba(169, 148, 242, .16); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ok: #4FD08F; --ok-soft: rgba(79, 208, 143, .15); --vio: #A994F2; --vio-soft: rgba(169, 148, 242, .16); } }
+html { touch-action: manipulation; }
+.wrap { max-width: 860px; margin: 0 auto; padding: max(12px, var(--st)) 14px calc(110px + var(--sb)); }
+.head { display: flex; align-items: center; gap: 8px; padding: 6px 2px 10px; }
+.head h1 { margin: 0; font-family: var(--font-display); font-size: 32px; font-weight: 800; letter-spacing: -.04em; line-height: 1; flex: 1; }
+.head h1 small { display: block; font-family: var(--font); font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--ink-2); margin-top: 4px; }
+.round { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--ink); }
+.round svg { width: 20px; height: 20px; }
+
+.tabs { display: flex; gap: 2px; padding: 4px; border-radius: 16px; margin-bottom: 14px; background: var(--glass-strong) !important; overflow-x: auto; scrollbar-width: none; position: sticky; top: max(6px, var(--st)); z-index: 5; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { flex: 1 0 auto; height: 40px; padding: 0 11px; border-radius: 12px; font-weight: 700; font-size: 14.5px; color: var(--ink-2); white-space: nowrap; }
+.tabs button[aria-selected="true"] { background: var(--petrol); color: var(--on-petrol); }
+.view { display: none; } .view.on { display: block; }
+
+.card { border-radius: 22px; padding: 14px 16px; margin-bottom: 12px; background: var(--glass-strong); border: 1px solid var(--glass-edge); box-shadow: 0 8px 24px -16px var(--glass-shadow); }
+.card h3 { margin: 0 0 8px; font-size: 13px; font-weight: 750; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
+.card h3 .n { margin-left: auto; font-family: var(--font-round); font-size: 13px; letter-spacing: 0; color: var(--petrol); }
+.card p { margin: 0 0 8px; font-size: 15px; line-height: 1.45; }
+.card p:last-child { margin-bottom: 0; }
+.lead { font-size: 14.5px; color: var(--ink-2); line-height: 1.45; margin: 0 2px 12px; }
+
+/* kroky */
+.step { display: flex; gap: 12px; align-items: flex-start; }
+.step .num { width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; font-family: var(--font-round); font-weight: 800; font-size: 17px; background: var(--petrol-soft); color: var(--petrol); flex: none; }
+.step.s2 .num { background: var(--warn-soft); color: var(--warn); }
+.step.s3 .num { background: var(--crit-soft); color: var(--crit); }
+.step .grow { flex: 1; min-width: 0; }
+.step b.t { display: block; font-size: 17px; font-weight: 800; letter-spacing: -.01em; margin: 5px 0 2px; }
+.step .q { font-size: 14px; color: var(--ink-2); }
+
+/* checklist */
+.chk { display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left; padding: 9px 2px; border-top: 1px solid var(--hairline); font-size: 15px; line-height: 1.35; }
+.chk:first-of-type { border-top: 0; }
+.chk .bx { width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--ink-3); flex: none; display: grid; place-items: center; margin-top: -1px; }
+.chk .bx svg { width: 15px; height: 15px; opacity: 0; }
+.chk small { display: block; font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+.chk[aria-pressed="true"] .bx { background: var(--warn); border-color: var(--warn); color: #fff; }
+.chk[aria-pressed="true"] .bx svg { opacity: 1; }
+.chk.doc[aria-pressed="true"] .bx { background: var(--ok); border-color: var(--ok); }
+.grp-t { font-size: 14px; font-weight: 800; margin: 14px 0 2px; display: flex; align-items: center; gap: 8px; }
+.grp-t:first-child { margin-top: 0; }
+.grp-t .c { font-family: var(--font-round); font-size: 12.5px; padding: 1px 8px; border-radius: 8px; background: var(--warn-soft); color: var(--warn); }
+.grp-t .c:empty { display: none; }
+
+.age { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 6px; }
+.age button { height: 36px; padding: 0 12px; border-radius: 11px; background: var(--fill); font-size: 14px; font-weight: 650; }
+.age button[aria-pressed="true"] { background: var(--petrol); color: var(--on-petrol); }
+.agenote { font-size: 13.5px; padding: 9px 12px; border-radius: 13px; background: var(--warn-soft); color: var(--ink); line-height: 1.4; margin-top: 6px; }
+.agenote b { color: var(--warn); }
+
+.act { margin: 0; padding: 0; list-style: none; }
+.act li { position: relative; padding: 8px 0 8px 26px; border-top: 1px solid var(--hairline); font-size: 15px; line-height: 1.4; }
+.act li:first-child { border-top: 0; }
+.act li::before { content: ""; position: absolute; left: 4px; top: 15px; width: 9px; height: 9px; border-radius: 3px; background: var(--petrol); }
+.act li small { display: block; font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+.act li .law { font-weight: 650; color: var(--petrol); white-space: nowrap; }
+.act.warn li::before { background: var(--warn); } .act.crit li::before { background: var(--crit); }
+.call { display: flex; align-items: center; justify-content: center; gap: 10px; height: 54px; border-radius: 17px; background: var(--crit); color: #fff; font-weight: 800; font-size: 18px; text-decoration: none; margin-top: 10px; }
+.call svg { width: 22px; height: 22px; }
+.call.sec { background: var(--fill); color: var(--ink); font-size: 16px; height: 48px; }
+
+/* znaky */
+.mn { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; margin: 4px 0 10px; }
+.mn span { display: grid; place-items: center; height: 42px; border-radius: 11px; background: var(--crit-soft); color: var(--crit); font-family: var(--font-round); font-weight: 800; font-size: 20px; }
+.mnl { margin: 0; padding: 0; list-style: none; }
+.mnl li { display: flex; gap: 10px; padding: 7px 0; border-top: 1px solid var(--hairline); font-size: 15px; }
+.mnl li:first-child { border-top: 0; }
+.mnl li b { width: 26px; flex: none; font-family: var(--font-round); font-weight: 800; color: var(--crit); }
+.mnl li small { color: var(--ink-2); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+@media (max-width: 560px) { .two { grid-template-columns: minmax(0, 1fr); } }
+.box { border-radius: 16px; padding: 10px 12px; }
+.box.bad { background: var(--crit-soft); } .box.ok { background: var(--ok-soft); }
+.box b { display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+.box.bad b { color: var(--crit); } .box.ok b { color: var(--ok); }
+.box ul { margin: 0; padding-left: 18px; font-size: 14.5px; line-height: 1.4; }
+.box li { margin: 3px 0; }
+ul.pl { margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.45; }
+ul.pl li { margin: 4px 0; }
+.say { border-left: 3px solid var(--petrol); padding: 6px 12px; margin: 8px 0; font-size: 15px; font-style: italic; background: var(--petrol-soft); border-radius: 0 12px 12px 0; }
+details.sec { border-top: 1px solid var(--hairline); padding: 4px 0; }
+details.sec:first-of-type { border-top: 0; }
+details.sec summary { list-style: none; cursor: pointer; padding: 8px 0; font-weight: 750; font-size: 15.5px; display: flex; align-items: center; gap: 8px; }
+details.sec summary::-webkit-details-marker { display: none; }
+details.sec summary::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 2px solid var(--ink-3); border-bottom: 2px solid var(--ink-3); transform: rotate(45deg); transition: .15s; }
+details.sec[open] summary::after { transform: rotate(-135deg); }
+details.sec > div { padding: 0 0 10px; }
+
+/* T74 */
+.t74 { display: grid; gap: 6px; }
+.t74 button { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border-radius: 13px; background: var(--fill); text-align: left; font-size: 15px; }
+.t74 button b { font-family: var(--font-round); font-weight: 800; width: 52px; flex: none; }
+.t74 button[aria-pressed="true"] { background: var(--petrol); color: var(--on-petrol); }
+
+/* právo */
+.lawc { padding: 10px 0; border-top: 1px solid var(--hairline); }
+.lawc:first-of-type { border-top: 0; padding-top: 2px; }
+.lawc .h { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.lawc .h b { font-size: 15.5px; font-weight: 800; }
+.lawc .h span { font-size: 12.5px; color: var(--petrol); font-weight: 700; }
+.lawc p { font-size: 14.5px; margin: 4px 0 0; color: var(--ink); }
+.lawc details summary { font-size: 13.5px; font-weight: 650; color: var(--petrol); cursor: pointer; margin-top: 6px; list-style: none; }
+.lawc details summary::-webkit-details-marker { display: none; }
+.verb { margin-top: 6px; padding: 10px 12px; border-radius: 13px; background: var(--fill); font-size: 14px; line-height: 1.5; }
+.verb p { margin: 0 0 5px; } .verb p.l1 { padding-left: 18px; }
+.tel { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--hairline); text-decoration: none; color: inherit; }
+.tel:first-of-type { border-top: 0; }
+.tel .grow { flex: 1; min-width: 0; }
+.tel b { display: block; font-size: 15.5px; }
+.tel span { font-size: 13px; color: var(--ink-2); }
+.tel .num { font-family: var(--font-round); font-weight: 800; font-size: 18px; color: var(--petrol); }
+
+/* spodní lišta */
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding: 10px 14px calc(10px + var(--sb)); }
+.bar .in { max-width: 860px; margin: 0 auto; display: flex; gap: 8px; align-items: center; padding: 8px; border-radius: 20px; background: var(--glass-strong); border: 1px solid var(--glass-edge); box-shadow: 0 10px 30px -10px var(--glass-shadow); }
+.bar .cnt { flex: 1; min-width: 0; padding-left: 8px; font-size: 13px; color: var(--ink-2); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar .cnt span { display: block; overflow: hidden; text-overflow: ellipsis; }
+.bar .cnt b { display: block; font-size: 15.5px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; }
+.bar .rs { width: 46px; padding: 0 !important; display: grid; place-items: center; }
+.bar .rs svg { width: 20px; height: 20px; }
+.bar button { height: 46px; padding: 0 14px; border-radius: 14px; font-weight: 750; font-size: 15px; }
+.bar .cp { background: var(--petrol); color: var(--on-petrol); display: flex; align-items: center; gap: 8px; }
+.bar .cp svg { width: 18px; height: 18px; }
+.bar .rs { background: var(--fill); }
+.foot { font-size: 12.5px; color: var(--ink-3); line-height: 1.45; margin: 18px 4px 0; }
+.foot a { color: var(--ink-2); }
+.toast { position: fixed; left: 50%; bottom: calc(96px + var(--sb)); transform: translate(-50%, 20px); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 14px; font-size: 14.5px; font-weight: 650; opacity: 0; pointer-events: none; transition: .2s; z-index: 50; max-width: calc(100vw - 32px); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+@media print { .tabs, .bar, .head .round { display: none !important; } .view { display: block !important; } }
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="head">
+    <h1>ResqCAN<small>Podezření na týrání a zanedbávání dítěte</small></h1>
+    <button type="button" class="round glass" id="b-theme" aria-label="Přepnout světlý nebo tmavý režim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+  </header>
+  <nav class="tabs glass" role="tablist">
+    <button type="button" data-tab="postup" aria-selected="true">Postup</button>
+    <button type="button" data-tab="znaky" aria-selected="false">Znaky</button>
+    <button type="button" data-tab="kom" aria-selected="false">Komunikace</button>
+    <button type="button" data-tab="dok" aria-selected="false">Dokumentace</button>
+    <button type="button" data-tab="pravo" aria-selected="false">Právo</button>
+  </nav>
+  <section class="view on" id="v-postup"></section>
+  <section class="view" id="v-znaky"></section>
+  <section class="view" id="v-kom"></section>
+  <section class="view" id="v-dok"></section>
+  <section class="view" id="v-pravo"></section>
+  <p class="foot">Zpracováno podle materiálů <a href="https://urgmed.cz/wp-content/uploads/2025/10/Urgentni_medicina_syndrom_CAN_prirucka_tiskova_verze_final.pdf" target="_blank" rel="noopener">Syndrom CAN v urgentní medicíně – příručka</a> a <a href="https://urgmed.cz/wp-content/uploads/2025/10/Urgentni_medicina_syndrom_CAN_karty_tiskova_verze_final.pdf" target="_blank" rel="noopener">karty</a> (Nadace Sirius ve spolupráci se SUMMK ČLS JEP, 2025). Pomůcka nenahrazuje klinický úsudek ani interní postupy ZZS. Zaškrtnuté údaje se nikam neukládají – po zavření appky zmizí.</p>
+</div>
+<div class="bar"><div class="in">
+  <div class="cnt"><b id="b-n">0 varovných znaků</b><span id="b-s">Zaškrtej, co vidíš</span></div>
+  <button type="button" class="rs" id="b-reset" aria-label="Nový případ" title="Nový případ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/></svg></button>
+  <button type="button" class="cp" id="b-copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Kopírovat</button>
+</div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+// Doslovná znění z ResqLexu (e-Sbírka, informativní znění)
+const LAW = {"372/35": ["(3) Jde-li o zdravotní služby, které spočívají v poskytnutí", "a) neodkladné péče, která není péčí podle § 38 odst. 4, nebo", "b) akutní péče, a", "souhlas zákonného zástupce nelze získat bez zbytečného odkladu, rozhodne o jejich poskytnutí ošetřující zdravotnický pracovník. To neplatí, lze-li zdravotní služby poskytnout podle odstavce 1 na základě souhlasu nezletilého pacienta.", "(5) Jde-li o pacienta uvedeného v § 28 odst. 5, poskytovatel vyloučí, má-li podezření, že na tomto pacientovi bylo spácháno domácí nebo sexuální násilí nebo že je tento pacient jinak zneužíván nebo týrán, popřípadě, že je ohrožován jeho zdravý vývoj, přítomnost osob uvedených v § 28 odst. 3 písm. e) při poskytování zdravotních služeb, pokud jde o vyšetření za účelem vyloučení známek uvedených skutečností."], "372/38": ["(2) Nezletilého pacienta nebo pacienta s ustanoveným zástupcem lze bez souhlasu osob uvedených v § 28 odst. 3 písm. e) bodech 1 a 2 hospitalizovat též v případě, jde-li o podezření na domácí nebo sexuální násilí nebo jiné týrání, zneužívání nebo zanedbávání.", "(5) Nezletilému pacientovi nebo pacientovi s ustanoveným zástupcem lze poskytnout neodkladnou péči bez souhlasu osob uvedených v § 28 odst. 3 písm. e) bodech 1 a 2, pokud je u něj podezření na domácí nebo sexuální násilí nebo jiné týrání, zneužívání nebo zanedbávání."], "372/32": ["(3) Poskytovatel může v nezbytném rozsahu zadržet informaci o zdravotním stavu nezletilého pacienta jeho zákonnému zástupci, pěstounovi nebo jiné pečující osobě v případě podezření, že se tato osoba na něm dopouští domácího nebo sexuálního násilí nebo se podílí na zneužívání nebo týrání nebo ohrožování zdravého vývoje tohoto nezletilého pacienta, lze-li předpokládat, že poskytnutím této informace by mohlo dojít k ohrožení pacienta. Obdobně se postupuje, jde-li o pacienta s ustanoveným zástupcem."], "TZ/367": ["(1) Kdo se hodnověrným způsobem dozví, že jiný připravuje nebo páchá trestný čin vraždy (§ 140), zabití (§ 141), těžkého ublížení na zdraví (§ 145), mučení a jiného nelidského a krutého zacházení (§ 149), nedovoleného přerušení těhotenství bez souhlasu těhotné ženy (§ 159), neoprávněného odebrání tkání a orgánů (§ 164), obchodování s lidmi (§ 168), zbavení osobní svobody (§ 170), zavlečení podle § 172 odst. 2 a 3, loupeže (§ 173), braní rukojmí (§ 174), vydírání podle § 175 odst. 3 a 4, neoprávněného nakládání s osobními údaji podle § 180 odst. 4, znásilnění (§ 185), sexuálního útoku (§ 185a), sexuálního nátlaku (§ 186), pohlavního zneužití (§ 187), zneužití dítěte k výrobě pornografie (§ 193), týrání svěřené osoby (§ 198), krádeže podle § 205 odst. 4, zpronevěry podle § 206 odst. 4, podvodu podle § 209 odst. 4, pojistného podvodu podle § 210 odst. 5, úvěrového podvodu podle § 211 odst. 5, dotačního podvodu podle § 212 odst. 5, legalizace výnosů z trestné činnosti podle § 216 odst. 4 a 5, padělání a pozměnění peněz (§ 233), neoprávněného opatření, padělání a pozměnění platebního prostředku (§ 234), neoprávněné výroby peněz (§ 237), zneužití informace v obchodním styku podle § 255 odst. 4, zneužití postavení v obchodním styku podle § 255a odst. 3, poškození finančních zájmů Evropské unie podle § 260 odst. 5, porušení předpisů o kontrole vývozu zboží a technologií dvojího užití (§ 262), porušení povinností při vývozu zboží a technologií dvojího užití (§ 263), provedení zahraničního obchodu s vojenským materiálem bez povolení nebo licence (§ 265), porušení povinnosti v souvislosti s vydáním povolení a licence pro zahraniční obchod s vojenským materiálem (§ 266), obecného ohrožení (§ 272), vývoje, výroby a držení zakázaných bojových prostředků (§ 280), nedovolené výroby a držení radioaktivní látky a vysoce nebezpečné látky (§ 281), nedovolené výroby a držení jaderného materiálu a zvláštního štěpného materiálu (§ 282), neoprávněné výroby a jiného nakládání s omamnými nebo psychotropními látkami, s rostlinami nebo houbami je obsahujícími nebo s jedy (§ 283), získání kontroly nad vzdušným dopravním prostředkem, civilním plavidlem a pevnou plošinou (§ 290), zavlečení vzdušného dopravního prostředku do ciziny (§ 292), vlastizrady (§ 309), rozvracení republiky (§ 310), teroristického útoku (§ 311), teroru (§ 312), účasti na teroristické skupině (§ 312a), financování terorismu (§ 312d), podpory a propagace terorismu (§ 312e), vyhrožování teroristickým trestným činem (§ 312f), sabotáže (§ 314), vyzvědačství (§ 316), ohrožení utajované informace (§ 317), neoprávněné činnosti pro cizí moc (§ 318a), válečné zrady (§ 320), násilí proti orgánu veřejné moci podle § 323 odst. 3 a 4, násilí proti úřední osobě podle § 325 odst. 3 a 4, přijetí úplatku (§ 331), podplacení (§ 332), násilného překročení státní hranice podle § 339 odst. 2 a 3, organizování a umožnění nedovoleného překročení státní hranice podle § 340 odst. 4, vzpoury vězňů (§ 344), neuposlechnutí rozkazu podle § 375 odst. 2 a 3, zprotivení a donucení k porušení vojenské povinnosti podle § 377 odst. 2 a 3, porušování práv a chráněných zájmů vojáků stejné hodnosti podle § 382 odst. 3 a 4, porušování práv a chráněných zájmů vojáků podřízených nebo s nižší hodností podle § 383 odst. 3 a 4, zběhnutí (§ 386), ohrožování morálního stavu vojáků podle § 392 odst. 2, genocidia (§ 400), útoku proti lidskosti (§ 401), apartheidu a diskriminace skupiny lidí (§ 402), agrese (§ 405a), přípravy útočné války (§ 406), styků ohrožujících mír (§ 409), použití zakázaného bojového prostředku a nedovoleného vedení boje (§ 411), válečné krutosti (§ 412), perzekuce obyvatelstva (§ 413), plenění v prostoru válečných operací (§ 414) nebo zneužití mezinárodně uznávaných a státních znaků podle § 415 odst. 3, a spáchání nebo dokončení takového trestného činu nepřekazí, bude potrestán odnětím svobody až na tři léta; stanoví-li tento zákon na některý z těchto trestných činů trest mírnější, bude potrestán oním trestem mírnějším.", "(2) Kdo spáchá čin uvedený v odstavci 1, není trestný, nemohl-li trestný čin překazit bez značných nesnází nebo aniž by sebe nebo osobu blízkou uvedl v nebezpečí smrti, ublížení na zdraví, jiné závažné újmy nebo trestního stíhání. Uvedení osoby blízké v nebezpečí trestního stíhání však nezbavuje pachatele trestní odpovědnosti, týká-li se nepřekažení trestného činu vlastizrady (§ 309), rozvracení republiky (§ 310), teroristického útoku (§ 311), teroru (§ 312), účasti na teroristické skupině (§ 312a), financování terorismu (§ 312d), podpory a propagace terorismu (§ 312e), vyhrožování teroristickým trestným činem (§ 312f), sabotáže (§ 314), vyzvědačství (§ 316), neoprávněné činnosti pro cizí moc (§ 318a), genocidia (§ 400), útoku proti lidskosti (§ 401), apartheidu a diskriminace skupiny lidí (§ 402), agrese (§ 405a), přípravy útočné války (§ 406), použití zakázaného bojového prostředku a nedovoleného vedení boje (§ 411), válečné krutosti (§ 412), perzekuce obyvatelstva (§ 413), plenění v prostoru válečných operací (§ 414) a zneužití mezinárodně uznávaných a státních znaků podle § 415 odst. 3.", "(3) Překazit trestný čin lze i jeho včasným oznámením státnímu zástupci nebo policejnímu orgánu; voják může místo toho učinit oznámení nadřízenému."], "TZ/368": ["(1) Kdo se hodnověrným způsobem dozví, že jiný spáchal trestný čin vraždy (§ 140), těžkého ublížení na zdraví (§ 145), mučení a jiného nelidského a krutého zacházení (§ 149), obchodování s lidmi (§ 168), zbavení osobní svobody (§ 170), braní rukojmí (§ 174), zneužití dítěte k výrobě pornografie (§ 193), týrání svěřené osoby (§ 198), padělání a pozměnění peněz (§ 233), neoprávněného opatření, padělání a pozměnění platebního prostředku (§ 234), neoprávněné výroby peněz (§ 237), porušení předpisů o kontrole vývozu zboží a technologií dvojího užití (§ 262), porušení povinností při vývozu zboží a technologií dvojího užití (§ 263), provedení zahraničního obchodu s vojenským materiálem bez povolení nebo licence (§ 265), porušení povinnosti v souvislosti s vydáním povolení a licence pro zahraniční obchod s vojenským materiálem (§ 266), obecného ohrožení (§ 272), vývoje, výroby a držení zakázaných bojových prostředků (§ 280), nedovolené výroby a držení radioaktivní látky a vysoce nebezpečné látky (§ 281), nedovolené výroby a držení jaderného materiálu a zvláštního štěpného materiálu (§ 282), získání kontroly nad vzdušným dopravním prostředkem, civilním plavidlem a pevnou plošinou (§ 290), zavlečení vzdušného dopravního prostředku do ciziny (§ 292), vlastizrady (§ 309), rozvracení republiky (§ 310), teroristického útoku (§ 311), teroru (§ 312), účasti na teroristické skupině (§ 312a), financování terorismu (§ 312d), podpory a propagace terorismu (§ 312e), sabotáže (§ 314), vyzvědačství (§ 316), ohrožení utajované informace (§ 317), neoprávněné činnosti pro cizí moc (§ 318a), válečné zrady (§ 320), přijetí úplatku (§ 331), podplacení (§ 332), genocidia (§ 400), útoku proti lidskosti (§ 401), apartheidu a diskriminace skupiny lidí (§ 402), agrese (§ 405a), přípravy útočné války (§ 406), použití zakázaného bojového prostředku a nedovoleného vedení boje (§ 411), válečné krutosti (§ 412), perzekuce obyvatelstva (§ 413), plenění v prostoru válečných operací (§ 414) nebo zneužití mezinárodně uznávaných a státních znaků podle § 415 odst. 3, a takový trestný čin neoznámí bez odkladu státnímu zástupci nebo policejnímu orgánu nebo místo toho, jde-li o vojáka, nadřízenému, bude potrestán odnětím svobody až na tři léta; stanoví-li tento zákon na některý z těchto trestných činů trest mírnější, bude potrestán oním trestem mírnějším.", "(2) Kdo spáchá čin uvedený v odstavci 1, není trestný, nemohl-li oznámení učinit, aniž by sebe nebo osobu blízkou uvedl v nebezpečí smrti, ublížení na zdraví, jiné závažné újmy nebo trestního stíhání.", "(3) Oznamovací povinnost podle odstavce 1 nemá advokát nebo jeho zaměstnanec, který se dozví o spáchání trestného činu v souvislosti s výkonem advokacie nebo právní praxe. Oznamovací povinnost nemá také duchovní registrované církve a náboženské společnosti s oprávněním k výkonu zvláštních práv, dozví-li se o spáchání trestného činu v souvislosti s výkonem zpovědního tajemství nebo v souvislosti s výkonem práva obdobného zpovědnímu tajemství. Oznamovací povinnost trestného činu obchodování s lidmi podle § 168 odst. 2 a zbavení osobní svobody (§ 170) nemá též osoba poskytující pomoc obětem trestných činů."]};
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+const PHONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 0-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>';
+
+/* ---------- varovné znaky (vlastní formulace podle karet a příručky) ---------- */
+const FLAGS = [
+  { g: 'Poranění', items: [
+    ['p1', 'Poranění na typickém místě – ÚTTOK 4 UFO', 'úhel čelisti, trup, tvář, oko, krk, ucho, uzdička, otisk předmětu'],
+    ['p2', 'Mnohočetné hematomy nebo poranění různého stáří'],
+    ['p3', 'Vzorované poranění', 'otisk ruky, předmětu, kousnutí, štípnutí'],
+    ['p4', 'Popálenina podezřelého tvaru', 'ponoření („ponožky“, „rukavičky“), cigareta, žehlička'],
+    ['p5', 'Poranění uzdičky (frenula) u kojence nebo batolete', 'varovné poranění – často předchází závažnému poranění hlavy'],
+    ['p6', 'Poranění na místech krytých oděvem nebo na předloktí', 'předloktí = krytí obličeje rukama'],
+    ['p7', 'Známky poranění hlavy u kojence', 'podrážděnost, apatie, zvracení, křeče, vyklenutá fontanela, apnoe'],
+  ] },
+  { g: 'Anamnéza úrazu', items: [
+    ['a1', 'Mechanismus neodpovídá poranění, věku nebo vývoji dítěte', 'např. „spadl z gauče“ u zlomeniny femuru kojence'],
+    ['a2', 'Vysvětlení chybí nebo je vágní', '„nevím“, „modřiny se mu dělají samy“'],
+    ['a3', 'Výpověď se mění nebo se liší dítě × doprovod'],
+    ['a4', 'Opakované úrazy, starší poranění bez vysvětlení'],
+    ['a5', 'Prodleva ve vyhledání pomoci'],
+    ['a6', 'Podezření na sebepoškození nebo pokus o sebevraždu'],
+  ] },
+  { g: 'Dítě a doprovod', items: [
+    ['c1', 'Doprovod skáče do řeči nebo odpovídá za dítě'],
+    ['c2', 'Doprovod je slovně nebo fyzicky agresivní'],
+    ['c3', 'Dítě se doprovodu bojí, je nápadně tiché nebo „zamrzlé“'],
+    ['c4', 'Doprovod brání vyšetření nebo převozu'],
+    ['c5', 'Známky poranění i u dalších osob v domácnosti'],
+    ['c6', 'Intoxikace dítěte nebo pečující osoby'],
+  ] },
+  { g: 'Prostředí a péče', items: [
+    ['e1', 'Zanedbaná hygiena, podvýživa, neprospívání'],
+    ['e2', 'Špína, zápach, plíseň v bytě'],
+    ['e3', 'Nebezpečné předměty nebo situace, dítě bez dohledu'],
+    ['e4', 'Rozbité věci – známky násilí v domácnosti'],
+    ['e5', 'Chybí základní vybavení pro dítě', 'kde spí, co jí, oblečení'],
+  ] },
+  { g: 'Možné sexuální zneužití', items: [
+    ['x1', 'Poranění nebo hematomy v genitální či anální oblasti'],
+    ['x2', 'Výtok u malé dívky, těhotenství nezletilé'],
+    ['x3', 'Chování nebo znalosti v sexuální oblasti neodpovídající věku'],
+    ['x4', 'Výrazná regrese ve vývoji, vyhýbání se doteku'],
+  ] },
+];
+const AGES = [
+  ['m4', '≤ 4 měsíce', '<b>Jakýkoli hematom</b> kdekoli na těle je u dítěte do 4 měsíců (včetně) podezřelý.'],
+  ['nm', 'Nechodící dítě', 'U dítěte, které se samo nepohybuje, je <b>samotný hematom</b> podezřelý – modřiny vznikají až s pohybem.'],
+  ['y1', 'Do 1 roku', 'Pozor na poranění <b>lebky, žeber a dlouhých kostí</b>. Zlomenina femuru či humeru do 1 roku je podezřelá.'],
+  ['y2', 'Do 2 let', 'Při podezření se v nemocnici dělá <b>kostní protokol</b> (skryté a starší zlomeniny) – důvod k převozu.'],
+  ['ok', 'Starší dítě', 'Vyptej se i dítěte – <b>odděleně</b> od doprovodu, otevřenými otázkami.'],
+];
+const DOCS = [
+  ['d1', 'Datum a čas vyšetření'],
+  ['d2', 'Osobní údaje dítěte a doprovodu', 'kdo je doprovod, adresa, kontakt, pojišťovna, praktický lékař pro děti'],
+  ['d3', 'Anamnéza úrazu co nejdoslovněji', 'od dítěte i doprovodu – liší-li se, zapiš obě verze'],
+  ['d4', 'Zhodnocení, zda mechanismus odpovídá věku a vývoji dítěte'],
+  ['d5', 'Popis všech nálezů', 'umístění, velikost, tvar, barva, odhad stáří; pomůže nákres'],
+  ['d6', 'Fotodokumentace s měřítkem', 'podle pravidel ZZS; ve zprávě uveď, že byla pořízena pro podezření na CAN'],
+  ['d7', 'Chování dítěte a doprovodu', 'věcně, bez hodnocení – co kdo řekl a udělal'],
+  ['d8', 'Převoz / odmítnutí převozu a komu bylo podezření předáno', 'jméno lékaře, čas'],
+  ['d9', 'Komu bylo oznámeno', 'Policie ČR / OSPOD – způsob, čas, jméno kontaktní osoby'],
+  ['d10', 'Diagnóza poranění + kód T74'],
+];
+const T74 = [['T74.0', 'Zanedbání nebo opuštění'], ['T74.1', 'Tělesné týrání'], ['T74.2', 'Pohlavní zneužívání'], ['T74.3', 'Psychologické týrání'], ['T74.8', 'Jiné syndromy týrání'], ['T74.9', 'Syndrom týrání NS']];
+
+/* ---------- stav (jen v paměti) ---------- */
+const st = { f: new Set(), d: new Set(), age: '', t74: '' };
+const ALLF = Object.fromEntries(FLAGS.flatMap((g) => g.items.map((i) => [i[0], { t: i[1], g: g.g }])));
+
+const chk = (id, t, s, cls, on) => `<button type="button" class="chk ${cls}" data-${cls === 'doc' ? 'd' : 'f'}="${id}" aria-pressed="${on}"><span class="bx">${CHECK}</span><span>${esc(t)}${s ? `<small>${esc(s)}</small>` : ''}</span></button>`;
+
+function renderPostup() {
+  const a = AGES.find((x) => x[0] === st.age);
+  $('v-postup').innerHTML = `
+  <p class="lead">Tři kroky z karty pro ZZS. Zaškrtej, co vidíš – dole si to pak zkopíruješ do dokumentace.</p>
+  <div class="card"><div class="step"><span class="num">1</span><div class="grow"><b class="t">Zraněné dítě a něco nesedí</b><div class="q">Odpovídá poranění mechanismu a věku? Úrazy staršího data? Jak se chová dítě a doprovod?</div></div></div></div>
+  <div class="card"><h3>Věk dítěte</h3>
+    <div class="age">${AGES.map(([id, l]) => `<button type="button" data-age="${id}" aria-pressed="${st.age === id}">${l}</button>`).join('')}</div>
+    ${a ? `<div class="agenote">${a[2]}</div>` : ''}</div>
+  <div class="card"><h3>Varovné znaky <span class="n">${st.f.size || ''}</span></h3>
+    ${FLAGS.map((g) => { const n = g.items.filter((i) => st.f.has(i[0])).length; return `<div class="grp-t">${esc(g.g)}<span class="c">${n || ''}</span></div>` + g.items.map((i) => chk(i[0], i[1], i[2], 'flag', st.f.has(i[0]))).join(''); }).join('')}
+  </div>
+  <div class="card"><div class="step s2"><span class="num">2</span><div class="grow"><b class="t">Máš podezření na týrání nebo zanedbávání?</b><div class="q">Stačí důvodné podezření – jistotu mít nemusíš a důkazy nezajišťuješ.</div></div></div>
+    <ul class="act warn" style="margin-top:10px">
+      <li>Ošetři a poskytni neodkladnou péči i bez souhlasu zákonného zástupce <span class="law">§ 38 odst. 5, § 35 odst. 3</span></li>
+      <li>Zůstaň klidný a vlídný, nekonfrontuj, neobviňuj <small>viz Komunikace</small></li>
+      <li>Snaž se rodiče přesvědčit k převozu a vyšetření v nemocnici</li>
+      <li>Při předání řekni své podezření <b>přímo ošetřujícímu lékaři</b></li>
+      <li>Vše zapiš do dokumentace, k diagnóze přidej <b>T74</b> <small>viz Dokumentace</small></li>
+      <li>OSPOD se oznamuje při jakémkoli podezření na CAN <span class="law">§ 10 odst. 4 z. 359/1999 Sb.</span><small>Ověř si, kdo oznámení podává podle interního postupu vaší ZZS.</small></li>
+      <li>Odmítají převoz a dítě je ohrožené? Hospitalizovat lze i bez souhlasu <span class="law">§ 38 odst. 2</span><small>zvaž přivolání Policie ČR</small></li>
+    </ul></div>
+  <div class="card"><div class="step s3"><span class="num">3</span><div class="grow"><b class="t">Rysy trestného činu nebo sexuální zneužití?</b><div class="q">Fyzické napadení, zanedbání s vážnou újmou na zdraví, sexuální zneužití…</div></div></div>
+    <ul class="act crit" style="margin-top:10px">
+      <li><b>Oznam Policii ČR</b> – přivolej ji na místo, pokud tam ještě není</li>
+      <li>Oznámení jen na OSPOD v takovém případě nestačí</li>
+      <li>Neoznámení podezření z trestného činu se trestá odnětím svobody až na 3 roky <span class="law">§ 367, § 368 TZ</span></li>
+    </ul>
+    <a class="call" href="tel:158">${PHONE}Policie ČR 158</a></div>`;
+}
+
+function renderZnaky() {
+  $('v-znaky').innerHTML = `
+  <div class="card"><h3>ÚTTOK 4 UFO – podezřelá místa hematomů</h3>
+    <div class="mn">${'ÚTTOK4UFO'.split('').map((c) => `<span>${c}</span>`).join('')}</div>
+    <ul class="mnl">
+      <li><b>Ú</b><span>Úhel dolní čelisti</span></li>
+      <li><b>T</b><span>Trup <small>– hrudník, břicho, záda, hýždě, anogenitální oblast</small></span></li>
+      <li><b>T</b><span>Tvář <small>– mimo kostní výčnělky</small></span></li>
+      <li><b>O</b><span>Oko <small>– víčko, spojivka</small></span></li>
+      <li><b>K</b><span>Krk</span></li>
+      <li><b>4</b><span>Jakýkoli hematom u dítěte do 4 měsíců včetně, kdekoli</span></li>
+      <li><b>U</b><span>Ucho</span></li>
+      <li><b>F</b><span>Frenulum <small>– uzdička rtu nebo jazyka</small></span></li>
+      <li><b>O</b><span>Otisk předmětu <small>– vzorovaný hematom (dlaň, pásek, kabel…)</small></span></li>
+    </ul>
+    <p style="font-size:13px;color:var(--ink-2);margin-top:8px">Česká obdoba pravidla TEN-4-FACESp.</p></div>
+  <div class="card"><h3>Podle věku</h3>${AGES.slice(0, 4).map((a) => `<p><b>${a[1]}:</b> ${a[2]}</p>`).join('')}
+    <p><b>Do 5 let:</b> poranění dvanáctníku bez dopravní nehody je silně podezřelé.</p></div>
+  <div class="card"><h3>Popáleniny</h3><div class="two">
+    <div class="box bad"><b>Spíš úmyslné</b><ul><li>Opaření ponořením – ostře ohraničené, symetrické, stejně hluboké („ponožky“, „rukavičky“)</li><li>Dolní končetiny, hýždě, hráz, záda</li><li>Kruhové popáleniny od cigarety – opakované, stejně velké, různého stáří</li><li>Otisk žehličky, topení, fénu; hřbet ruky</li></ul></div>
+    <div class="box ok"><b>Spíš nehoda</b><ul><li>Opaření horkou tekutinou při jídle či vaření</li><li>Horní polovina těla, přední strana</li><li>Neostré okraje, různá hloubka, stékání</li><li>Dlaň ruky (sáhnutí)</li></ul></div></div></div>
+  <div class="card"><h3>Zlomeniny</h3><div class="two">
+    <div class="box bad"><b>Podezřelé</b><ul><li>Femur a humerus do 1 roku</li><li>Žebra u malých dětí</li><li>Lebka – impresní, diastatické, týlní</li><li>Lopatka, hrudní kost, trnové výběžky</li><li>Jakákoli zlomenina u nechodícího dítěte</li></ul></div>
+    <div class="box ok"><b>Běžné u úrazů</b><ul><li>Distální předloktí, prsty</li><li>Pády, sport, dopravní nehody</li><li>Rodiče přijdou do pár hodin</li></ul></div></div></div>
+  <div class="card"><h3>Ostatní formy</h3>
+    <details class="sec"><summary>Třesení a poranění hlavy kojence</summary><div><ul class="pl"><li>Subdurální hematom, krvácení do sítnice, zlomeniny žeber, poranění krční páteře</li><li>Příznaky: podrážděnost nebo apatie, porucha vědomí, zvracení, křeče, vyklenutá fontanela, hypotonie, apnoe</li><li>Často opakované; spouštěčem bývá neutišitelný pláč</li><li>Drobná modřina nebo poranění uzdičky může být jediným viditelným znakem</li></ul></div></details>
+    <details class="sec"><summary>Zanedbávání</summary><div><ul class="pl"><li>Špatná hygiena, podvýživa nebo neprospívání</li><li>Nedostatečná zdravotní péče, nedodržování léčby</li><li>Chybějící dohled, nebezpečné prostředí</li><li>Opožděný vývoj, intoxikace pečujících osob</li></ul></div></details>
+    <details class="sec"><summary>Psychické týrání</summary><div><ul class="pl"><li>Ponižování, vyhrožování, nepřiměřené nároky</li><li>Šikana a kyberšikana</li><li>Projevy u dítěte: úzkost, psychosomatické potíže, sebepoškozování, poruchy příjmu potravy, útěky</li></ul></div></details>
+    <details class="sec"><summary>Münchhausenův syndrom v zastoupení</summary><div><p>Pečující osoba vyvolává nebo předstírá nemoc dítěte – opakované nejasné potíže, které se objevují jen v její přítomnosti.</p></div></details>
+    <details class="sec"><summary>Nejohroženější děti</summary><div><ul class="pl"><li>Kojenci a batolata</li><li>Děti se zdravotním znevýhodněním – vrozené vady, opožděný vývoj, nesoběstačnost, ADHD, poruchy autistického spektra</li></ul></div></details>
+  </div>`;
+}
+
+function renderKom() {
+  $('v-kom').innerHTML = `
+  <div class="card"><h3>S dítětem</h3><div class="two">
+    <div class="box ok"><b>Dělej</b><ul><li>Klidné, bezpečné prostředí, mluv jednoduše</li><li>Otevřené otázky: „Co se ti stalo?“</li><li>Ptej se na každé poranění, i na staré</li><li>Ujisti dítě, že za nic nemůže</li><li>Řekni po pravdě, že to musíš předat dál</li></ul></div>
+    <div class="box bad"><b>Nedělej</b><ul><li>Neslibuj, že to zůstane tajemství</li><li>Nevyslýchej, nezpochybňuj</li><li>Žádné sugestivní otázky („Udeřil tě táta?“)</li><li>Neptej se „proč“, neopakuj stejnou otázku</li></ul></div></div>
+    <div class="say">„Jsem tu, abych ti pomohl. Nic zlého se ti teď nestane. Řekni mi v klidu, co se stalo.“</div></div>
+  <div class="card"><h3>S rodičem / doprovodem</h3><div class="two">
+    <div class="box ok"><b>Dělej</b><ul><li>Klid a profesionalita, neutrální tón</li><li>Ptej se: jak, kdy, kde, kdo u toho byl</li><li>Stáčej řeč na péči o dítě</li><li>Vyšetření bez rodiče vysvětli jako běžný postup</li></ul></div>
+    <div class="box bad"><b>Nedělej</b><ul><li>Neobviňuj, nekonfrontuj</li><li>Neříkej „podezříváme vás z týrání“</li><li>Nehodnoť – zapisuj, co slyšíš</li></ul></div></div>
+    <div class="say">„Chceme mít jistotu, že pro [jméno dítěte] uděláme všechno. Proto bych ho rád vzal na vyšetření do nemocnice.“</div></div>
+  <div class="card"><h3>Když je doprovod agresivní</h3><ul class="pl"><li>Zůstaň klidný, nenech se vtáhnout do hádky</li><li>Přivolej kolegu, případně se dočasně vzdal</li><li>Bezpečnost posádky má přednost – Policie ČR <a href="tel:158">158</a></li></ul></div>`;
+}
+
+function renderDok() {
+  $('v-dok').innerHTML = `
+  <div class="card"><h3>Co zapsat <span class="n">${st.d.size}/${DOCS.length}</span></h3>${DOCS.map((d) => chk(d[0], d[1], d[2], 'doc', st.d.has(d[0]))).join('')}</div>
+  <div class="card"><h3>Kód T74 k diagnóze poranění</h3><div class="t74">${T74.map(([c, t]) => `<button type="button" data-t74="${c}" aria-pressed="${st.t74 === c}"><b>${c}</b>${esc(t)}</button>`).join('')}</div>
+    <p style="font-size:13px;color:var(--ink-2);margin-top:10px">Kód se přidává k diagnóze základního poranění, např. S72 + T74.9.</p></div>`;
+}
+
+const verb = (k) => (LAW[k] || []).map((l) => `<p class="${/^[a-z]\)/.test(l) ? 'l1' : ''}">${esc(l)}</p>`).join('');
+function renderPravo() {
+  const L = [
+    ['Neodkladná péče bez souhlasu', '§ 38 odst. 5 z. 372/2011 Sb.', 'Při podezření na domácí nebo sexuální násilí, týrání či zanedbávání lze dítěti poskytnout neodkladnou péči bez souhlasu zákonných zástupců.', '372/38'],
+    ['Hospitalizace bez souhlasu', '§ 38 odst. 2 z. 372/2011 Sb.', 'Ze stejného důvodu lze dítě hospitalizovat i bez souhlasu zákonných zástupců.', '372/38'],
+    ['Péče, když souhlas nelze získat', '§ 35 odst. 3 a 5 z. 372/2011 Sb.', 'Neodkladnou nebo akutní péči lze poskytnout, když souhlas zákonného zástupce nelze získat bez zbytečného odkladu. Při podezření na násilí lze z vyšetření vyloučit osoby, které by se ho mohly dopouštět.', '372/35'],
+    ['Zadržení informace', '§ 32 odst. 3 z. 372/2011 Sb.', 'Informaci o zdravotním stavu dítěte lze v nezbytném rozsahu zadržet osobě podezřelé z násilí.', '372/32'],
+    ['Oznamovací povinnost – OSPOD', '§ 10 odst. 4 z. 359/1999 Sb.', 'Poskytovatel zdravotních služeb je povinen bez zbytečného odkladu oznámit OSPOD skutečnosti nasvědčující tomu, že jde o ohrožené dítě.', ''],
+    ['Neoznámení a nepřekažení trestného činu', '§ 367 a § 368 z. 40/2009 Sb.', 'Kdo se hodnověrně dozví, že jiný spáchal vybraný závažný trestný čin (mj. týrání svěřené osoby, těžké ublížení na zdraví), a neoznámí ho, hrozí mu až 3 roky (§ 368). Kdo neoznámí trestný čin, který se připravuje nebo právě páchá (mj. i znásilnění nebo pohlavní zneužití), hrozí totéž (§ 367). Výjimky v § 368 odst. 3 se zdravotníků netýkají.', 'TZ/368', 'TZ/367'],
+  ];
+  $('v-pravo').innerHTML = `
+  <div class="card"><h3>Kontakty</h3>
+    <a class="tel" href="tel:158"><div class="grow"><b>Policie ČR</b><span>podezření na trestný čin</span></div><span class="num">158</span></a>
+    <a class="tel" href="tel:116111"><div class="grow"><b>Linka bezpečí</b><span>pro děti a dospívající, nonstop</span></div><span class="num">116 111</span></a>
+    <a class="tel" href="https://www.lkcr.cz/rychla-pravni-pomoc-259.html" target="_blank" rel="noopener"><div class="grow"><b>Rychlá linka právní pomoci ČLK</b><span>konzultace sporných situací (web)</span></div><span class="num">›</span></a>
+    <div class="tel" style="cursor:default"><div class="grow"><b>OSPOD</b><span>obecní úřad obce s rozšířenou působností podle bydliště dítěte; mimo úřední hodiny pohotovost OSPOD nebo Policie ČR</span></div></div></div>
+  <div class="card"><h3>Právní opora</h3>${L.map(([t, c, x, k, k2]) => `<div class="lawc"><div class="h"><b>${esc(t)}</b><span>${esc(c)}</span></div><p>${esc(x)}</p>${k ? `<details><summary>Doslovné znění</summary><div class="verb">${verb(k)}${k2 ? '<hr style="border:0;border-top:1px solid var(--hairline);margin:8px 0">' + verb(k2) : ''}</div></details>` : ''}</div>`).join('')}
+    <p style="font-size:12.5px;color:var(--ink-2);margin-top:10px">Doslovná znění jsou stejná jako v ResqLexu (informativní znění e-Sbírky). Shrnutí nahoře nejsou právní výklad.</p></div>`;
+}
+
+/* ---------- lišta a kopírování ---------- */
+function renderBar() {
+  const n = st.f.size;
+  $('b-n').textContent = n === 1 ? '1 varovný znak' : n >= 2 && n <= 4 ? n + ' varovné znaky' : n + ' varovných znaků';
+  $('b-s').textContent = n ? (st.t74 ? 'Dg. ' + st.t74 : 'Doplň T74 v Dokumentaci') : 'Zaškrtávej, co vidíš';
+}
+function summary() {
+  const groups = {};
+  st.f.forEach((id) => { const f = ALLF[id]; (groups[f.g] = groups[f.g] || []).push(f.t); });
+  const a = AGES.find((x) => x[0] === st.age);
+  let t = 'Podezření na syndrom CAN.';
+  if (a) t += ' Věk: ' + a[1] + '.';
+  Object.entries(groups).forEach(([g, xs]) => { t += `\n${g}: ${xs.join('; ')}.`; });
+  if (st.t74) t += `\nDg.: ${st.t74} (${T74.find((x) => x[0] === st.t74)[1]}) – doplnit k diagnóze poranění.`;
+  return t;
+}
+function renderAll() { renderPostup(); renderZnaky(); renderKom(); renderDok(); renderPravo(); renderBar(); }
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.tab) {
+    document.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', x === b));
+    document.querySelectorAll('.view').forEach((v) => v.classList.toggle('on', v.id === 'v-' + b.dataset.tab));
+    window.scrollTo(0, 0); return;
+  }
+  if (b.dataset.f) { const s = st.f; s.has(b.dataset.f) ? s.delete(b.dataset.f) : s.add(b.dataset.f); keep(renderPostup, b); renderBar(); return; }
+  if (b.dataset.d) { const s = st.d; s.has(b.dataset.d) ? s.delete(b.dataset.d) : s.add(b.dataset.d); keep(renderDok, b); return; }
+  if (b.dataset.age) { st.age = st.age === b.dataset.age ? '' : b.dataset.age; keep(renderPostup, b); return; }
+  if (b.dataset.t74) { st.t74 = st.t74 === b.dataset.t74 ? '' : b.dataset.t74; keep(renderDok, b); renderBar(); return; }
+  if (b.id === 'b-reset') { if ((st.f.size || st.d.size || st.age || st.t74) && !confirm('Smazat zaškrtnuté údaje a začít nový případ?')) return; st.f.clear(); st.d.clear(); st.age = ''; st.t74 = ''; renderAll(); toast('Nový případ'); return; }
+  if (b.id === 'b-copy') {
+    if (!st.f.size && !st.t74) { toast('Nejdřív zaškrtni varovné znaky'); return; }
+    const txt = summary();
+    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(() => toast('Zkopírováno do schránky'), () => { prompt('Zkopíruj text:', txt); });
+  }
+});
+// překreslení bez skoku stránky
+function keep(fn, el) {
+  const sel = Object.entries(el.dataset).map(([k, v]) => `[data-${k.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase())}="${v}"]`).join('');
+  const y = el.getBoundingClientRect().top; fn();
+  const n = document.querySelector(sel); if (n) window.scrollBy(0, n.getBoundingClientRect().top - y);
+}
+let toastT = null;
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 1800); }
+try { const t = localStorage.getItem('resqcan:theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+$('b-theme').onclick = () => {
+  const c = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const n = c === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; try { localStorage.setItem('resqcan:theme', n); } catch (e) {}
+};
+renderAll();
+</script>
+</body>
+</html>
