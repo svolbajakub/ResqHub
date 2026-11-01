@@ -167,6 +167,11 @@ ol.pts li:first-child::before { top: 1px; }
 .lb.on { display: grid; }
 .lb img { max-width: 100%; max-height: 82vh; border-radius: 12px; }
 .lb p { color: #ddd; font-size: 13px; text-align: center; margin: 10px 0 0; }
+.mkn { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--hairline); display: grid; gap: 6px; }
+.mkn div { display: flex; gap: 10px; align-items: baseline; font-size: 14px; line-height: 1.35; }
+.mkn b { font-family: var(--font-round); font-weight: 800; font-size: 14px; padding: 2px 7px; border-radius: 7px; background: var(--fill); flex: none; }
+.mkn span { color: var(--ink-2); min-width: 0; }
+.mkn i { font-style: normal; color: var(--ink-3); }
 .foot { font-size: 12.5px; color: var(--ink-3); line-height: 1.45; margin: 18px 4px 0; }
 .foot a { color: var(--ink-2); }
 .cred summary { cursor: pointer; font-weight: 700; }
@@ -233,7 +238,7 @@ const SRC = {
 const DEV = [
   // ——— SRDCE ———
   {
-    id: 'lvad', n: 'LVAD – mechanická srdeční podpora', s: 'LVAD', g: 'srdce', reg: ['hrudnik', 'bricho', 'vedle'], kj: 1,
+    id: 'lvad', mkn: [["Z95.8", "Přítomnost jiných srdečních a cévních implantátů a štěpů"]], n: 'LVAD – mechanická srdeční podpora', s: 'LVAD', g: 'srdce', reg: ['hrudnik', 'bricho', 'vedle'], kj: 1,
     k: 'lvad heartmate srdecni pumpa podpora levokomorova mechanicka driveline controller ridici jednotka baterie hucení',
     what: 'Pumpa v hrotu levé komory, která trvale pumpuje krev do aorty. Tok je nepřetržitý, proto pulz často nehmatáš. Nosí ji pacienti s těžkým srdečním selháním – jako most k transplantaci nebo trvale.',
     look: ['Kabel (driveline) vychází z kůže na břiše a vede k řídicí jednotce u pasu.', 'Dvě baterie v pouzdrech nebo vestě, v noci napájení ze sítě.', 'Poslechem nad srdcem a v levém nadbřišku slyšíš „vrnění“ pumpy.', 'Pacient má tašku s náhradní řídicí jednotkou a bateriemi a kartu s kontaktem na centrum.'],
@@ -246,7 +251,7 @@ const DEV = [
     sch: { d: [[64, 76, 5]], l: ['M64 81 L70 104 L96 120'], x: [[92, 116, 16, 12]], z: 'pumpa · kabel · řídicí jednotka' },
   },
   {
-    id: 'pm', n: 'Kardiostimulátor', s: 'Kardiostimulátor', g: 'srdce', reg: ['hrudnik'], kj: 1,
+    id: 'pm', mkn: [["Z95.0", "Přítomnost elektronického kardiostimulátoru"]], n: 'Kardiostimulátor', s: 'Kardiostimulátor', g: 'srdce', reg: ['hrudnik'], kj: 1,
     k: 'kardiostimulator pacemaker pm stimulace bradykardie elektroda placka',
     what: 'Přístroj, který stimuluje srdce při pomalém nebo vynechávajícím rytmu. Elektrody vedou žilou do pravé síně a komory.',
     look: ['„Placka“ asi 4–5 cm pod kůží pod klíční kostí, obvykle vlevo, s jizvou.', 'Na EKG stimulační hroty před P vlnou nebo QRS (u bipolární stimulace jen drobné).', 'Pacient mívá průkaz kardiostimulátoru.'],
@@ -259,7 +264,7 @@ const DEV = [
     sch: { d: [[77, 62, 5]], l: ['M74 64 Q68 68 64 74'], z: 'pod levou klíční kostí' },
   },
   {
-    id: 'icd', n: 'ICD – implantabilní defibrilátor', s: 'ICD', g: 'srdce', reg: ['hrudnik'], kj: 1,
+    id: 'icd', mkn: [["Z95.0", "Přítomnost elektronického kardiostimulátoru"]], n: 'ICD – implantabilní defibrilátor', s: 'ICD', g: 'srdce', reg: ['hrudnik'], kj: 1,
     k: 'icd defibrilator implantabilni vyboj s-icd subkutanni magnet elektricka boure',
     what: 'Přístroj, který při komorové tachykardii nebo fibrilaci sám stimuluje nebo dá výboj. Zároveň umí stimulovat při bradykardii.',
     look: ['Větší než kardiostimulátor, pod klíční kostí vlevo.', 'Podkožní ICD (S-ICD): přístroj na levém boku hrudníku, elektroda podél hrudní kosti.', 'Pacient mívá průkaz; často sám řekne „dostal jsem ránu“.'],
@@ -272,7 +277,7 @@ const DEV = [
     sch: { d: [[77, 62, 6]], c: [[88, 84, 4]], l: ['M74 64 Q68 68 64 74', 'M60 58 L60 86'], z: 'klasické vlevo · S-ICD na boku' },
   },
   {
-    id: 'vesta', n: 'Nositelný defibrilátor (LifeVest)', s: 'LifeVest', g: 'srdce', reg: ['hrudnik', 'vedle'], kj: 1,
+    id: 'vesta', mkn: [["Z97.8", "Přítomnost jiných určených pomůcek"]], n: 'Nositelný defibrilátor (LifeVest)', s: 'LifeVest', g: 'srdce', reg: ['hrudnik', 'vedle'], kj: 1,
     k: 'lifevest vesta nositelny defibrilator zoll wcd',
     what: 'Vesta s elektrodami a monitorem na opasku. Hlídá rytmus a při VT/VF sama vybije. Nosí se dočasně, třeba po infarktu nebo do implantace ICD.',
     look: ['Elastická vesta pod oblečením, pás s elektrodami.', 'Monitor s baterií v pouzdře na opasku nebo přes rameno.', 'Před výbojem pípá, vibruje a mluví.'],
@@ -286,7 +291,7 @@ const DEV = [
   },
   // ——— DÝCHÁNÍ ———
   {
-    id: 'trach', n: 'Tracheostomie', s: 'Tracheostomie', g: 'dych', reg: ['krk'], kj: 1,
+    id: 'trach', mkn: [["Z93.0", "Tracheostomie"]], n: 'Tracheostomie', s: 'Tracheostomie', g: 'dych', reg: ['krk'], kj: 1,
     k: 'tracheostomie tracheostomicka kanyla trach tracheotomie balonek manzeta vnitrni kanyla odsavani',
     what: 'Otvor v průdušnici s kanylou. Na rozdíl od laryngektomie je horní dýchací cesta zachovaná – pacient může mít vzduch i z úst a nosu.',
     look: ['Kanyla s přírubou na krku, upevněná páskem.', 'Někdy pilotní balónek (manžeta), vnitřní kanyla, mluvicí ventil nebo HME filtr.'],
@@ -299,7 +304,7 @@ const DEV = [
     sch: { d: [[60, 47, 4]], l: ['M52 47 L68 47'], z: 'kanyla v krku' },
   },
   {
-    id: 'lary', n: 'Laryngektomie', s: 'Laryngektomie', g: 'dych', reg: ['krk'], kj: 1,
+    id: 'lary', mkn: [["Z93.0", "Tracheostomie", "stoma"], ["Z90.0", "Získané chybění části hlavy a krku", "chybění hrtanu"]], n: 'Laryngektomie', s: 'Laryngektomie', g: 'dych', reg: ['krk'], kj: 1,
     k: 'laryngektomie odstraneny hrtan dycha krkem stoma hlasova protéza proteza hme',
     what: 'Po odstranění hrtanu je průdušnice vyvedená trvale na krk. Pacient dýchá jen krkem – ústy ani nosem ho neokysličíš.',
     look: ['Otvor na krku obvykle bez kanyly, často s nalepeným filtrem (HME).', 'Může mít hlasovou protézu – malý silikonový ventil v otvoru.', 'Mluví šeptem, elektrolaryngem nebo přes protézu; mívá průkaz „dýchám krkem“.'],
@@ -312,7 +317,7 @@ const DEV = [
     sch: { c: [[60, 47, 4]], z: 'otvor bez kanyly' },
   },
   {
-    id: 'vent', n: 'Domácí ventilace, NIV, CPAP', s: 'Domácí ventilace', g: 'dych', reg: ['vedle', 'krk'], kj: 1,
+    id: 'vent', mkn: [["Z99.1", "Závislost na respirátoru", "ventilátor"], ["Z99.8", "Závislost na jiných pomocných přístrojích a pomůckách", "CPAP, NIV bez závislosti"]], n: 'Domácí ventilace, NIV, CPAP', s: 'Domácí ventilace', g: 'dych', reg: ['vedle', 'krk'], kj: 1,
     k: 'domaci ventilace ventilator niv cpap bipap maska okruh hemv umela plicni ventilace',
     what: 'Pacienti s chronickým respiračním selháním (nervosvalová onemocnění, míšní léze, CHOPN, syndrom spánkové apnoe). Ventilace přes masku nebo tracheostomii.',
     look: ['Přístroj na stolku nebo vozíku, okruh k masce či kanyle.', 'Často odsávačka, záložní baterie, u závislých na ventilátoru i druhý přístroj.'],
@@ -325,7 +330,7 @@ const DEV = [
     sch: { x: [[96, 34, 16, 14]], l: ['M96 41 Q80 40 64 46'], z: 'přístroj u lůžka' },
   },
   {
-    id: 'o2', n: 'Domácí kyslík (koncentrátor)', s: 'Domácí kyslík', g: 'dych', reg: ['vedle'],
+    id: 'o2', mkn: [["Z99.8", "Závislost na jiných pomocných přístrojích a pomůckách"]], n: 'Domácí kyslík (koncentrátor)', s: 'Domácí kyslík', g: 'dych', reg: ['vedle'],
     k: 'kyslik koncentrator domaci oxygenoterapie dlouhodoba dlt bryle kyslikove lahve',
     what: 'Dlouhodobá domácí oxygenoterapie – koncentrátor nebo lahve, kyslíkové brýle.',
     look: ['Hučící přístroj s hadičkou ke kyslíkovým brýlím, případně přenosný koncentrátor nebo lahev.'],
@@ -338,7 +343,7 @@ const DEV = [
   },
   // ——— CÉVNÍ PŘÍSTUPY ———
   {
-    id: 'port', n: 'Port (venózní port)', s: 'Port', g: 'cevy', reg: ['hrudnik', 'ruka'],
+    id: 'port', mkn: [["Z95.8", "Přítomnost jiných srdečních a cévních implantátů a štěpů"]], n: 'Port (venózní port)', s: 'Port', g: 'cevy', reg: ['hrudnik', 'ruka'],
     k: 'port portkatetr port-a-cath venozni port chemoterapie huber gripper jehla',
     what: 'Komůrka s membránou pod kůží napojená na centrální žílu. Nejčastěji u onkologických pacientů.',
     look: ['Hmatný kulatý „knoflík“ 2–3 cm pod kůží, obvykle pod pravou klíční kostí, někdy na paži.', 'Průkaz portu; někdy už zavedená jehla s krytím.'],
@@ -350,7 +355,7 @@ const DEV = [
     sch: { c: [[45, 62, 5]], l: ['M45 62 Q50 50 56 44'], z: 'pod pravou klíční kostí' },
   },
   {
-    id: 'picc', n: 'PICC a midline', s: 'PICC', g: 'cevy', reg: ['ruka'],
+    id: 'picc', mkn: [["Z95.8", "Přítomnost jiných srdečních a cévních implantátů a štěpů"]], n: 'PICC a midline', s: 'PICC', g: 'cevy', reg: ['ruka'],
     k: 'picc midline periferne zavedeny centralni katetr paze',
     what: 'Tenký katétr zavedený žilou na paži. PICC končí v horní duté žíle, midline v žíle paže.',
     look: ['Katétr vychází nad loktem, zakrytý fixací, s jedním až třemi lumeny a koncovkami.'],
@@ -362,7 +367,7 @@ const DEV = [
     sch: { l: ['M26 84 Q30 66 46 60'], d: [[26, 86, 3]], z: 'vstup nad loktem' },
   },
   {
-    id: 'avf', n: 'Dialyzační shunt (AV píštěl, graft)', s: 'AV píštěl', g: 'cevy', reg: ['ruka'],
+    id: 'avf', mkn: [["Z99.2", "Závislost na renální dialýze"]], n: 'Dialyzační shunt (AV píštěl, graft)', s: 'AV píštěl', g: 'cevy', reg: ['ruka'],
     k: 'av pistel arteriovenozni shunt graft dialyza hemodialyza fistule krvaceni vir',
     what: 'Chirurgicky propojená tepna a žíla na paži pro hemodialýzu. Pacient chodí na dialýzu obvykle třikrát týdně.',
     look: ['Výrazná, vinutá žíla na předloktí nebo paži, jizva u zápěstí nebo lokte.', 'Hmatný vír a slyšitelný šelest.'],
@@ -374,7 +379,7 @@ const DEV = [
     sch: { l: ['M100 104 q3 6 0 12 q-3 6 0 12 q3 6 1 10'], z: 'předloktí nebo paže' },
   },
   {
-    id: 'dkat', n: 'Dialyzační katétr', s: 'Dialyzační katétr', g: 'cevy', reg: ['krk', 'hrudnik'],
+    id: 'dkat', mkn: [["Z99.2", "Závislost na renální dialýze"]], n: 'Dialyzační katétr', s: 'Dialyzační katétr', g: 'cevy', reg: ['krk', 'hrudnik'],
     k: 'dialyzacni katetr permcath tunelizovany centralni hemodialyza cerveny modry',
     what: 'Tunelizovaný centrální katétr pro hemodialýzu, obvykle z vnitřní jugulární žíly.',
     look: ['Katétr vychází z kůže na hrudníku pod klíční kostí, se dvěma větvemi – červenou a modrou – a svorkami.'],
@@ -387,7 +392,7 @@ const DEV = [
   },
   // ——— BŘICHO A MOČ ———
   {
-    id: 'pd', n: 'Peritoneální dialýza', s: 'Peritoneální dialýza', g: 'git', reg: ['bricho', 'vedle'],
+    id: 'pd', mkn: [["Z99.2", "Závislost na renální dialýze"]], n: 'Peritoneální dialýza', s: 'Peritoneální dialýza', g: 'git', reg: ['bricho', 'vedle'],
     k: 'peritonealni dialyza capd apd tenckhoff katetr bricho cykler',
     what: 'Dialýza přes pobřišnici: měkký katétr v břiše, výměny roztoku přes den nebo přístrojem (cyklér) v noci.',
     look: ['Měkký katétr vycházející z břicha pod pupkem do strany.', 'Vaky s roztokem, cyklér u postele.'],
@@ -399,7 +404,7 @@ const DEV = [
     sch: { d: [[50, 112, 3]], l: ['M50 112 Q44 116 40 122'], z: 'katétr pod pupkem' },
   },
   {
-    id: 'peg', n: 'PEG a gastrostomie', s: 'PEG', g: 'git', reg: ['bricho'],
+    id: 'peg', mkn: [["Z93.1", "Gastrostomie"]], n: 'PEG a gastrostomie', s: 'PEG', g: 'git', reg: ['bricho'],
     k: 'peg gastrostomie vyzivova sonda button low profile peg-j jejunostomie',
     what: 'Výživová sonda zavedená přes stěnu břicha přímo do žaludku (PEG-J až do tenkého střeva).',
     look: ['Hadička z levého horního kvadrantu břicha s vnějším talířkem a koncovkou.', 'Nebo nízkoprofilový „knoflík“ (button) na úrovni kůže.'],
@@ -411,7 +416,7 @@ const DEV = [
     sch: { d: [[72, 96, 4]], z: 'levý horní kvadrant' },
   },
   {
-    id: 'stomie', n: 'Stomie (kolostomie, ileostomie, urostomie)', s: 'Stomie', g: 'git', reg: ['bricho'],
+    id: 'stomie', mkn: [["Z93.2", "Ileostomie"], ["Z93.3", "Kolostomie"], ["Z93.6", "Jiná umělá vyústění močového ústrojí", "urostomie"]], n: 'Stomie (kolostomie, ileostomie, urostomie)', s: 'Stomie', g: 'git', reg: ['bricho'],
     k: 'stomie kolostomie ileostomie urostomie vyvod sacek',
     what: 'Vývod střeva nebo močových cest na břiše do sáčku.',
     look: ['Sáček nalepený na břiše. Zdravá stomie je růžová a vlhká.'],
@@ -423,7 +428,7 @@ const DEV = [
     sch: { c: [[74, 112, 4], [46, 112, 4]], z: 'kolostomie vlevo · ileostomie vpravo' },
   },
   {
-    id: 'nefro', n: 'Nefrostomie', s: 'Nefrostomie', g: 'git', reg: ['zada'],
+    id: 'nefro', mkn: [["Z93.6", "Jiná umělá vyústění močového ústrojí"]], n: 'Nefrostomie', s: 'Nefrostomie', g: 'git', reg: ['zada'],
     k: 'nefrostomie ledvina drenaz sacek bok zada',
     what: 'Drén zavedený přes záda přímo do ledviny, odvádí moč do sáčku.',
     look: ['Hadička z bederní krajiny (jedna nebo obě strany) do sáčku na stehně nebo u postele.'],
@@ -435,7 +440,7 @@ const DEV = [
     sch: { c: [[38, 104, 4], [82, 104, 4]], z: 'ze zad v bedrech' },
   },
   {
-    id: 'epi', n: 'Epicystostomie', s: 'Epicystostomie', g: 'git', reg: ['panev'],
+    id: 'epi', mkn: [["Z93.5", "Cystostomie"]], n: 'Epicystostomie', s: 'Epicystostomie', g: 'git', reg: ['panev'],
     k: 'epicystostomie suprapubicky katetr mocovy mechyr cystostomie',
     what: 'Katétr zavedený nad stydkou sponou přímo do močového měchýře.',
     look: ['Katétr vychází těsně nad sponou do sáčku.'],
@@ -447,7 +452,7 @@ const DEV = [
     sch: { d: [[60, 124, 3]], z: 'nad stydkou sponou' },
   },
   {
-    id: 'pmk', n: 'Permanentní močový katétr', s: 'Permanentní katétr', g: 'git', reg: ['panev'],
+    id: 'pmk', mkn: [["Z97.8", "Přítomnost jiných určených pomůcek"]], n: 'Permanentní močový katétr', s: 'Permanentní katétr', g: 'git', reg: ['panev'],
     k: 'permanentni mocovy katetr pmk foley cevka sacek autonomni dysreflexie',
     what: 'Katétr zavedený močovou trubicí do měchýře.',
     look: ['Katétr ústí do sáčku, balónek drží katétr v měchýři.'],
@@ -460,7 +465,7 @@ const DEV = [
   },
   // ——— NERVY ———
   {
-    id: 'vps', n: 'VP shunt (ventrikuloperitoneální drenáž)', s: 'VP shunt', g: 'neuro', reg: ['hlava', 'krk', 'bricho'],
+    id: 'vps', mkn: [["Z98.2", "Přítomnost pomůcky pro drenáž mozkomíšního moku"]], n: 'VP shunt (ventrikuloperitoneální drenáž)', s: 'VP shunt', g: 'neuro', reg: ['hlava', 'krk', 'bricho'],
     k: 'vp shunt drenaz hydrocefalus ventrikuloperitonealni chlopen rezervoar likvor',
     what: 'Drenáž mozkomíšního moku z mozkových komor do břicha u hydrocefalu. Častá u dětí.',
     look: ['Kopulka (rezervoár) nebo chlopeň za uchem či na hlavě.', 'Hmatná hadička pod kůží za uchem, na krku a na hrudníku.'],
@@ -472,7 +477,7 @@ const DEV = [
     sch: { d: [[73, 22, 3]], l: ['M73 25 Q74 40 70 52 Q72 80 66 106'], z: 'za uchem → hrudník → břicho' },
   },
   {
-    id: 'itb', n: 'Baklofenová pumpa (intratekální)', s: 'Baklofenová pumpa', g: 'neuro', reg: ['bricho'],
+    id: 'itb', mkn: [["Z96.8", "Přítomnost jiných určených funkčních implantátů"]], n: 'Baklofenová pumpa (intratekální)', s: 'Baklofenová pumpa', g: 'neuro', reg: ['bricho'],
     k: 'baklofen baclofen pumpa intratekalni itb spasticita lioresal',
     what: 'Implantovaná pumpa podává baklofen do páteřního kanálu. Pacienti s těžkou spasticitou – DMO, roztroušená skleróza, míšní léze.',
     look: ['Kulatý disk asi 7 cm pod kůží v podbřišku (vpravo nebo vlevo).', 'Katétr pod kůží k páteři; pacient mívá kartu. Při docházejícím léku nebo poruše pumpa pípá.'],
@@ -484,7 +489,7 @@ const DEV = [
     sch: { c: [[46, 116, 6]], l: ['M46 116 Q56 122 60 124'], z: 'disk v podbřišku' },
   },
   {
-    id: 'dbs', n: 'Hluboká mozková stimulace (DBS)', s: 'DBS', g: 'neuro', reg: ['hlava', 'hrudnik'],
+    id: 'dbs', mkn: [["Z96.8", "Přítomnost jiných určených funkčních implantátů"]], n: 'Hluboká mozková stimulace (DBS)', s: 'DBS', g: 'neuro', reg: ['hlava', 'hrudnik'],
     k: 'dbs hluboka mozkova stimulace parkinson tres dystonie neurostimulator',
     what: 'Elektrody v mozku napojené na stimulátor pod klíční kostí. Parkinsonova nemoc, třes, dystonie.',
     look: ['Generátor pod klíční kostí (často oboustranně), kabel za uchem k temeni, drobné vyvýšeniny na lebce.', 'Pacient má ovladač, kterým zjistí, zda stimulátor běží.'],
@@ -497,7 +502,7 @@ const DEV = [
     sch: { d: [[54, 12, 2.5], [66, 12, 2.5], [44, 62, 4], [76, 62, 4]], l: ['M54 12 Q48 26 50 40 Q46 50 44 60', 'M66 12 Q72 26 70 40 Q74 50 76 60'], z: 'elektrody v mozku → generátor' },
   },
   {
-    id: 'vns', n: 'Stimulátor bloudivého nervu (VNS)', s: 'VNS', g: 'neuro', reg: ['hrudnik', 'krk'],
+    id: 'vns', mkn: [["Z96.8", "Přítomnost jiných určených funkčních implantátů"]], n: 'Stimulátor bloudivého nervu (VNS)', s: 'VNS', g: 'neuro', reg: ['hrudnik', 'krk'],
     k: 'vns vagus stimulator bloudivy nerv epilepsie magnet zachvat',
     what: 'Stimulátor levého bloudivého nervu u farmakorezistentní epilepsie (někdy u deprese).',
     look: ['Generátor vlevo pod klíční kostí nebo u podpaží, jizva na levé straně krku.', 'Pacient nosí magnet – na náramku, hodinkách nebo pásku.'],
@@ -510,7 +515,7 @@ const DEV = [
   },
   // ——— CUKROVKA ———
   {
-    id: 'ipump', n: 'Inzulinová pumpa', s: 'Inzulinová pumpa', g: 'cukr', reg: ['bricho', 'vedle'],
+    id: 'ipump', mkn: [["Z96.4", "Přítomnost endokrinních implantátů"]], n: 'Inzulinová pumpa', s: 'Inzulinová pumpa', g: 'cukr', reg: ['bricho', 'vedle'],
     k: 'inzulinova pumpa inzulin patch omnipod medtronic tandem uzavrena smycka diabetes',
     what: 'Pumpa podává krátkodobý inzulin do podkoží. Často je propojená se senzorem a dávkuje sama (uzavřená smyčka).',
     look: ['Malý přístroj u pasu s hadičkou ke kanyle v podkoží břicha, stehna nebo paže.', 'Nebo náplasťová pumpa bez hadičky nalepená na kůži.'],
@@ -522,7 +527,7 @@ const DEV = [
     sch: { x: [[92, 112, 14, 12]], d: [[68, 108, 3]], l: ['M92 118 Q80 116 68 108'], z: 'pumpa + kanyla v podkoží' },
   },
   {
-    id: 'cgm', n: 'Senzor glukózy (Libre, Dexcom)', s: 'Senzor glukózy', g: 'cukr', reg: ['ruka', 'bricho'],
+    id: 'cgm', mkn: [["Z97.8", "Přítomnost jiných určených pomůcek"]], n: 'Senzor glukózy (Libre, Dexcom)', s: 'Senzor glukózy', g: 'cukr', reg: ['ruka', 'bricho'],
     k: 'senzor glukozy cgm libre freestyle dexcom fgm kontinualni monitor',
     what: 'Senzor v podkoží měří glukózu v tkáňovém moku a posílá ji do telefonu nebo čtečky.',
     look: ['Kotouček velikosti mince na zadní straně paže, nebo malý senzor na břiše.', 'Hodnoty a alarmy v telefonu pacienta.'],
@@ -712,7 +717,7 @@ function hl(text, terms) {
 function renderList() {
   const terms = fold(q).split(/\s+/).filter((t) => t.length > 1);
   let arr = DEV.filter((d) => !zone || d.reg.includes(zone));
-  if (terms.length) arr = arr.filter((d) => { const h = fold(d.n + ' ' + d.k + ' ' + d.what + ' ' + d.look.join(' ')); return terms.every((t) => h.includes(t)); });
+  if (terms.length) arr = arr.filter((d) => { const h = fold(d.n + ' ' + d.k + ' ' + (d.mkn || []).map((m) => m[0]).join(' ') + ' ' + d.what + ' ' + d.look.join(' ')); return terms.every((t) => h.includes(t)); });
   $('l-t').textContent = zone ? REG[zone] : (terms.length ? 'Výsledky' : 'Všechna zařízení');
   $('l-n').textContent = arr.length;
   $('l-all').hidden = !zone && !terms.length;
@@ -741,7 +746,7 @@ function renderDet(id) {
   $('v-det').innerHTML = `
     <div class="dh"><button type="button" class="round glass" id="b-back" aria-label="Zpět">${IC.back}</button><h2>${esc(d.n)}</h2></div>
     <div class="card"><div class="hero"><div>${schema(d, false)}<div class="cap">${esc((d.sch && d.sch.z) || '')}</div></div>
-      <div><div class="tags"><span class="tag ${gc}">${gl}</span>${d.kj ? '<span class="tag kpr">KPR jinak</span>' : ''}</div><p>${esc(d.what)}</p></div></div></div>
+      <div><div class="tags"><span class="tag ${gc}">${gl}</span>${d.kj ? '<span class="tag kpr">KPR jinak</span>' : ''}</div><p>${esc(d.what)}</p></div></div>${(d.mkn || []).length ? `<div class="mkn">${d.mkn.map(([c, t, n]) => `<div><b>${c}</b><span>${esc(t)}${n ? ` <i>(${esc(n)})</i>` : ''}</span></div>`).join('')}</div>` : ''}</div>
     <div class="card"><h3>${IC.cam}Jak to vypadá</h3>${foto(d)}</div>
     ${sec('kpr', 'kpr', d.kj ? 'Zástava a resuscitace – jinak' : 'Zástava a resuscitace', d.kpr, d.kj)}
     ${sec('look', 'eye', 'Poznáš podle', d.look)}
