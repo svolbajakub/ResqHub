@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResqHEMS</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ResqHEMS">
+<meta name="theme-color" content="#E4EEEF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#03141A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+/* ResqHEMS – letecká záchranná služba. Vzhled sladěný s ResqHubem. */
+:root {
+  --bg: #E4EEEF; --ink: #0A1F23; --ink-2: rgba(10, 31, 35, .6); --ink-3: rgba(10, 31, 35, .36);
+  --petrol: #0B6E79; --petrol-soft: rgba(11, 110, 121, .12); --on-petrol: #FFFFFF;
+  --warn: #B26A00; --warn-soft: rgba(242, 154, 31, .17);
+  --crit: #D0303A; --crit-soft: rgba(229, 56, 59, .14);
+  --glow-a: rgba(11, 110, 121, .5); --glow-b: rgba(53, 194, 196, .4);
+  --glass: rgba(255, 255, 255, .6); --glass-strong: rgba(250, 253, 253, .96);
+  --glass-edge: rgba(255, 255, 255, .8); --glass-hi: rgba(255, 255, 255, .95); --glass-shadow: rgba(6, 55, 62, .13);
+  --hairline: rgba(10, 31, 35, .1); --fill: rgba(10, 31, 35, .06);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+    --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+    --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+    --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+    --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+    --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+    --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03141A; --ink: #EAF6F7; --ink-2: rgba(234, 246, 247, .64); --ink-3: rgba(234, 246, 247, .34);
+  --petrol: #3CC0CB; --petrol-soft: rgba(60, 192, 203, .14); --on-petrol: #03141A;
+  --warn: #FFB45E; --warn-soft: rgba(255, 169, 77, .15); --crit: #FF6B6E; --crit-soft: rgba(255, 107, 110, .16);
+  --glow-a: rgba(11, 110, 121, .6); --glow-b: rgba(28, 157, 163, .3);
+  --glass: rgba(255, 255, 255, .075); --glass-strong: rgba(22, 38, 43, .97);
+  --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .15); --glass-shadow: rgba(0, 0, 0, .45);
+  --hairline: rgba(255, 255, 255, .1); --fill: rgba(255, 255, 255, .08);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { position: relative; isolation: isolate; min-height: 100vh; overflow-x: hidden; font-family: var(--font); font-size: 17px; line-height: 1.3; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; padding: 0; }
+svg { display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 12px; }
+.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ambient::before, .ambient::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); }
+.ambient::before { width: 130vw; height: 60vh; left: -40vw; top: -30vh; background: var(--glow-a); }
+.ambient::after { width: 90vw; height: 44vh; right: -42vw; top: 6vh; background: var(--glow-b); }
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%); border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px -12px var(--glass-shadow); }
+
+/* ---- ResqHEMS ---- */
+:root { --ok: #17915A; --ok-soft: rgba(23, 145, 90, .13); --sky: #2F6FD6; --sky-soft: rgba(47, 111, 214, .13); }
+:root[data-theme="dark"] { --ok: #4FD08F; --ok-soft: rgba(79, 208, 143, .15); --sky: #7FA9F5; --sky-soft: rgba(127, 169, 245, .16); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ok: #4FD08F; --ok-soft: rgba(79, 208, 143, .15); --sky: #7FA9F5; --sky-soft: rgba(127, 169, 245, .16); } }
+html { touch-action: manipulation; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: max(12px, var(--st)) 14px calc(40px + var(--sb)); }
+.head { display: flex; align-items: center; gap: 8px; padding: 6px 2px 10px; }
+.head h1 { margin: 0; font-family: var(--font-display); font-size: 32px; font-weight: 800; letter-spacing: -.04em; line-height: 1; flex: 1; }
+.head h1 small { display: block; font-family: var(--font); font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--ink-2); margin-top: 4px; }
+.round { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--ink); }
+.round svg { width: 20px; height: 20px; }
+.tabs { display: flex; gap: 2px; padding: 4px; border-radius: 16px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; background: var(--glass-strong) !important; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { flex: 1 0 auto; height: 40px; padding: 0 12px; border-radius: 12px; font-weight: 700; font-size: 14.5px; color: var(--ink-2); white-space: nowrap; }
+.tabs button[aria-selected="true"] { background: var(--petrol); color: var(--on-petrol); }
+.view { display: none; } .view.on { display: block; }
+.card { border-radius: 22px; padding: 14px; background: var(--glass-strong); border: 1px solid var(--glass-edge); box-shadow: 0 8px 24px -16px var(--glass-shadow); margin-bottom: 12px; }
+.lbl { font-size: 12.5px; font-weight: 750; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); margin: 0 2px 8px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; padding: 0 14px; border-radius: 14px; background: var(--fill); font-weight: 750; font-size: 15px; text-decoration: none; color: inherit; flex: none; }
+.btn.pri { background: var(--petrol); color: var(--on-petrol); }
+.btn svg { width: 18px; height: 18px; }
+.btn.sm { height: 36px; font-size: 13.5px; border-radius: 11px; padding: 0 11px; }
+.loc { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr); }
+.where { font-size: 14px; color: var(--ink-2); line-height: 1.35; }
+.where b { color: var(--ink); }
+.search { display: flex; gap: 6px; }
+.search input { flex: 1; min-width: 0; width: 100%; height: 44px; border-radius: 13px; border: 1px solid var(--hairline); background: var(--fill); padding: 0 12px; font-size: 15.5px; outline: none; }
+.hits { display: grid; gap: 4px; }
+.hits button { text-align: left; padding: 9px 11px; border-radius: 12px; background: var(--fill); font-size: 14px; line-height: 1.3; }
+.hits button small { display: block; color: var(--ink-2); font-size: 12px; }
+.layout { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .layout { grid-template-columns: 340px minmax(0, 1fr); align-items: start; } .side { position: sticky; top: 12px; } }
+
+.sun { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 15px; background: var(--fill); font-size: 14px; line-height: 1.35; }
+.sun svg { width: 26px; height: 26px; flex: none; color: var(--warn); }
+.sun.night svg { color: var(--sky); }
+.sun b { font-family: var(--font-round); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.chk { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 650; }
+.chk input { width: 20px; height: 20px; accent-color: var(--petrol); }
+
+.list { display: grid; gap: 10px; }
+.b { border-radius: 20px; padding: 13px 14px; background: var(--glass-strong); border: 1px solid var(--glass-edge); display: grid; gap: 6px; }
+.b.first { box-shadow: inset 0 0 0 2px var(--petrol); }
+.b.off { opacity: .55; }
+.b .top { display: flex; gap: 12px; align-items: center; }
+.b .cs { min-width: 64px; text-align: center; padding: 6px 4px; border-radius: 13px; background: var(--petrol-soft); color: var(--petrol); line-height: 1; flex: none; }
+.b.first .cs { background: var(--petrol); color: var(--on-petrol); }
+.b .cs small { display: block; font-size: 10.5px; font-weight: 750; text-transform: uppercase; letter-spacing: .05em; opacity: .85; }
+.b .cs b { font-family: var(--font-round); font-size: 24px; font-weight: 800; }
+.b .grow { flex: 1; min-width: 0; }
+.b .n { font-size: 16px; font-weight: 800; line-height: 1.2; }
+.b .m { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+.b .num { text-align: right; flex: none; }
+.b .num .t { font-family: var(--font-round); font-weight: 800; font-size: 26px; line-height: 1; }
+.b .num .t small { font-size: 13px; font-weight: 700; color: var(--ink-2); margin-left: 2px; }
+.b .num .d { font-size: 12.5px; color: var(--ink-2); margin-top: 3px; white-space: nowrap; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag { font-size: 11.5px; font-weight: 750; padding: 2px 7px; border-radius: 7px; background: var(--fill); color: var(--ink-2); }
+.tag.h24 { background: var(--ok-soft); color: var(--ok); }
+.tag.day { background: var(--warn-soft); color: var(--warn); }
+.tag.offt { background: var(--crit-soft); color: var(--crit); }
+.empty { text-align: center; color: var(--ink-2); padding: 34px 14px; font-size: 15px; line-height: 1.45; }
+.note { font-size: 12.5px; color: var(--ink-2); line-height: 1.45; margin: 8px 2px 0; }
+
+/* souřadnice */
+.co { display: grid; gap: 8px; }
+.cof { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 15px; background: var(--fill); }
+.cof .grow { flex: 1; min-width: 0; }
+.cof small { display: block; font-size: 12px; font-weight: 750; color: var(--ink-2); text-transform: uppercase; letter-spacing: .04em; }
+.cof b { display: block; font-family: var(--font-round); font-size: 21px; font-weight: 800; letter-spacing: .01em; overflow-wrap: anywhere; }
+
+/* pravidla */
+.rules { margin: 0; padding: 0; list-style: none; }
+.rules li { position: relative; padding: 9px 0 9px 28px; border-top: 1px solid var(--hairline); font-size: 15px; line-height: 1.4; }
+.rules li:first-child { border-top: 0; }
+.rules li::before { content: ""; position: absolute; left: 5px; top: 16px; width: 10px; height: 10px; border-radius: 3px; background: var(--petrol); }
+.rules.crit li::before { background: var(--crit); }
+.rules.night li::before { background: var(--sky); }
+.rules li small { display: block; font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+
+/* srovnání */
+.f2 { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 520px) { .f2 { grid-template-columns: minmax(0, 1fr); } }
+.fld { display: grid; gap: 5px; min-width: 0; }
+.fld label { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.fld select, .fld input { height: 44px; border-radius: 13px; border: 1px solid var(--hairline); background: var(--fill); padding: 0 12px; font-size: 15.5px; min-width: 0; width: 100%; }
+.cmp { display: grid; gap: 12px; margin-top: 4px; }
+.bar { display: grid; gap: 4px; }
+.bar .h { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; font-weight: 750; }
+.bar .h b { font-family: var(--font-round); font-size: 18px; }
+.track { display: flex; height: 26px; border-radius: 9px; overflow: hidden; background: var(--fill); }
+.track span { display: grid; place-items: center; font-size: 11px; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; min-width: 0; }
+.s1 { background: #7C8F94; } .s2 { background: var(--sky); } .s3 { background: #B77A1E; } .s4 { background: var(--petrol); } .s5 { background: #5B6B70; }
+.verdict { padding: 11px 13px; border-radius: 15px; font-size: 15px; font-weight: 700; line-height: 1.4; }
+.verdict.heli { background: var(--sky-soft); } .verdict.amb { background: var(--ok-soft); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--ink-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+.set { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.foot { font-size: 12.5px; color: var(--ink-3); line-height: 1.45; margin: 18px 4px 0; }
+.foot a { color: var(--ink-2); }
+.toast { position: fixed; left: 50%; bottom: calc(24px + var(--sb)); transform: translate(-50%, 20px); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 14px; font-size: 14.5px; font-weight: 650; opacity: 0; pointer-events: none; transition: .2s; z-index: 50; max-width: calc(100vw - 32px); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.spin { width: 14px; height: 14px; border: 2px solid var(--ink-3); border-top-color: transparent; border-radius: 50%; display: inline-block; vertical-align: -2px; animation: sp .8s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="head">
+    <h1>ResqHEMS<small>Letecká záchranná služba – dolet, souřadnice, přílet</small></h1>
+    <button type="button" class="round glass" id="b-theme" aria-label="Přepnout světlý nebo tmavý režim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+  </header>
+  <nav class="tabs" role="tablist">
+    <button type="button" data-tab="dolet" aria-selected="true">Dolet</button>
+    <button type="button" data-tab="coord" aria-selected="false">Souřadnice</button>
+    <button type="button" data-tab="cmp" aria-selected="false">Vrtulník × sanitka</button>
+    <button type="button" data-tab="prilet" aria-selected="false">Přílet</button>
+    <button type="button" data-tab="set" aria-selected="false">Nastavení</button>
+  </nav>
+
+  <div class="layout">
+    <aside class="side">
+      <div class="card">
+        <div class="lbl">Poloha zásahu</div>
+        <div class="loc">
+          <div class="where" id="where">Poloha zatím není nastavená.</div>
+          <button type="button" class="btn pri" id="b-gps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7.5"/></svg>Moje poloha</button>
+          <div class="search"><input type="search" id="q" placeholder="nebo zadej místo / souřadnice" autocomplete="off" enterkeyhint="search"><button type="button" class="btn" id="b-q">Hledat</button></div>
+          <div class="hits" id="hits"></div>
+        </div>
+      </div>
+      <div class="card"><div class="sun" id="sun"></div></div>
+    </aside>
+    <main>
+      <section class="view on" id="v-dolet">
+        <div class="row" style="margin:0 2px 10px"><label class="chk"><input type="checkbox" id="o-h24"> Jen nepřetržitý provoz (H24)</label></div>
+        <div class="list" id="list"></div>
+        <p class="note">Odhad = aktivace (vzlet) + let vzdušnou čarou traťovou rychlostí + přiblížení a přistání. Hodnoty upravíš v Nastavení. O vyslání rozhoduje ZOS.</p>
+      </section>
+      <section class="view" id="v-coord">
+        <div class="card"><div class="lbl">Souřadnice k předání (WGS-84)</div><div class="co" id="co"></div>
+          <p class="note">Při diktování: nejdřív <b>sever</b> (N), pak <b>východ</b> (E). Pozice z GPS má přesnost uvedenou vlevo.</p></div>
+      </section>
+      <section class="view" id="v-cmp">
+        <div class="card"><div class="lbl">Kam s pacientem</div>
+          <div class="f2">
+            <div class="fld" style="grid-column:1/-1"><label for="c-dq">Cílové pracoviště</label><div class="search"><input type="search" id="c-dq" placeholder="Hledej nemocnici nebo město…" autocomplete="off"><button type="button" class="btn" id="c-dbtn">Online</button></div><div class="where" id="c-dsel"></div><div class="hits" id="c-dhits"></div></div>
+            <div class="fld"><label for="c-amb">Sanitka do cíle (min)</label><input id="c-amb" type="number" inputmode="numeric" min="1" max="600"></div>
+            <div class="fld"><label for="c-scene">Čas na místě s LZS (min)</label><input id="c-scene" type="number" inputmode="numeric" min="0" max="120"></div>
+            <div class="fld"><label for="c-base">Vrtulník</label><select id="c-base"></select></div>
+          </div>
+          <p class="note" id="c-hint"></p></div>
+        <div class="card"><div class="cmp" id="cmp"></div></div>
+      </section>
+      <section class="view" id="v-prilet">
+        <div class="card"><div class="lbl">Před příletem</div><ul class="rules">
+          <li>Informuj ostatní na místě – velitele zásahu HZS, policii, další posádky</li>
+          <li>Přistává-li vrtulník na silnici, zastavte provoz v obou směrech</li>
+          <li>Odstraň nebo zajisti volné předměty, které může strhnout proud vzduchu od rotoru <small>deky, fólie, igelit, pokrývky hlavy; zavři okna a dveře aut poblíž</small></li>
+          <li>Chraň pacienta před vzdušným vírem a prachem při přistání</li>
+          <li>Buď na příjmu – vysílačka nebo služební telefon podle pokynů ZOS</li>
+        </ul></div>
+        <div class="card"><div class="lbl">Při přistání a u vrtulníku</div><ul class="rules crit">
+          <li>Během přistání neměň svou polohu ani polohu vozidel, pokud posádka neurčí jinak</li>
+          <li><b>Nikdy nechoď k vrtulníku, dokud se točí rotor</b> – jen v doprovodu člena posádky</li>
+          <li>Nepouštěj k vrtulníku vozidla ani lidi – pohyb u stroje řídí posádka</li>
+          <li>Pilot může přistát i na jiném, vzdálenějším, ale bezpečnějším místě</li>
+        </ul></div>
+        <div class="card"><div class="lbl">V noci navíc</div><ul class="rules night">
+          <li>Platí vše výše</li>
+          <li>Majáky a osvětlení místa nech zapnuté ještě před příletem</li>
+          <li><b>Nepoužívej dálková světla</b> a nikdy nesviť směrem k vrtulníku <small>oslnění pilota, zvlášť s brýlemi pro noční vidění</small></li>
+        </ul></div>
+        <p class="note">Podle materiálu ZZS Ústeckého kraje „Pravidla pro spolupráci VS ZZS při příletu vrtulníku LZS“.</p>
+      </section>
+      <section class="view" id="v-set">
+        <div class="card"><div class="lbl">Výpočet doletu</div>
+          <div class="set">
+            <div class="fld"><label for="s-akd">Aktivace ve dne (min)</label><input id="s-akd" type="number" min="0" max="30"></div>
+            <div class="fld"><label for="s-akn">Aktivace v noci (min)</label><input id="s-akn" type="number" min="0" max="45"></div>
+            <div class="fld"><label for="s-ec">EC135 / H135 (km/h)</label><input id="s-ec" type="number" min="100" max="300"></div>
+            <div class="fld"><label for="s-w3">W-3A Sokol (km/h)</label><input id="s-w3" type="number" min="100" max="300"></div>
+            <div class="fld"><label for="s-land">Přiblížení a přistání (min)</label><input id="s-land" type="number" min="0" max="15"></div>
+          </div>
+          <p class="note">Výchozí aktivace 3 min ve dne a 10 min v noci odpovídá limitům uvedeným ZZS Jihočeského kraje. Traťová rychlost je nižší než maximální (EC135 cca 250 km/h), protože zahrnuje stoupání a manévrování.</p>
+          <div class="row" style="margin-top:10px"><button type="button" class="btn sm" id="s-reset">Obnovit výchozí</button></div></div>
+      </section>
+    </main>
+  </div>
+  <p class="foot">Stanoviště podle MZ ČR (Návrh řešení zabezpečení LZS po roce 2028, 2025) a webů ZZS a provozovatelů. Polohy základen podle DSA a údajů ZZS. Denní provoz se řídí světlem („od svítání do soumraku“) a přesné časy si určuje provozovatel – údaj o západu slunce je jen orientační. Vyhledávání míst: Nominatim / © OpenStreetMap.</p>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmtKm = (k) => k < 10 ? k.toFixed(1).replace('.', ',') : String(Math.round(k));
+const store = { get(k, d) { try { const v = localStorage.getItem('resqhems:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem('resqhems:' + k, JSON.stringify(v)); } catch (e) {} } };
+
+/* ---------- stanoviště (stav 2025/2026) ---------- */
+// t: typ stroje (ec = EC135/H135, w3 = W-3A Sokol); h24: nepřetržitý provoz; ap: poloha přibližná
+const BASES = [
+  { cs: '01', m: 'Praha', p: '24. základna dopravního letectva, Praha-Kbely', op: 'Letecká služba Policie ČR', typ: 'EC135 T2', t: 'ec', h24: true, g: [50.1213, 14.5436] },
+  { cs: '04', m: 'Brno', p: 'Letiště Brno-Tuřany', op: 'DSA', typ: 'H135 T2+', t: 'ec', h24: true, g: [49.155415, 16.680368] },
+  { cs: '05', m: 'Ostrava', p: 'Ostrava', op: 'ATE', typ: 'EC135', t: 'ec', h24: true, g: [49.803087, 18.23043] },
+  { cs: '06', m: 'Hradec Králové', p: 'Hradec Králové', op: 'DSA', typ: 'EC135', t: 'ec', h24: true, g: [50.193333, 15.825556] },
+  { cs: '07', m: 'Plzeň', p: 'Letiště Plzeň-Líně', op: 'Armáda ČR', typ: 'W-3A Sokol', t: 'w3', h24: true, g: [49.676203, 13.266947] },
+  { cs: '09', m: 'Olomouc', p: 'Olomouc', op: 'ATE', typ: 'EC135', t: 'ec', h24: false, g: [49.583512, 17.221944] },
+  { cs: '12', m: 'Jihlava', p: 'Jihlava', op: 'DSA', typ: 'EC135', t: 'ec', h24: false, g: [49.398611, 15.568056] },
+  { cs: '13', m: 'České Budějovice', p: 'Letiště Planá u Č. Budějovic', op: 'DSA', typ: 'EC135 T2+', t: 'ec', h24: true, g: [48.944461, 14.445136] },
+  { cs: '15', m: 'Ústí nad Labem', p: 'Ústí nad Labem', op: 'DSA', typ: 'EC135 T2+', t: 'ec', h24: false, g: [50.6775, 14.023889] },
+  { cs: '18', m: 'Liberec', p: 'Liberec', op: 'DSA', typ: 'EC135 T2+', t: 'ec', h24: false, g: [50.768333, 15.025] },
+];
+// cíle pro srovnání (výběr center) – polohy přibližné
+const DEST = [["Masarykova nemocnice Ústí nad Labem", "Ústí nad Labem", 50.6835, 14.0055], ["Nemocnice Děčín", "Děčín", 50.7772, 14.2052], ["Nemocnice Teplice", "Teplice", 50.643, 13.8105], ["Nemocnice Most", "Most", 50.5048, 13.6282], ["Nemocnice Chomutov", "Chomutov", 50.4562, 13.4298], ["Nemocnice Litoměřice", "Litoměřice", 50.5418, 14.1345], ["Podřipská nemocnice Roudnice nad Labem", "Roudnice nad Labem", 50.4252, 14.2582], ["Nemocnice Žatec", "Žatec", 50.3281, 13.5648], ["Nemocnice Kadaň", "Kadaň", 50.3792, 13.2738], ["Nemocnice Louny", "Louny", 50.3542, 13.8001], ["Lužická nemocnice Rumburk", "Rumburk", 50.9529, 14.5491], ["Krajská nemocnice Liberec", "Liberec", 50.7642, 15.0478], ["Nemocnice s poliklinikou Česká Lípa", "Česká Lípa", 50.6829, 14.5452], ["Karlovarská krajská nemocnice", "Karlovy Vary", 50.2338, 12.8641], ["Nemocnice Sokolov", "Sokolov", 50.1728, 12.6452], ["Fakultní nemocnice Plzeň (Lochotín)", "Plzeň", 49.77, 13.3712], ["PRIVAMED – Mulačova nemocnice", "Plzeň", 49.7695, 13.3546], ["Oblastní nemocnice Mladá Boleslav", "Mladá Boleslav", 50.4169, 14.9071], ["Oblastní nemocnice Kladno", "Kladno", 50.1419, 14.1003], ["Oblastní nemocnice Kolín", "Kolín", 50.0268, 15.1962], ["Oblastní nemocnice Příbram", "Příbram", 49.6902, 14.0012], ["FN Motol", "Praha 5", 50.0747, 14.3414], ["Nemocnice Na Homolce", "Praha 5", 50.0697, 14.3583], ["Ústřední vojenská nemocnice", "Praha 6", 50.0848, 14.3486], ["FN Královské Vinohrady", "Praha 10", 50.0731, 14.4728], ["Všeobecná fakultní nemocnice", "Praha 2", 50.0748, 14.4232], ["FN Bulovka", "Praha 8", 50.1164, 14.4637], ["Fakultní Thomayerova nemocnice", "Praha 4", 50.0297, 14.4607], ["IKEM", "Praha 4", 50.032, 14.4597], ["NH Hospital", "Praha 5", 50.0459, 14.3264], ["Ústav pro péči o matku a dítě (Podolí)", "Praha 4", 50.0574, 14.417], ["FN Hradec Králové", "Hradec Králové", 50.2005, 15.8165]];  // [název, město, lat, lon] – polohy přibližné
+const DEF = { akd: 3, akn: 10, ec: 220, w3: 230, land: 2 };
+const st = { from: store.get('from', null), h24: store.get('h24', false), cfg: { ...DEF, ...store.get('cfg', {}) }, dest: (() => { const v = store.get('dest2', null); return v && v.g ? v : { label: DEST[0][0], g: [DEST[0][2], DEST[0][3]] }; })(), amb: store.get('amb', ''), scene: store.get('scene', 15), base: store.get('base', 'auto') };
+
+function hav(a, b) { const R = 6371, r = Math.PI / 180, dLa = (b[0] - a[0]) * r, dLo = (b[1] - a[1]) * r; const x = Math.sin(dLa / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); }
+
+/* ---------- slunce (algoritmus NOAA, zenit 90,833°) ---------- */
+function sunTimes(date, lat, lon) {
+  const rad = Math.PI / 180, day = Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 864e5);
+  const g = 2 * Math.PI / 365 * (day - 1);
+  const eq = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+  const decl = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+  const ha = Math.acos(Math.cos(90.833 * rad) / (Math.cos(lat * rad) * Math.cos(decl)) - Math.tan(lat * rad) * Math.tan(decl)) / rad;
+  const base = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  const rise = new Date(base + (720 - 4 * (lon + ha) - eq) * 6e4), set = new Date(base + (720 - 4 * (lon - ha) - eq) * 6e4);
+  return { rise, set };
+}
+const hm = (d) => d.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
+function daylight() {
+  const g = st.from ? st.from.g : [50.66, 14.03], now = new Date(), s = sunTimes(now, g[0], g[1]);
+  return { ...s, day: now >= s.rise && now < s.set, now };
+}
+
+/* ---------- výpočet doletu ---------- */
+function eta(b, to, isDay) {
+  const km = hav(b.g, to), v = b.t === 'w3' ? st.cfg.w3 : st.cfg.ec;
+  const ak = isDay ? st.cfg.akd : st.cfg.akn;
+  return { km, fly: km / v * 60, total: ak + km / v * 60 + st.cfg.land, ak };
+}
+
+function renderSun() {
+  const d = daylight(), el = $('sun');
+  el.className = 'sun' + (d.day ? '' : ' night');
+  const ico = d.day ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>';
+  const left = Math.round((d.set - d.now) / 6e4);
+  const txt = d.day ? `Den – slunce zapadá v <b>${hm(d.set)}</b>${left < 90 ? ` (za ${left} min)` : ''}.<br>Stanoviště s denním provozem obvykle končí kolem soumraku.` : `Tma – slunce vychází v <b>${hm(d.rise < d.now ? new Date(+d.rise + 864e5) : d.rise)}</b>.<br>Létají jen stanoviště s nepřetržitým provozem.`;
+  el.innerHTML = ico + `<div>${txt}${st.from ? '' : '<br><small style="color:var(--ink-3)">pro Ústí nad Labem – nastav polohu</small>'}</div>`;
+}
+
+function renderList() {
+  const box = $('list');
+  if (!st.from) { box.innerHTML = '<div class="empty">Nastav polohu zásahu – tlačítkem <b>Moje poloha</b> nebo zadáním místa či souřadnic.</div>'; return; }
+  const d = daylight();
+  const rows = BASES.filter((b) => !st.h24 || b.h24).map((b) => ({ b, e: eta(b, st.from.g, d.day), off: !b.h24 && !d.day })).sort((a, c) => (a.off - c.off) || a.e.total - c.e.total);
+  box.innerHTML = rows.map(({ b, e, off }, i) => `<article class="b${i === 0 && !off ? ' first' : ''}${off ? ' off' : ''}">
+    <div class="top"><div class="cs"><small>Kryštof</small><b>${b.cs}</b></div>
+      <div class="grow"><div class="n">${esc(b.m)}</div><div class="m">${esc(b.p)}${b.ap ? ' (poloha přibližná)' : ''}</div></div>
+      <div class="num"><div class="t">${Math.round(e.total)}<small>min</small></div><div class="d">${fmtKm(e.km)} km · let ${Math.round(e.fly)} min</div></div></div>
+    <div class="tags"><span class="tag ${b.h24 ? 'h24' : 'day'}">${b.h24 ? 'H24' : 'Denní provoz'}</span>${off ? '<span class="tag offt">Po soumraku pravděpodobně mimo provoz</span>' : ''}<span class="tag">${esc(b.typ)}</span><span class="tag">${esc(b.op)}</span></div></article>`).join('');
+}
+
+/* ---------- souřadnice ---------- */
+function dm(v, pos, neg) { const s = v >= 0 ? pos : neg, a = Math.abs(v), d = Math.floor(a), m = (a - d) * 60; return `${s} ${d}° ${m.toFixed(3).replace('.', ',')}′`; }
+function dms(v, pos, neg) { const s = v >= 0 ? pos : neg, a = Math.abs(v), d = Math.floor(a), mf = (a - d) * 60, m = Math.floor(mf), sec = (mf - m) * 60; return `${s} ${d}° ${m}′ ${sec.toFixed(1).replace('.', ',')}″`; }
+function renderCoord() {
+  if (!st.from) { $('co').innerHTML = '<div class="empty">Nejdřív nastav polohu.</div>'; return; }
+  const [la, lo] = st.from.g;
+  const F = [['Stupně (desetinné)', `${la.toFixed(5)}, ${lo.toFixed(5)}`], ['Stupně a minuty', `${dm(la, 'N', 'S')}  ${dm(lo, 'E', 'W')}`], ['Stupně, minuty, vteřiny', `${dms(la, 'N', 'S')}  ${dms(lo, 'E', 'W')}`]];
+  $('co').innerHTML = F.map(([t, v], i) => `<div class="cof"><div class="grow"><small>${t}</small><b>${v}</b></div><button type="button" class="btn sm" data-copy="${i}">Kopírovat</button></div>`).join('')
+    + `<div class="cof"><div class="grow"><small>Otevřít v mapě</small><b style="font-size:15px;font-family:var(--font)">${esc(st.from.label)}</b></div><a class="btn sm" href="https://mapy.com/zakladni?x=${lo}&y=${la}&z=16&source=coor&id=${lo}%2C${la}" target="_blank" rel="noopener">Mapy.com</a></div>`;
+  $('co').onclick = (e) => { const b = e.target.closest('[data-copy]'); if (!b) return; const v = F[+b.dataset.copy][1]; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast('Zkopírováno'), () => toast(v)); };
+}
+
+/* ---------- vrtulník × sanitka ---------- */
+function renderCmp() {
+  $('c-dsel').innerHTML = `Vybráno: <b>${esc(st.dest.label)}</b>`;
+  $('c-base').innerHTML = '<option value="auto">Nejbližší dostupný</option>' + BASES.map((b) => `<option value="${b.cs}" ${st.base === b.cs ? 'selected' : ''}>Kryštof ${b.cs} – ${esc(b.m)}</option>`).join('');
+  $('c-base').value = st.base; $('c-scene').value = st.scene; $('c-amb').value = st.amb;
+  const box = $('cmp');
+  if (!st.from) { box.innerHTML = '<div class="empty">Nejdřív nastav polohu zásahu.</div>'; $('c-hint').textContent = ''; return; }
+  const dest = st.dest.g, d = daylight();
+  const airDest = hav(st.from.g, dest);
+  const est = Math.round(airDest * 1.3 / 70 * 60);
+  $('c-hint').innerHTML = `Vzdušně do cíle ${fmtKm(airDest)} km. Hrubý odhad sanitky po silnici: <b>${est} min</b> – lepší je zadat čas z navigace.`;
+  const amb = +st.amb || est;
+  let cands = BASES.filter((b) => b.h24 || d.day);
+  if (st.base !== 'auto') cands = BASES.filter((b) => b.cs === st.base);
+  if (!cands.length) { box.innerHTML = '<div class="empty">Žádný vrtulník teď není v provozu.</div>'; return; }
+  const best = cands.map((b) => ({ b, e: eta(b, st.from.g, d.day) })).sort((a, c) => a.e.total - c.e.total)[0];
+  const v = best.b.t === 'w3' ? st.cfg.w3 : st.cfg.ec;
+  const parts = [['s1', 'aktivace', best.e.ak], ['s2', 'let na místo', best.e.fly + st.cfg.land], ['s3', 'na místě', +st.scene], ['s2', 'let do cíle', airDest / v * 60 + st.cfg.land]];
+  const heli = parts.reduce((a, p) => a + p[2], 0);
+  const max = Math.max(heli, amb);
+  const seg = (cls, t, m) => `<span class="${cls}" style="width:${m / max * 100}%" title="${t}: ${Math.round(m)} min">${m / max > .12 ? Math.round(m) : ''}</span>`;
+  const diff = Math.round(amb - heli);
+  box.innerHTML = `
+    <div class="bar"><div class="h"><span>Vrtulník – Kryštof ${best.b.cs} (${esc(best.b.m)})</span><b>${Math.round(heli)} min</b></div><div class="track">${parts.map((p) => seg(...p)).join('')}</div></div>
+    <div class="bar"><div class="h"><span>Sanitka ze zásahu do cíle</span><b>${amb} min</b></div><div class="track">${seg('s4', 'sanitka', amb)}</div></div>
+    <div class="legend"><span><i class="s1"></i>aktivace</span><span><i class="s2"></i>let</span><span><i class="s3"></i>na místě s LZS</span><span><i class="s4"></i>sanitka</span></div>
+    <div class="verdict ${diff > 0 ? 'heli' : 'amb'}">${diff > 0 ? `Vrtulník dopraví pacienta do cíle o <b>${diff} min dřív</b>.` : diff < 0 ? `Sanitka bude v cíli o <b>${-diff} min dřív</b> než vrtulník.` : 'Oba časy vychází stejně.'}</div>
+    <p class="note" style="margin:0">Sanitka se počítá od chvíle, kdy je pacient připravený k odjezdu. Vrtulník zahrnuje i čekání na přílet a dobu ošetření s posádkou LZS. Lékařský benefit posádky LZS tu není započítaný – rozhoduje ZOS.</p>`;
+}
+
+/* ---------- poloha ---------- */
+function setFrom(f) { st.from = f; store.set('from', f); renderAll(); }
+$('b-gps').onclick = () => {
+  if (!navigator.geolocation) { toast('Tento prohlížeč polohu neumí'); return; }
+  $('where').innerHTML = '<span class="spin"></span> Zjišťuji polohu…';
+  navigator.geolocation.getCurrentPosition((p) => setFrom({ label: `Moje poloha (±${Math.round(p.coords.accuracy)} m)`, g: [p.coords.latitude, p.coords.longitude] }),
+    (e) => { renderWhere(); toast(e.code === 1 ? 'Přístup k poloze je zakázaný – povol ho v prohlížeči' : 'Polohu se nepodařilo zjistit'); }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 15000 });
+};
+function parseCoord(s) {
+  const m = s.replace(/,(?=\d)/g, '.').match(/(-?\d{1,2}\.\d+)[^\d-]+(-?\d{1,3}\.\d+)/);
+  if (!m) return null; const la = +m[1], lo = +m[2];
+  return la > 47 && la < 52 && lo > 11 && lo < 20 ? [la, lo] : null;
+}
+async function search() {
+  const q = $('q').value.trim(); if (q.length < 2) return;
+  const c = parseCoord(q); if (c) { setFrom({ label: 'Zadané souřadnice', g: c }); $('q').value = ''; return; }
+  $('hits').innerHTML = '<div class="where"><span class="spin"></span> Hledám…</div>';
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=cz&limit=5&accept-language=cs&q=${encodeURIComponent(q)}`);
+    const j = await r.json();
+    $('hits').innerHTML = j.length ? j.map((p, i) => `<button type="button" data-hit="${i}">${esc(p.name || p.display_name.split(',')[0])}<small>${esc(p.display_name)}</small></button>`).join('') : '<div class="where">Nic nenalezeno.</div>';
+    $('hits').onclick = (e) => { const b = e.target.closest('[data-hit]'); if (!b) return; const p = j[+b.dataset.hit]; $('hits').innerHTML = ''; $('q').value = ''; setFrom({ label: p.display_name.split(',').slice(0, 2).join(','), g: [+p.lat, +p.lon] }); };
+  } catch (e) { $('hits').innerHTML = '<div class="where">Hledání se nepovedlo – zkontroluj připojení, nebo zadej souřadnice.</div>'; }
+}
+$('b-q').onclick = search;
+$('q').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); search(); } });
+function renderWhere() { $('where').innerHTML = st.from ? `<b>${esc(st.from.label)}</b><br>${st.from.g[0].toFixed(5)}, ${st.from.g[1].toFixed(5)}` : 'Poloha zatím není nastavená.'; }
+
+/* ---------- nastavení ---------- */
+const SET = ['akd', 'akn', 'ec', 'w3', 'land'];
+function renderSet() { SET.forEach((k) => { $('s-' + k).value = st.cfg[k]; }); }
+SET.forEach((k) => { $('s-' + k).onchange = (e) => { const v = +e.target.value; if (!isFinite(v) || v < 0) { renderSet(); return; } st.cfg[k] = v; store.set('cfg', st.cfg); renderList(); renderCmp(); }; });
+$('s-reset').onclick = () => { st.cfg = { ...DEF }; store.set('cfg', {}); renderSet(); renderList(); renderCmp(); toast('Obnoveno'); };
+$('o-h24').onchange = (e) => { st.h24 = e.target.checked; store.set('h24', st.h24); renderList(); };
+// cíl: okamžitě z vestavěného seznamu, tlačítkem Online i z mapy (všechny nemocnice a místa v ČR)
+const norm = (x) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+function setDest(label, g) { st.dest = { label, g }; store.set('dest2', st.dest); $('c-dhits').innerHTML = ''; $('c-dq').value = ''; renderCmp(); }
+$('c-dq').oninput = () => {
+  const q = norm($('c-dq').value.trim()); if (!q) { $('c-dhits').innerHTML = ''; return; }
+  const words = q.split(/\s+/);
+  const hit = DEST.filter(([n, m]) => words.every((w) => norm(n + ' ' + m).includes(w))).slice(0, 6);
+  $('c-dhits').innerHTML = hit.map(([n, m, a, b]) => `<button type="button" data-dl="${a},${b}" data-dn="${esc(n)}">${esc(n)}<small>${esc(m)}</small></button>`).join('') + `<button type="button" data-donline="1">Hledat „${esc($('c-dq').value.trim())}“ online<small>všechny nemocnice a místa v ČR (Nominatim)</small></button>`;
+};
+async function destOnline() {
+  const q = $('c-dq').value.trim(); if (q.length < 2) return;
+  $('c-dhits').innerHTML = '<div class="where"><span class="spin"></span> Hledám…</div>';
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=cz&limit=8&accept-language=cs&q=${encodeURIComponent(q)}`);
+    const j = await r.json();
+    // nemocnice dopředu
+    j.sort((a, b) => (b.type === 'hospital') - (a.type === 'hospital'));
+    $('c-dhits').innerHTML = j.length ? j.map((p) => `<button type="button" data-dl="${p.lat},${p.lon}" data-dn="${esc(p.name || p.display_name.split(',')[0])}">${p.type === 'hospital' ? '' : ''}${esc(p.name || p.display_name.split(',')[0])}<small>${esc(p.display_name)}</small></button>`).join('') : '<div class="where">Nic nenalezeno – zkus „nemocnice + město“.</div>';
+  } catch (e) { $('c-dhits').innerHTML = '<div class="where">Online hledání se nepovedlo – zkontroluj připojení.</div>'; }
+}
+$('c-dbtn').onclick = destOnline;
+$('c-dq').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); destOnline(); } });
+$('c-dhits').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.donline) { destOnline(); return; } const [a, c] = b.dataset.dl.split(',').map(Number); setDest(b.dataset.dn, [a, c]); };
+$('c-base').onchange = (e) => { st.base = e.target.value; store.set('base', st.base); renderCmp(); };
+$('c-amb').onchange = (e) => { st.amb = e.target.value; store.set('amb', st.amb); renderCmp(); };
+$('c-scene').onchange = (e) => { st.scene = Math.max(0, +e.target.value || 0); store.set('scene', st.scene); renderCmp(); };
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-tab]'); if (!b) return;
+  document.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', x === b));
+  document.querySelectorAll('.view').forEach((v) => v.classList.toggle('on', v.id === 'v-' + b.dataset.tab));
+});
+function renderAll() { renderWhere(); renderSun(); renderList(); renderCoord(); renderCmp(); renderSet(); $('o-h24').checked = st.h24; }
+let toastT = null;
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2200); }
+try { const t = localStorage.getItem('resqhems:theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+$('b-theme').onclick = () => {
+  const c = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const n = c === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; try { localStorage.setItem('resqhems:theme', n); } catch (e) {}
+};
+renderAll();
+setInterval(() => { renderSun(); renderList(); }, 60000);
+</script>
+</body>
+</html>
